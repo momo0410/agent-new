@@ -11,6 +11,6 @@
 对外统一入口：OnlineSearchService
 """
 
-from .registry import OnlineSearchService, get_online_search_service
+from .registry import OnlineSearchService, get_online_search_service, reset_online_search_service
 
-__all__ = ["OnlineSearchService", "get_online_search_service"]
+__all__ = ["OnlineSearchService", "get_online_search_service", "reset_online_search_service"]
