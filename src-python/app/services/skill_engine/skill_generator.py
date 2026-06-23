@@ -84,7 +84,8 @@ class SkillGenerator:
                        让生成的 Principle 章节基于 NVD 权威信息而非模型记忆。
         """
         self.skills_root = skills_root
-        self.learned_dir = os.path.join(skills_root, "learned")
+        # P0: 生成的 skill 默认进入 draft 目录，经过 LifecycleManager 自动晋升
+        self.learned_dir = os.path.join(skills_root, "learned", "draft")
         self.llm_client = llm_client
         self.online_search_results = online_search_results or []
         self._existing_skill_names: set[str] = set()

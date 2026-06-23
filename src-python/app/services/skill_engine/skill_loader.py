@@ -111,6 +111,38 @@ class SkillLoader:
             if category_dir.startswith("."):
                 continue
 
+            # 'learned' 类别采用 draft/active/deprecated 三态布局，
+            # 默认只加载 draft + active，忽略 deprecated。
+            if category_dir == "learned":
+                for life_state in ("active", "draft"):  # active 优先（list 前面）
+                    state_dir = os.path.join(cat_path, life_state)
+                    if not os.path.isdir(state_dir):
+                        continue
+                    for entry in sorted(os.listdir(state_dir)):
+                        entry_path = os.path.join(state_dir, entry)
+                        skill = self._load_entry(entry_path, f"learned/{life_state}")
+                        if not skill:
+                            continue
+                        if isinstance(skill, list):
+                            skills.extend(skill)
+                        else:
+                            skills.append(skill)
+                # 兼容：直接放在 skills/learned/ 根下的旧文件
+                for entry in sorted(os.listdir(cat_path)):
+                    entry_path = os.path.join(cat_path, entry)
+                    if not os.path.isfile(entry_path):
+                        continue
+                    if not (entry.endswith(".md") or entry.endswith(".json")):
+                        continue
+                    skill = self._load_entry(entry_path, "learned")
+                    if not skill:
+                        continue
+                    if isinstance(skill, list):
+                        skills.extend(skill)
+                    else:
+                        skills.append(skill)
+                continue
+
             for entry in sorted(os.listdir(cat_path)):
                 entry_path = os.path.join(cat_path, entry)
                 skill = self._load_entry(entry_path, category_dir)
