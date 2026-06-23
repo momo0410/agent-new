@@ -1,0 +1,29 @@
+# Python bytecode cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Node
+node_modules
+
+# Build output
+dist/
+
+# Zone.Identifier (Windows download markers)
+*:Zone.Identifier
+
+# Python test/bench cache
+.pytest_cache/
+src-python/.benchmarks/
+
+# Runtime artifacts
+data/pentest/
+src-python/pentest_state_*.json
+src-python/report.md
+data/audit_log.db
+src-python/.venv/
+
+# IDE
+.vscode/
+.idea/

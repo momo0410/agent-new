@@ -1,0 +1,265 @@
+{
+  "data": {
+    "cve_id": "CVE-2021-44228",
+    "description": "Apache Log4j2 2.0-beta9 through 2.15.0 (excluding security releases 2.12.2, 2.12.3, and 2.3.1) JNDI features used in configuration, log messages, and parameters do not protect against attacker controlled LDAP and other JNDI related endpoints. An attacker who can control log messages or log message parameters can execute arbitrary code loaded from LDAP servers when message lookup substitution is enabled. From log4j 2.15.0, this behavior has been disabled by default. From version 2.16.0 (along with 2.12.2, 2.12.3, and 2.3.1), this functionality has been completely removed. Note that this vulnerability is specific to log4j-core and does not affect log4net, log4cxx, or other Apache Logging Services projects.",
+    "cvss_score": 10.0,
+    "cvss_severity": "CRITICAL",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+    "affected_products": [
+      {
+        "cpe": "cpe:2.3:o:siemens:6bk1602-0aa12-0tp0_firmware:*:*:*:*:*:*:*:*",
+        "vulnerable": true,
+        "version_start": "",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:h:siemens:6bk1602-0aa12-0tp0:-:*:*:*:*:*:*:*",
+        "vulnerable": false,
+        "version_start": "",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:o:siemens:6bk1602-0aa22-0tp0_firmware:*:*:*:*:*:*:*:*",
+        "vulnerable": true,
+        "version_start": "",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:h:siemens:6bk1602-0aa22-0tp0:-:*:*:*:*:*:*:*",
+        "vulnerable": false,
+        "version_start": "",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:o:siemens:6bk1602-0aa32-0tp0_firmware:*:*:*:*:*:*:*:*",
+        "vulnerable": true,
+        "version_start": "",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:h:siemens:6bk1602-0aa32-0tp0:-:*:*:*:*:*:*:*",
+        "vulnerable": false,
+        "version_start": "",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:o:siemens:6bk1602-0aa42-0tp0_firmware:*:*:*:*:*:*:*:*",
+        "vulnerable": true,
+        "version_start": "",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:h:siemens:6bk1602-0aa42-0tp0:-:*:*:*:*:*:*:*",
+        "vulnerable": false,
+        "version_start": "",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:o:siemens:6bk1602-0aa52-0tp0_firmware:*:*:*:*:*:*:*:*",
+        "vulnerable": true,
+        "version_start": "",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:h:siemens:6bk1602-0aa52-0tp0:-:*:*:*:*:*:*:*",
+        "vulnerable": false,
+        "version_start": "",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:a:apache:log4j:*:*:*:*:*:*:*:*",
+        "vulnerable": true,
+        "version_start": "2.0.1",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:a:apache:log4j:*:*:*:*:*:*:*:*",
+        "vulnerable": true,
+        "version_start": "2.4.0",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:a:apache:log4j:*:*:*:*:*:*:*:*",
+        "vulnerable": true,
+        "version_start": "2.13.0",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:a:apache:log4j:2.0:-:*:*:*:*:*:*",
+        "vulnerable": true,
+        "version_start": "",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:a:apache:log4j:2.0:beta9:*:*:*:*:*:*",
+        "vulnerable": true,
+        "version_start": "",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:a:apache:log4j:2.0:rc1:*:*:*:*:*:*",
+        "vulnerable": true,
+        "version_start": "",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:a:apache:log4j:2.0:rc2:*:*:*:*:*:*",
+        "vulnerable": true,
+        "version_start": "",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:o:siemens:sppa-t3000_ses3000_firmware:*:*:*:*:*:*:*:*",
+        "vulnerable": true,
+        "version_start": "",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:h:siemens:sppa-t3000_ses3000:-:*:*:*:*:*:*:*",
+        "vulnerable": false,
+        "version_start": "",
+        "version_end": ""
+      },
+      {
+        "cpe": "cpe:2.3:a:siemens:capital:*:*:*:*:*:*:*:*",
+        "vulnerable": true,
+        "version_start": "",
+        "version_end": ""
+      }
+    ],
+    "references": [
+      {
+        "url": "http://packetstormsecurity.com/files/165225/Apache-Log4j2-2.14.1-Remote-Code-Execution.html",
+        "source": "security@apache.org",
+        "tags": [
+          "Third Party Advisory",
+          "VDB Entry"
+        ]
+      },
+      {
+        "url": "http://packetstormsecurity.com/files/165260/VMware-Security-Advisory-2021-0028.html",
+        "source": "security@apache.org",
+        "tags": [
+          "Third Party Advisory",
+          "VDB Entry"
+        ]
+      },
+      {
+        "url": "http://packetstormsecurity.com/files/165261/Apache-Log4j2-2.14.1-Information-Disclosure.html",
+        "source": "security@apache.org",
+        "tags": [
+          "Exploit",
+          "Third Party Advisory",
+          "VDB Entry"
+        ]
+      },
+      {
+        "url": "http://packetstormsecurity.com/files/165270/Apache-Log4j2-2.14.1-Remote-Code-Execution.html",
+        "source": "security@apache.org",
+        "tags": [
+          "Exploit",
+          "Third Party Advisory",
+          "VDB Entry"
+        ]
+      },
+      {
+        "url": "http://packetstormsecurity.com/files/165281/Log4j2-Log4Shell-Regexes.html",
+        "source": "security@apache.org",
+        "tags": [
+          "Third Party Advisory",
+          "VDB Entry"
+        ]
+      },
+      {
+        "url": "http://packetstormsecurity.com/files/165282/Log4j-Payload-Generator.html",
+        "source": "security@apache.org",
+        "tags": [
+          "Third Party Advisory",
+          "VDB Entry"
+        ]
+      },
+      {
+        "url": "http://packetstormsecurity.com/files/165306/L4sh-Log4j-Remote-Code-Execution.html",
+        "source": "security@apache.org",
+        "tags": [
+          "Third Party Advisory",
+          "VDB Entry"
+        ]
+      },
+      {
+        "url": "http://packetstormsecurity.com/files/165307/Log4j-Remote-Code-Execution-Word-Bypassing.html",
+        "source": "security@apache.org",
+        "tags": [
+          "Third Party Advisory",
+          "VDB Entry"
+        ]
+      },
+      {
+        "url": "http://packetstormsecurity.com/files/165311/log4j-scan-Extensive-Scanner.html",
+        "source": "security@apache.org",
+        "tags": [
+          "Broken Link",
+          "Third Party Advisory",
+          "VDB Entry"
+        ]
+      },
+      {
+        "url": "http://packetstormsecurity.com/files/165371/VMware-Security-Advisory-2021-0028.4.html",
+        "source": "security@apache.org",
+        "tags": [
+          "Exploit",
+          "Third Party Advisory",
+          "VDB Entry"
+        ]
+      },
+      {
+        "url": "http://packetstormsecurity.com/files/165532/Log4Shell-HTTP-Header-Injection.html",
+        "source": "security@apache.org",
+        "tags": [
+          "Exploit",
+          "Third Party Advisory",
+          "VDB Entry"
+        ]
+      },
+      {
+        "url": "http://packetstormsecurity.com/files/165642/VMware-vCenter-Server-Unauthenticated-Log4Shell-JNDI-Injection-Remote-Code-Execution.html",
+        "source": "security@apache.org",
+        "tags": [
+          "Exploit",
+          "Third Party Advisory",
+          "VDB Entry"
+        ]
+      },
+      {
+        "url": "http://packetstormsecurity.com/files/165673/UniFi-Network-Application-Unauthenticated-Log4Shell-Remote-Code-Execution.html",
+        "source": "security@apache.org",
+        "tags": [
+          "Exploit",
+          "Third Party Advisory",
+          "VDB Entry"
+        ]
+      },
+      {
+        "url": "http://packetstormsecurity.com/files/167794/Open-Xchange-App-Suite-7.10.x-Cross-Site-Scripting-Command-Injection.html",
+        "source": "security@apache.org",
+        "tags": [
+          "Third Party Advisory",
+          "VDB Entry"
+        ]
+      },
+      {
+        "url": "http://packetstormsecurity.com/files/167917/MobileIron-Log4Shell-Remote-Command-Execution.html",
+        "source": "security@apache.org",
+        "tags": [
+          "Exploit",
+          "Third Party Advisory",
+          "VDB Entry"
+        ]
+      }
+    ],
+    "published": "2021-12-10T10:15:09.143",
+    "modified": "2026-06-17T04:12:05.460",
+    "source": "NVD"
+  },
+  "key": "c37cc3f262443ff7"
+}

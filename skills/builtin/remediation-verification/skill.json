@@ -1,0 +1,116 @@
+{
+  "schema_version": "skill-spec/v1",
+  "name": "remediation_verification",
+  "version": "1.0.0",
+  "description": "Re-run security checks after remediation and produce before/after evidence.",
+  "category": "verification",
+  "status": "active",
+  "source": "builtin",
+  "required_context_keys": [
+    "ssh_manager",
+    "remediation_results",
+    "original_findings",
+    "fixed_items",
+    "unfixed_items"
+  ],
+  "output_template": "# Remediation Verification Report\n\n## Verification Summary\n{verification_summary}\n\n## Overall Result\n{overall_result}\n\n## Evidence\n{evidence}\n",
+  "owners": [
+    "agent-platform"
+  ],
+  "parameters": [],
+  "steps": [
+    {
+      "id": "rv_collect_before",
+      "name": "Collect remediation baseline",
+      "description": "Read the pre-remediation baseline from context.",
+      "tool_name": "get_remediation_baseline",
+      "parameters": {},
+      "depends_on": []
+    },
+    {
+      "id": "rv_ssh_check",
+      "name": "Re-run SSH audit",
+      "description": "Verify the SSH configuration after remediation.",
+      "tool_name": "detect_ssh_audit",
+      "parameters": {},
+      "depends_on": [
+        "rv_collect_before"
+      ]
+    },
+    {
+      "id": "rv_user_check",
+      "name": "Re-run user audit",
+      "description": "Verify user-account hardening after remediation.",
+      "tool_name": "detect_user_audit",
+      "parameters": {},
+      "depends_on": [
+        "rv_collect_before"
+      ]
+    },
+    {
+      "id": "rv_fw_check",
+      "name": "Re-run firewall audit",
+      "description": "Verify firewall state after remediation.",
+      "tool_name": "detect_firewall",
+      "parameters": {},
+      "depends_on": [
+        "rv_collect_before"
+      ]
+    },
+    {
+      "id": "rv_file_check",
+      "name": "Re-run file permission audit",
+      "description": "Verify sensitive file permissions after remediation.",
+      "tool_name": "detect_file_permission",
+      "parameters": {},
+      "depends_on": [
+        "rv_collect_before"
+      ]
+    },
+    {
+      "id": "rv_port_check",
+      "name": "Re-run port scan",
+      "description": "Verify exposed ports after remediation.",
+      "tool_name": "detect_port_scan",
+      "parameters": {},
+      "depends_on": [
+        "rv_collect_before"
+      ]
+    },
+    {
+      "id": "rv_process_check",
+      "name": "Re-run process audit",
+      "description": "Verify suspicious process state after remediation.",
+      "tool_name": "detect_process",
+      "parameters": {},
+      "depends_on": [
+        "rv_collect_before"
+      ]
+    },
+    {
+      "id": "rv_compare",
+      "name": "Compare before and after",
+      "description": "Compare remediation baseline and latest verification findings.",
+      "tool_name": "compare_remediation_results",
+      "parameters": {},
+      "depends_on": [
+        "rv_ssh_check",
+        "rv_user_check",
+        "rv_fw_check",
+        "rv_file_check",
+        "rv_port_check",
+        "rv_process_check"
+      ]
+    },
+    {
+      "id": "rv_report",
+      "name": "Generate verification report",
+      "description": "Generate the final remediation verification report.",
+      "tool_name": "generate_verification_report",
+      "parameters": {},
+      "depends_on": [
+        "rv_compare"
+      ]
+    }
+  ]
+}
