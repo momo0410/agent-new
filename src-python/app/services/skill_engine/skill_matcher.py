@@ -4,7 +4,7 @@ Skill 匹配器 — 根据用户请求/上下文匹配相关 skill
 匹配策略：
 1. 关键词匹配：用户请求中出现的词与 skill tags/name/description 匹配
 2. Domain 匹配：指定领域时精确匹配
-3. 模糊匹配：编辑距离/TF-IDF（暂未实现）
+3. 向量检索：TF-IDF + cosine similarity 作为补充（P3）
 
 返回匹配的 skill 列表，供 Agent 注入 SKILL.md 内容到 LLM prompt
 """
@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from .skill_loader import LoadedSkill, SkillLoader
+from .skill_index import SkillIndex, VectorMatch
 
 
 @dataclass
@@ -107,11 +108,20 @@ class SkillMatcher:
     def __init__(self, loader: SkillLoader):
         self.loader = loader
         self._skills_cache: Optional[list[LoadedSkill]] = None
+        self._vector_index: Optional[SkillIndex] = None
 
     def _get_skills(self) -> list[LoadedSkill]:
         if self._skills_cache is None:
             self._skills_cache = self.loader.load_all()
         return self._skills_cache
+
+    def _get_vector_index(self) -> SkillIndex:
+        """延迟构建向量索引（首次调用时构建）。"""
+        if self._vector_index is None:
+            skills = self._get_skills()
+            self._vector_index = SkillIndex(skills)
+            self._vector_index.build()
+        return self._vector_index
 
     def match(
         self,
@@ -214,6 +224,34 @@ class SkillMatcher:
                 ))
 
         candidates.sort(key=lambda x: -x.score)
+
+        # ── 向量检索补充 (P3) ──
+        # 规则匹配结果不足时，用向量检索补充
+        if len(candidates) < limit:
+            try:
+                index = self._get_vector_index()
+                vector_results = index.search_with_fallback(
+                    query, limit=limit, vector_threshold=0.6
+                )
+                seen_skills = {id(c.skill) for c in candidates}
+                for vr in vector_results:
+                    if id(vr.skill) in seen_skills:
+                        continue
+                    # 向量分数归一化到规则分数区间 (0-20)
+                    normalized_score = vr.score * 20.0
+                    if normalized_score < 1.0:
+                        continue
+                    candidates.append(SkillMatch(
+                        skill=vr.skill,
+                        score=normalized_score,
+                        match_reason=vr.match_reason,
+                    ))
+                    seen_skills.add(id(vr.skill))
+                # 重新排序
+                candidates.sort(key=lambda x: -x.score)
+            except Exception:
+                pass  # 向量检索失败不影响规则匹配结果
+
         return candidates[:limit]
 
     def get_skill_by_name(self, name: str) -> Optional[LoadedSkill]:
