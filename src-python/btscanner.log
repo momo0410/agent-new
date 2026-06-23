@@ -1,0 +1,9 @@
+2026/04/29 14:51:23: info: btscanner starting
+2026/04/29 14:51:23: error: get_max_devices(): no valid HCI devices were found
+2026/04/29 14:51:23: info: btscanner shutting down
+2026/04/29 14:56:12: info: btscanner starting
+2026/04/29 14:56:12: error: get_max_devices(): no valid HCI devices were found
+2026/04/29 14:56:12: info: btscanner shutting down
+2026/04/29 15:06:25: info: btscanner starting
+2026/04/29 15:06:25: error: get_max_devices(): no valid HCI devices were found
+2026/04/29 15:06:25: info: btscanner shutting down
