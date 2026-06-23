@@ -27,3 +27,5 @@ src-python/.venv/
 # IDE
 .vscode/
 .idea/
+# P1: embedding cache
+skills/.cache/

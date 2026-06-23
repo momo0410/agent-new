@@ -1,20 +1,32 @@
 """
 Skill 匹配器 — 根据用户请求/上下文匹配相关 skill
 
-匹配策略：
-1. 关键词匹配：用户请求中出现的词与 skill tags/name/description 匹配
-2. Domain 匹配：指定领域时精确匹配
-3. 向量检索：TF-IDF + cosine similarity 作为补充（P3）
+匹配策略（P1: 混合检索）：
+1. 服务指纹直配：SERVICE_SKILL_MAP 命中给极强 boost
+2. 规则评分：tags / name / description / domain / keyword→domain
+3. TF-IDF 检索：本地 TF-IDF + 余弦相似度
+4. Embedding 检索：FastEmbed bge-small-zh 语义检索
+5. RRF（Reciprocal Rank Fusion）融合 2/3/4 的排名，加上 1 的强约束 boost
 
 返回匹配的 skill 列表，供 Agent 注入 SKILL.md 内容到 LLM prompt
 """
 
+import os
 import re
 from dataclasses import dataclass
 from typing import Optional
 
 from .skill_loader import LoadedSkill, SkillLoader
 from .skill_index import SkillIndex, VectorMatch
+
+# Embedding 索引可选；导入失败时只走 TF-IDF
+try:
+    from .skill_embedding_index import SkillEmbeddingIndex, EmbeddingMatch
+    _EMBEDDING_AVAILABLE = True
+except ImportError:
+    SkillEmbeddingIndex = None  # type: ignore
+    EmbeddingMatch = None  # type: ignore
+    _EMBEDDING_AVAILABLE = False
 
 
 @dataclass
@@ -109,6 +121,8 @@ class SkillMatcher:
         self.loader = loader
         self._skills_cache: Optional[list[LoadedSkill]] = None
         self._vector_index: Optional[SkillIndex] = None
+        self._embedding_index = None  # type: Optional[SkillEmbeddingIndex]
+        self._hybrid_enabled = True  # P1: 默认启用混合检索
 
     def _get_skills(self) -> list[LoadedSkill]:
         if self._skills_cache is None:
@@ -116,12 +130,29 @@ class SkillMatcher:
         return self._skills_cache
 
     def _get_vector_index(self) -> SkillIndex:
-        """延迟构建向量索引（首次调用时构建）。"""
+        """延迟构建 TF-IDF 向量索引（首次调用时构建）。"""
         if self._vector_index is None:
             skills = self._get_skills()
             self._vector_index = SkillIndex(skills)
             self._vector_index.build()
         return self._vector_index
+
+    def _get_embedding_index(self):
+        """延迟构建 embedding 索引；失败/不可用时返回 None"""
+        if not _EMBEDDING_AVAILABLE:
+            return None
+        if self._embedding_index is None:
+            try:
+                skills = self._get_skills()
+                cache_dir = os.path.join(self.loader.skills_root, ".cache", "embeddings")
+                index = SkillEmbeddingIndex(skills, cache_dir=cache_dir)
+                if index.build():
+                    self._embedding_index = index
+                else:
+                    self._embedding_index = False  # 标记构建失败，避免反复尝试
+            except Exception:
+                self._embedding_index = False
+        return self._embedding_index if self._embedding_index else None
 
     def match(
         self,
@@ -225,34 +256,165 @@ class SkillMatcher:
 
         candidates.sort(key=lambda x: -x.score)
 
-        # ── 向量检索补充 (P3) ──
-        # 规则匹配结果不足时，用向量检索补充
-        if len(candidates) < limit:
+        # ── P1: 混合检索（RRF 融合 TF-IDF + Embedding）──
+        if self._hybrid_enabled:
             try:
-                index = self._get_vector_index()
-                vector_results = index.search_with_fallback(
-                    query, limit=limit, vector_threshold=0.6
+                candidates = self._fuse_with_hybrid_search(
+                    query=query,
+                    rule_candidates=candidates,
+                    service_boost=service_boost,
+                    limit=limit,
+                    domain=domain,
+                    subdomain=subdomain,
+                    tags=tags,
                 )
-                seen_skills = {id(c.skill) for c in candidates}
-                for vr in vector_results:
-                    if id(vr.skill) in seen_skills:
-                        continue
-                    # 向量分数归一化到规则分数区间 (0-20)
-                    normalized_score = vr.score * 20.0
-                    if normalized_score < 1.0:
-                        continue
-                    candidates.append(SkillMatch(
-                        skill=vr.skill,
-                        score=normalized_score,
-                        match_reason=vr.match_reason,
-                    ))
-                    seen_skills.add(id(vr.skill))
-                # 重新排序
-                candidates.sort(key=lambda x: -x.score)
-            except Exception:
-                pass  # 向量检索失败不影响规则匹配结果
+            except Exception as exc:  # noqa: BLE001
+                # 故障安全：任何失败回退到原 TF-IDF 兜底
+                import logging
+                logging.getLogger(__name__).warning(
+                    "hybrid 检索失败，回退 TF-IDF 兜底: %s", exc
+                )
+                if len(candidates) < limit:
+                    try:
+                        index = self._get_vector_index()
+                        vector_results = index.search_with_fallback(
+                            query, limit=limit, vector_threshold=0.6
+                        )
+                        seen_skills = {id(c.skill) for c in candidates}
+                        for vr in vector_results:
+                            if id(vr.skill) in seen_skills:
+                                continue
+                            normalized_score = vr.score * 20.0
+                            if normalized_score < 1.0:
+                                continue
+                            candidates.append(SkillMatch(
+                                skill=vr.skill,
+                                score=normalized_score,
+                                match_reason=vr.match_reason,
+                            ))
+                            seen_skills.add(id(vr.skill))
+                        candidates.sort(key=lambda x: -x.score)
+                    except Exception:
+                        pass
 
         return candidates[:limit]
+
+    # ----- P1: RRF 混合检索辅助 -----
+
+    def _fuse_with_hybrid_search(
+        self,
+        query: str,
+        rule_candidates: list["SkillMatch"],
+        service_boost: dict[str, float],
+        limit: int,
+        domain: Optional[str],
+        subdomain: Optional[str],
+        tags: Optional[list[str]],
+    ) -> list["SkillMatch"]:
+        """用 RRF 融合规则评分 + TF-IDF + Embedding 三路检索
+
+        Reciprocal Rank Fusion: score(d) = sum(1/(K+rank_i)), K=60 (业界常用)
+        在 RRF 分数之上叠加 SERVICE_SKILL_MAP 强约束 boost。
+        """
+        K = 60
+        TOP_K_PER_SOURCE = 20
+
+        # 1. 规则评分排名
+        rule_ranks: dict[str, int] = {}
+        for rank, m in enumerate(rule_candidates):
+            rule_ranks.setdefault(m.skill.name, rank)
+
+        skill_by_name = {s.name: s for s in self._get_skills()}
+
+        # 2. TF-IDF 排名
+        tfidf_ranks: dict[str, int] = {}
+        try:
+            tfidf_index = self._get_vector_index()
+            tfidf_results = tfidf_index.search_with_fallback(
+                query, limit=TOP_K_PER_SOURCE, vector_threshold=0.3
+            )
+            for rank, vr in enumerate(tfidf_results):
+                tfidf_ranks.setdefault(vr.skill.name, rank)
+        except Exception:
+            pass
+
+        # 3. Embedding 排名
+        emb_ranks: dict[str, int] = {}
+        emb_index = self._get_embedding_index()
+        if emb_index is not None:
+            try:
+                emb_results = emb_index.search(query, top_k=TOP_K_PER_SOURCE, min_score=0.25)
+                for rank, em in enumerate(emb_results):
+                    emb_ranks.setdefault(em.skill.name, rank)
+            except Exception:
+                pass
+
+        # 4. RRF 融合分数
+        all_names = set(rule_ranks) | set(tfidf_ranks) | set(emb_ranks)
+        rrf_scores: dict[str, float] = {}
+        sources: dict[str, list[str]] = {}
+        for name in all_names:
+            score = 0.0
+            srcs = []
+            if name in rule_ranks:
+                score += 1.0 / (K + rule_ranks[name])
+                srcs.append(f"rule#{rule_ranks[name]+1}")
+            if name in tfidf_ranks:
+                score += 1.0 / (K + tfidf_ranks[name])
+                srcs.append(f"tfidf#{tfidf_ranks[name]+1}")
+            if name in emb_ranks:
+                score += 1.0 / (K + emb_ranks[name])
+                srcs.append(f"emb#{emb_ranks[name]+1}")
+            rrf_scores[name] = score
+            sources[name] = srcs
+
+        # 5. service_boost 强约束（在 RRF 之上加显著权重）
+        for skill_name, boost in service_boost.items():
+            rrf_scores[skill_name] = rrf_scores.get(skill_name, 0.0) + 0.5
+
+        # 6. 应用过滤器（domain / subdomain / tags），保证与规则路一致
+        filtered: list[tuple[str, float]] = []
+        for name, rrf in rrf_scores.items():
+            skill = skill_by_name.get(name)
+            if not skill:
+                continue
+            if domain and skill.domain != domain:
+                continue
+            if subdomain and skill.subdomain != subdomain:
+                continue
+            if tags and not any(t in (skill.tags or []) for t in tags):
+                continue
+            filtered.append((name, rrf))
+
+        if not filtered:
+            # 全部被过滤；回退到原 rule_candidates
+            return rule_candidates
+
+        # 7. 排序、归一化到 0-20 分（与现有量纲一致）
+        filtered.sort(key=lambda x: -x[1])
+        top = filtered[: max(limit * 2, limit)]
+        max_score = top[0][1] if top else 1.0
+
+        # 保留原 rule_candidates 中的 reason 信息（便于调试）
+        rule_reason_by_name = {m.skill.name: m.match_reason for m in rule_candidates}
+
+        merged: list[SkillMatch] = []
+        for name, rrf in top:
+            skill = skill_by_name.get(name)
+            if not skill:
+                continue
+            normalized = 20.0 * rrf / max_score if max_score > 0 else 0.0
+            reason_parts = sources.get(name, [])
+            if name in service_boost:
+                reason_parts.append("service-skill match")
+            base_reason = rule_reason_by_name.get(name, "")
+            full_reason = ", ".join(reason_parts) + (f"; {base_reason}" if base_reason else "")
+            merged.append(SkillMatch(
+                skill=skill,
+                score=normalized,
+                match_reason=full_reason[:200],
+            ))
+        return merged
 
     def get_skill_by_name(self, name: str) -> Optional[LoadedSkill]:
         """精确匹配名称"""

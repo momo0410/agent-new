@@ -18,3 +18,6 @@ pydantic-settings>=2.7.0
 python-multipart>=0.0.26
 httpx>=0.27.0
 tomli>=2.0.0
+
+# P1: Skill semantic search (optional - falls back to TF-IDF if unavailable)
+fastembed>=0.8.0
