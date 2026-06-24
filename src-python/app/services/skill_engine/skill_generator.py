@@ -46,6 +46,51 @@ def _normalize_service_tag(service: str) -> str:
     return lowered.split()[0] if lowered else "unknown"
 
 
+def _clean_service_name(service: str) -> str:
+    """规范化服务名用于跨靶机复用（P5 修复）
+
+    nmap 的 service 字段格式是 `<protocol>  <product> <version>`，
+    内部多个空格分隔。这导致 Detection Fingerprint 写出来是
+    "包含 `ftp     vsftpd 2.3.4`" —— 下次靶机版本不同就不会触发。
+
+    规范化策略：
+    1. 压缩多空格为单空格
+    2. 去掉版本号尾部的括号注释（如 `((Unix))`）
+    3. 保留协议+产品+主版本号（如 `vsftpd 2.3.4`）
+    """
+    s = str(service or "").strip()
+    if not s:
+        return "unknown"
+    # 压缩多空格
+    s = re.sub(r"\s+", " ", s)
+    # 去掉尾部括号（如 ((Unix)) ((Ubuntu) DAV/2)）
+    s = re.sub(r"\s*\(\(?[^)]*\)\)?\s*", " ", s).strip()
+    # 协议字段（如 ftp/http/ssh）如果重复出现，去掉前缀
+    parts = s.split(" ", 1)
+    if len(parts) == 2:
+        protocol = parts[0].lower()
+        rest = parts[1]
+        # 如果第一段是协议名且 rest 已经有产品名，丢掉协议
+        if protocol in {"ftp", "http", "https", "ssh", "telnet", "smtp", "smb",
+                        "samba", "mysql", "postgresql", "postgres", "redis",
+                        "vnc", "irc", "rmi", "tomcat", "rpcbind", "domain",
+                        "netbios-ssn", "microsoft-ds", "exec", "login",
+                        "ircs-u", "ajp13", "apachemq", "rsh", "rlogin",
+                        "shell", "ingreslock", "distccd", "drb", "bindshell"}:
+            return rest.strip() or protocol
+    return s.strip()
+
+
+def _service_family(service: str) -> str:
+    """提取服务大类，用于推广 (vsftpd 2.3.4 -> vsftpd, Apache httpd 2.4.49 -> Apache httpd)"""
+    cleaned = _clean_service_name(service)
+    # 去掉版本号
+    m = re.match(r"([A-Za-z][\w.-]*(?:\s+[A-Za-z][\w.-]*)?)", cleaned)
+    if m:
+        return m.group(1).strip()
+    return cleaned
+
+
 def _sanitize_name(text: str) -> str:
     text = str(text or "").strip().lower()
     text = re.sub(r"[^a-z0-9_-]+", "-", text)
@@ -749,7 +794,10 @@ class SkillGenerator:
         """
         tag = path["tag"]
         port = path["port"]
-        service = path["service"]
+        service_raw = path["service"]
+        # P5 修复：规范化服务名用于跨靶机复用
+        service = _clean_service_name(service_raw)
+        family = _service_family(service_raw)
         exploit_success = path["exploit_success"]
         name = path["name"]
         ip = path.get("ip", "")
@@ -789,8 +837,8 @@ class SkillGenerator:
         for c in cves[:3]:
             tags.append(c.lower())
 
-        # description
-        description = f"{'成功利用' if exploit_success else '检测到'} {service} 服务 (端口 {port})"
+        # description (P5: 用 family 而非原始字符串，便于检索)
+        description = f"{'成功利用' if exploit_success else '检测到'} {family} 服务 (端口 {port}，本次版本 {service})"
         if creds:
             description += f"，凭据: {', '.join(c.get('username','?') for c in creds[:3])}"
 
@@ -815,16 +863,16 @@ class SkillGenerator:
         lines.append("## Principle")
         lines.append("")
         if cves:
-            lines.append(f"目标 {service}（端口 {port}）存在 {', '.join(cves[:3])} 漏洞。")
+            lines.append(f"目标 {family}（端口 {port}）存在 {', '.join(cves[:3])} 漏洞。")
         if exploit_success:
             lines.append(
-                f"本次渗透通过 {service} 服务直接获得了执行能力，"
+                f"本次渗透通过 {family} 服务（具体版本: {service}）直接获得了执行能力，"
                 f"说明该服务存在以下根因之一："
             )
         else:
             lines.append(
-                f"本次渗透在 {service}（端口 {port}）发现了潜在的可利用点。"
-                f"该端口/服务的常见漏洞根因包括："
+                f"本次渗透在 {family}（端口 {port}）发现了潜在的可利用点。"
+                f"该服务家族的常见漏洞根因包括："
             )
         # 给出基于服务类型的根因猜测
         principle_hints = {
@@ -854,15 +902,17 @@ class SkillGenerator:
         lines.append("")
         lines.append("当满足以下条件时，**应触发本 skill** 进行验证/利用：")
         lines.append("")
-        lines.append(f"1. nmap 服务指纹包含 `{service}` 或目标开放端口 {port}")
+        # P5 修复：触发条件用 family 关键词，而非整段未规范化字符串
+        lines.append(f"1. nmap 服务指纹包含关键词 `{family}` 或目标开放端口 {port}")
+        lines.append(f"   （本次具体版本: `{service}`，但同家族其他版本同样适用）")
         if cves:
             lines.append(f"2. nmap NSE / searchsploit / vulners 上报了 {', '.join(cves[:3])}")
         if creds:
             lines.append(f"3. 已知/已收集到凭据池含: {', '.join(c.get('username','?') for c in creds[:5])}")
         lines.append("")
         lines.append("**反例（不应触发本 skill）**：")
-        lines.append(f"- {service} 服务版本不在易受影响范围（已打补丁）")
-        lines.append(f"- 端口 {port} 未开放或服务已被替换")
+        lines.append(f"- {family} 已升级到已修复版本（参考 CVE 详情确认 fixed_version）")
+        lines.append(f"- 端口 {port} 未开放或服务已被替换为其他产品")
         lines.append("")
 
         # ──── ## Workflow（执行步骤） ────
@@ -923,7 +973,7 @@ class SkillGenerator:
                 err = str(f.get("error", "") or "")[:80].replace("|", "\\|").replace("\n", " ")
                 lines.append(f"| {tool} 报错: `{err}` | 工具参数/网络/版本不匹配 | 切换工具或重试时调整参数 |")
         else:
-            lines.append(f"| {service} 连接被拒 | 服务未开放或防火墙 | 重新指纹扫描确认端口 |")
+            lines.append(f"| {family} 连接被拒 | 服务未开放或防火墙 | 重新指纹扫描确认端口 |")
             lines.append(f"| 工具调用超时 | 网络抖动或服务响应慢 | 增大 timeout 或换工具 |")
         lines.append(f"| Exploit 返回 'no session created' | payload 类型不匹配目标架构 | 换 payload (reverse_tcp vs bind_tcp) |")
         lines.append("")
@@ -931,22 +981,27 @@ class SkillGenerator:
         # ──── ## Generalization（推广规则） ────
         lines.append("## Generalization")
         lines.append("")
-        lines.append(f"- **适用服务类型**：{service}（包含同类不同版本）")
+        # P5 修复：用 service_family 而非全字符串做推广（vsftpd 2.3.4 → vsftpd 系列）
+        lines.append(f"- **适用服务家族**：`{family}`（包含所有 {family} 同类不同版本）")
+        lines.append(f"- **本次具体版本**：`{service}`")
         if cves:
             lines.append(f"- **直接覆盖 CVE**：{', '.join(cves)}")
-        lines.append(f"- **同类相似 CVE**：使用 searchsploit / nvd 搜索 \"{service}\" 即可发现")
+        lines.append(f"- **同类相似 CVE 检索**：`searchsploit {family}` 或 `searchsploit {tag}`")
         lines.append("")
-        lines.append(f"**通用利用模板**：当遇到任何 {service} 服务时：")
-        lines.append("1. nmap -sV 拿版本号")
-        lines.append("2. searchsploit / msfconsole search 看可用模块")
-        lines.append("3. 优先尝试 metasploit 已封装的 exploit（成功率最高）")
-        lines.append("4. 备选：手动复现公开 PoC")
+        lines.append(f"**通用利用模板**（适用于所有 {family} 类型服务）：")
+        lines.append(f"1. nmap -sV -p <port> <target>  # 拿具体版本号")
+        lines.append(f"2. searchsploit {family}  # 搜该家族所有公开 exploit")
+        lines.append(f"3. msfconsole -q -x 'search {tag}; exit'  # 检查现成 metasploit 模块")
+        lines.append(f"4. 把版本号填入对应 CVE PoC（如不同 minor 版本通常仍可利用）")
+        lines.append(f"5. 失败回退：先看 Failure Modes 表，再考虑用 hydra/弱口令")
         lines.append("")
 
         # ──── ## Key Concepts ────
         lines.append("## Key Concepts")
         lines.append("")
-        lines.append(f"- **端口**：{port}/{service}")
+        lines.append(f"- **端口**：{port}/{tag}")
+        lines.append(f"- **服务家族**：{family}")
+        lines.append(f"- **本次版本**：{service}")
         if exploit_success:
             lines.append(f"- **本次结果**：✅ 成功取得执行能力")
         if sessions:
