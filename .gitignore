@@ -29,3 +29,25 @@ src-python/.venv/
 .idea/
 # P1: embedding cache
 skills/.cache/
+
+# 渗透运行时产物（不同步，双端独立）
+reports/R*/
+reports/R*.log
+reports/kali-smoke/
+reports/smoke*/
+reports/reflection_*.json
+reports/state_*/
+reports/state_*.json
+reports/R1_unpacked/
+hydra.restore
+*.tar.gz
+
+# 累积的运行时知识库（双端独立，避免合并冲突）
+skills/.experience/
+skills/learned/draft/
+skills/learned/active/
+skills/learned/deprecated/
+skills/learned/.lifecycle.json
+
+# venv
+.venv/
