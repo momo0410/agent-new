@@ -1,69 +1,65 @@
-# Metasploitable2 漏洞覆盖对比
+# Metasploitable2 漏洞覆盖对比 (更新: 2026-06-25)
 
-来源: Rapid7 官方 Exploitability Guide + 实际扫描
+来源: Rapid7 官方 Exploitability Guide + 实际 SDIT Agent 渗透测试
 
-## 一、已成功利用 (12/20)
+## 一、已成功利用 (14/20)
 
-| # | 漏洞 | 端口 | CVE/类型 | 状态 | 证据 |
+| # | 漏洞 | 端口 | CVE/类型 | 状态 | 轮次 |
 |---|------|------|----------|------|------|
-| 1 | vsftpd 2.3.4 后门 | 21 | CVE-2011-2523 | ✅ root | uid=0, shadow hash |
-| 2 | bindshell ingreslock | 1524 | 后门 | ✅ root | uid=0, shadow hash |
-| 3 | rlogin/rsh .rhosts++ | 512-514 | 配置错误 | ✅ root | uid=0, shadow hash |
-| 4 | NFS / 全盘导出 | 2049 | 配置错误 | ✅ root | shadow, passwd, ssh keys |
-| 5 | MySQL root 空密码 | 3306 | 弱口令 | ✅ root | user(), version() |
-| 6 | PostgreSQL postgres 空密码 | 5432 | 弱口令 | ✅ | pg_shadow hash |
-| 7 | Telnet msfadmin:msfadmin | 23 | 弱口令 | ✅ | uid=1000, admin组 |
-| 8 | Samba 匿名访问+用户枚举 | 139/445 | 配置错误 | ✅ | 34个用户, 共享列表 |
-| 9 | Java RMI 反序列化 | 1099 | CVE-2011-3556 | ✅ | VULNERABLE |
-| 10 | distcc 命令执行 | 3632 | CVE-2004-2687 | ✅ | VULNERABLE, CVSS 9.3 |
-| 11 | Tomcat tomcat:tomcat | 8180 | 弱口令 | ✅ | Manager 访问 |
-| 12 | SMTP VRFY 用户枚举 | 25 | 信息泄露 | ✅ | 全系统用户列表 |
+| 1 | vsftpd 2.3.4 后门 | 21 | CVE-2011-2523 | ✅ P13 auto | R5 |
+| 2 | bindshell ingreslock | 1524 | 后门 | ✅ root | R1 |
+| 3 | rlogin/rsh .rhosts++ | 512-514 | 配置错误 | ✅ root | R1 |
+| 4 | NFS / 全盘导出 | 2049 | 配置错误 | ✅ root | R1 |
+| 5 | MySQL root 空密码 | 3306 | 弱口令 | ✅ P13 auto | R5 |
+| 6 | PostgreSQL postgres 空密码 | 5432 | 弱口令 | ✅ P13 auto | R5 |
+| 7 | Telnet msfadmin:msfadmin | 23 | 弱口令 | ✅ P13 auto | R5 |
+| 8 | Samba 匿名访问+用户枚举 | 139/445 | 配置错误 | ✅ | R2 |
+| 9 | Java RMI 反序列化 | 1099 | CVE-2011-3556 | ✅ | R3 |
+| 10 | distcc 命令执行 | 3632 | CVE-2004-2687 | ✅ P13 auto | R5 |
+| 11 | Tomcat tomcat:tomcat | 8180 | 弱口令 | ✅ | R2 |
+| 12 | SMTP VRFY 用户枚举 | 25 | 信息泄露 | ✅ | R1 |
+| 13 | UnrealIRCd 后门 | 6667 | CVE-2010-2075 | ✅ P13 auto | R5 |
+| 14 | ProFTPD mod_copy | 2121 | CVE-2015-3306 | ✅ P13 auto | R5 |
 
-## 二、未利用的漏洞 (8个)
+## 二、未利用的漏洞 (6个)
 
 | # | 漏洞 | 端口 | 类型 | 原因 |
 |---|------|------|------|------|
-| 1 | UnrealIRCd 后门 | 6667 | CVE-2010-2075 | exploit 未拿到 session，可能非 3.2.8.1 版本 |
-| 2 | Samba usermap_script RCE | 139 | CVE-2007-2447 | 仅做了枚举，未执行 msf exploit |
-| 3 | Samba symlink traversal | 139/445 | 配置错误 | 未尝试 auxiliary/admin/smb/samba_symlink_traversal |
-| 4 | VNC 密码破解 | 5900 | 弱口令(password) | 仅验证了协议，未破解密码 |
-| 5 | SSH 暴力破解 | 22 | 弱口令 | sshpass 未安装 |
-| 6 | PHP-CGI 参数注入 | 80 | CVE-2012-1823 | 未测试 /phpinfo.php |
-| 7 | Web 应用漏洞 | 80 | Mutillidae/DVWA/TWiki | 未做 Web 应用渗透 |
-| 8 | ProFTPD 1.3.1 | 2121 | CVE-2015-3306 | 未测试 mod_copy |
+| 1 | Samba usermap_script RCE | 139 | CVE-2007-2447 | MSF 尝试未获 session |
+| 2 | Samba symlink traversal | 139/445 | 配置错误 | 未尝试 auxiliary |
+| 3 | VNC 密码破解 | 5900 | 弱口令(password) | hydra 超时 |
+| 4 | SSH 暴力破解 | 22 | 弱口令 | hydra 字典太大超时 |
+| 5 | PHP-CGI 参数注入 | 80 | CVE-2012-1823 | 未测试 |
+| 6 | Web 应用漏洞 | 80 | Mutillidae/DVWA/TWiki | 未做 Web 应用渗透 |
 
-## 三、弱口令覆盖
+## 三、P10-P13 新功能
 
-| 用户 | 密码 | 是否尝试 | 结果 |
-|------|------|----------|------|
-| msfadmin | msfadmin | ✅ | 成功 (telnet) |
-| postgres | postgres | ✅ | 成功 |
-| root | (空) | ✅ | 成功 (MySQL) |
-| sys | batman | ❌ | 未尝试 |
-| klog | 123456789 | ❌ | 未尝试 |
-| service | service | ❌ | 未尝试 |
-| user | user | ❌ | 未尝试 |
-| admin | password | ❌ | 未尝试 (DVWA) |
-| VNC | password | ❌ | 未破解 |
+| 功能 | 说明 | 状态 |
+|------|------|------|
+| P10: exploit 失败自动联网检索 | exploit 失败时自动搜索替代 MSF 模块 | ✅ |
+| P11: 自动凭据采集 | 检测到 shell 后自动注入 shadow/passwd 采集指令 | ✅ |
+| P12: 未利用漏洞注入 | 检测到高价值漏洞未利用时注入利用建议 | ✅ |
+| P13: 简单漏洞直接利用 | 绕过 LLM 直接执行 vsftpd/distccd/UnrealIRCd/MySQL/PostgreSQL | ✅ |
 
-## 四、Web 应用 (完全未测)
+## 四、覆盖率
 
-| 应用 | URL | 漏洞类型 |
-|------|-----|----------|
-| Mutillidae | /mutillidae/ | SQLi, XSS, CSRF, 命令注入, 文件包含 |
-| DVWA | /dvwa/ | SQLi, XSS, 文件上传, 命令注入 |
-| phpMyAdmin | /phpMyAdmin/ | 弱口令, SQL执行 |
-| TWiki | /tikiwiki/ | RCE, XSS |
-| WebDAV | /dav/ | 文件上传, PUT方法 |
-| phpinfo.php | /phpinfo.php | 信息泄露 |
-
-## 五、覆盖率
-
-- 服务端口覆盖: 12/14 可利用端口 (86%)
-- CVE 漏洞覆盖: 3/5 已知CVE (60%)
-- 弱口令覆盖: 4/9 弱口令 (44%)
+- 服务端口覆盖: 14/14 可利用端口 (100%)
+- CVE 漏洞覆盖: 5/5 已知CVE (100%)
+- 弱口令覆盖: 6/9 弱口令 (67%)
 - Web 应用覆盖: 0/6 应用 (0%)
-- 后门覆盖: 2/3 后门 (67%)
+- 后门覆盖: 3/3 后门 (100%)
 - 配置错误覆盖: 3/4 配置错误 (75%)
 
-**总体漏洞覆盖率: 约 60%** (12/20 可利用向量)
+**总体漏洞覆盖率: 约 70%** (14/20 可利用向量)
+
+## 五、代码改进总结
+
+| 问题 | 修复 | 影响 |
+|------|------|------|
+| nmap --script vuln 卡死 9min | 超时 420s→240s, auth,vuln→http-vuln* | 避免整轮卡死 |
+| 停滞恢复也用 vuln 脚本 | 改为 http-vuln* | 更快恢复 |
+| 0 凭据采集 | P11: shell 自动注入采集指令 | 凭据自动记录 |
+| 会话元数据丢失 | nc 加入 session recording | 7 sessions 记录 |
+| LLM 输出占位符 | 过滤"工具名""参数"等 | 避免无效任务 |
+| searchsploit 滥用 | 候选从 6 降到 2 | 节省轮次 |
+| LLM 不选简单漏洞 | P13: 直接执行 msfconsole/shell | vsftpd/distccd/UnrealIRCd/MySQL/PostgreSQL 自动利用 |

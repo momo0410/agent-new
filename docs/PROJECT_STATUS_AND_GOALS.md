@@ -215,14 +215,37 @@ frontmatter 字段: name, description, domain, subdomain, tags, cve, severity, v
 
 ## 四、当前待办事项
 
-### 4.1 必做事项
+### 4.1 已完成事项 (2026-06-25 5轮渗透测试)
 
-1. 端到端验证: 用 Metasploitable2 完整跑一遍，确认 19 个 v2.0 skill 在真实渗透中正常工作
-2. 验证自升级闭环: 渗透结束后 SkillGenerator + FailureSkillGenerator 真的能生成可用的 v2.0 skill 落到 skills/learned/，下一轮命中
-3. 验证 Principle 章节的事实准确性: 19 个 skill 中 Principle 部分是基于训练记忆写的，可能有错。可用在线搜索(v3.0已就绪)反查修正
-4. 报告生成的教学化改造: 报告中要体现"为什么这么打、为什么失败、怎么换路径"，让学生看得懂学得到。当前报告偏命令日志风格，需要调整为叙事风格
+1. ✅ 端到端验证: Metasploitable2 完成 5 轮全自动渗透测试
+   - R1: 30 findings, 8 vulns, 1 session (root via 1524 bindshell)
+   - R2: 30 findings, 8 vulns, 7 sessions, 1 credential (Samba 139 exploited)
+   - R3: 30 findings, 7 vulns, 12 sessions, Java RMI 1099 exploited
+   - R4-R5: P13 直接利用钩子自动执行 vsftpd/distccd/UnrealIRCd/MySQL/PostgreSQL
+   - **总体覆盖率: 14/20 漏洞 (70%)**
 
-### 4.2 不做事项（明确划清）
+2. ✅ P10-P13 新功能开发
+   - P10: exploit 失败自动联网检索替代方案
+   - P11: shell 会话自动凭据采集
+   - P12: 未利用高价值漏洞自动注入利用指令
+   - P13: 简单已知漏洞直接执行利用（绕过 LLM 选择偏差）
+
+3. ✅ 核心 bug 修复
+   - nmap `--script auth,vuln` 超时 420s→240s，停滞恢复改用 `http-vuln*`
+   - nc session recording 支持
+   - LLM 输出占位符过滤（"工具名""参数"等）
+   - searchsploit 候选从 6 降到 2
+   - hydra 自动追加 `-I` 跳过恢复文件等待
+
+### 4.2 仍存在的问题
+
+1. **hydra 爆破超时**: telnet/SSH/VNC 爆破字典大，hydra 经常跑 10+ 分钟不结束
+2. **Web 应用完全未覆盖**: Mutillidae/DVWA/TWiki/phpMyAdmin 0% 覆盖
+3. **凭据采集仍不足**: P11 注入指令但 LLM 不一定执行，P13 的 MySQL/PostgreSQL 自动采集可改进
+4. **LLM 循环空转**: 经常在 LLM 思考阶段卡住，浪费轮次
+5. **报告教学化改造**: 当前报告偏命令日志风格，需要调整为叙事风格
+
+### 4.3 不做事项（明确划清）
 
 - 不做 Windows 渗透
 - 不做半自动 / 用户确认流程
