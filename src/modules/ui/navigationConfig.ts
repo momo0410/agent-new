@@ -112,7 +112,6 @@ const NAV_ORDER: Record<UIMode, AppPage[]> = {
     'ssh-terminal'
   ],
   'ai': [
-    'ai-command-center',
     'dashboard',
     'system-info',
     'remote-operations',

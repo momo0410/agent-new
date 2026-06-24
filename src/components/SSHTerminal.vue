@@ -376,6 +376,9 @@ import { commandHintsManager, type CommandHint } from '../modules/ssh/commandHin
 import { streamAIProxyMessages, type AIProviderConfig } from '../modules/utils/aiProxy'
 import { aiService } from '../modules/ai/aiService'
 
+type BrowserTimeout = number
+type BrowserInterval = number
+
 interface TerminalInstance {
   id: string
   name: string
@@ -396,13 +399,13 @@ interface TerminalInstance {
   // 终端实时 WebSocket
   terminalSocket?: WebSocket
   // WebSocket 自动重连计时器
-  outputReconnectTimer?: ReturnType<typeof setTimeout>
+  outputReconnectTimer?: BrowserTimeout
   // 当前终端通道的重连次数
   wsReconnectAttempts?: number
   // WebSocket 心跳 ping 定时器
-  wsPingTimer?: ReturnType<typeof setInterval>
+  wsPingTimer?: BrowserInterval
   // WebSocket 无消息超时看门狗
-  wsWatchdogTimer?: ReturnType<typeof setInterval>
+  wsWatchdogTimer?: BrowserInterval
   // 最近一次收到 WebSocket 消息的时间戳
   wsLastMessageTime?: number
 }
@@ -446,7 +449,7 @@ const selectedUsername = ref<string>('')
 const accounts = ref<any[]>([])
 
 // 发送输入的缓冲（按终端分片，降低高频输入导致的抖动与拥塞）
-const inputBuffers = new Map<string, { buf: string; timer: number | null }>()
+const inputBuffers = new Map<string, InputBuffer>()
 const reconnecting = ref<boolean>(false)
 
 // 命令提示相关
@@ -606,7 +609,7 @@ const initializeTerminal = (terminalInstance: TerminalInstance) => {
 // Enhanced input processing with adaptive throttling
 interface InputBuffer {
   buf: string
-  timer: number | null
+  timer: BrowserTimeout | null
   lastFlush: number
   inputRate: number
   priority: 'control' | 'navigation' | 'normal' | 'bulk'

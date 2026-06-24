@@ -341,7 +341,8 @@ export class DashboardRenderer {
     const coords = coordArray.map(c => `${c.x},${c.y}`);
     const linePath = `M${coords.join(' L')}`;
 
-    return `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" style="width:100%;height:${height}px;overflow:visible;"><path d="${linePath}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const title = unit ? `<title>趋势图 (${unit})</title>` : '<title>趋势图</title>';
+    return `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" style="width:100%;height:${height}px;overflow:visible;">${title}<path d="${linePath}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   }
 
   private renderLineChartWithGrid(points: number[], color: string, chartId: string): string {
