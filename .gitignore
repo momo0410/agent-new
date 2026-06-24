@@ -51,3 +51,5 @@ skills/learned/.lifecycle.json
 
 # venv
 .venv/
+r8_*.json
+r9b_*.json
