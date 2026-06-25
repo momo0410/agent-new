@@ -243,6 +243,7 @@ frontmatter 字段: name, description, domain, subdomain, tags, cve, severity, v
    - P15 在线情报优先级提升：service_intel token 配额 500→1200，并提前到候选任务之前注入；上下文明确要求模型优先参考 CVE/MSF/default creds/recommended 命令
    - P16 进程组强杀：Executor 在 POSIX 下用 `setsid` 启动子进程，超时时 kill 整个 process group，避免 shell 被杀但 msfconsole/ruby 子进程残留
    - P17 msfconsole 自动 LHOST：当命令缺少 LHOST 时，Executor 根据 `SDIT_LHOST` 或本机到 RHOSTS 的路由自动补 `set LHOST`，避免 Metasploit option validation 阻塞利用链
+   - P18 init 扫描治理：init 阶段如果 LLM 用 shell 包装 masscan/nmap/rustscan，自动改写为 nmap 工具调用，确保 parser 产生结构化 findings，避免扫描有输出但 State 无端口清单
 
 4. ✅ R10 首轮验证发现并修复 P14 问题
    - 流程: Windows 通过 GitHub 同步到 Kali (`git pull --ff-only origin master`)，Kali 本地运行 `SDIT_SSH_HOST=local python3 -u batch_pentest.py --targets MSF2=192.168.136.137 --max-rounds 25`

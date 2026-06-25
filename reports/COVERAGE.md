@@ -77,3 +77,4 @@ P13 钩子尝试自动执行 msfconsole 利用，但因 **缺少 LHOST 参数** 
 | 在线情报被候选任务/历史动作挤到后面 | service_intel 配额 500→1200，提前到候选任务之前，并加“必须参考情报修正 exploit 命令”提示 | 已修复，待 R12 观察模型是否引用 |
 | msfconsole 超时只杀 shell wrapper | POSIX 使用 setsid + killpg 强杀整组，避免 ruby/msfconsole 孤儿进程残留 | 已修复，待 R13 验证 |
 | LLM 给的 msfconsole args 缺 LHOST | executor._rewrite_msfconsole_args 自动按环境/路由探测补 set LHOST | 已修复，待 R14 验证 |
+| LLM 在 init 用 shell 包装 masscan 导致无结构化 findings | init 阶段自动将 shell+scanner 改写为 nmap 工具调用，保留 parser 能力 | 已修复，待 R16 验证 |
