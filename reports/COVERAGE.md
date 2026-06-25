@@ -72,3 +72,4 @@ P13 钩子尝试自动执行 msfconsole 利用，但因 **缺少 LHOST 参数** 
 | searchsploit 滥用 | 候选从 6 降到 2 | 节省轮次 |
 | LLM 不选简单漏洞 | P13: 直接执行 msfconsole/shell | 需再跑一轮验证 |
 | P13 msfconsole 缺 LHOST | 动态 socket 检测 Kali IP + 所有命令加 set LHOST | 已推送，待验证 |
+| P14 msfconsole 参数追加到 exit 后 | 移除中间 `run; exit` / `exploit; exit`，统一重排为 LPORT/payload → exploit → exit -y | 已修复并加单测 |

