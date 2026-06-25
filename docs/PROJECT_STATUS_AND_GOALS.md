@@ -244,6 +244,8 @@ frontmatter 字段: name, description, domain, subdomain, tags, cve, severity, v
    - P16 进程组强杀：Executor 在 POSIX 下用 `setsid` 启动子进程，超时时 kill 整个 process group，避免 shell 被杀但 msfconsole/ruby 子进程残留
    - P17 msfconsole 自动 LHOST：当命令缺少 LHOST 时，Executor 根据 `SDIT_LHOST` 或本机到 RHOSTS 的路由自动补 `set LHOST`，避免 Metasploit option validation 阻塞利用链
    - P18 init 扫描治理：init 阶段如果 LLM 用 shell 包装 masscan/nmap/rustscan，自动改写为 nmap 工具调用，确保 parser 产生结构化 findings，避免扫描有输出但 State 无端口清单
+   - P19 direct exploit registry：新增 `direct_exploits.py`，按服务指纹生成 direct bindshell / vsftpd / MySQL / PostgreSQL 候选，MSF 降级为 fallback
+   - P20 success_judge：新增统一成功判定并接入 P13 direct 路径，PostgreSQL 成功写入 credentials，root shell 写 host_compromise
 
 4. ✅ R10 首轮验证发现并修复 P14 问题
    - 流程: Windows 通过 GitHub 同步到 Kali (`git pull --ff-only origin master`)，Kali 本地运行 `SDIT_SSH_HOST=local python3 -u batch_pentest.py --targets MSF2=192.168.136.137 --max-rounds 25`
@@ -263,13 +265,21 @@ frontmatter 字段: name, description, domain, subdomain, tags, cve, severity, v
    - 修复: `_run_process()` 在 POSIX 使用 `preexec_fn=os.setsid` 开新进程组，超时通过 `os.killpg(..., SIGKILL)` 强杀整组；Windows 保持 `proc.kill()` 路径
    - 验证: 同 P15 回归集合 64 passed
 
+7. ✅ R21 最新完整测试结果 (2026-06-25)
+   - 流程: Kali 本地运行 `SDIT_SSH_HOST=local python3 -u batch_pentest.py --targets MSF2=192.168.136.137 --max-rounds 25 --skill-limit 8 --out-root reports/R21_MSF2`
+   - 结果: `phase=done`, elapsed=4300.5s, findings=31, vulnerabilities=7, sessions=6, credentials=2
+   - 成功 exploited surface: `192.168.136.137|1524` bindshell/root shell、`192.168.136.137|3306` MySQL root 弱凭据
+   - 有效凭据验证: PostgreSQL `postgres` / `postgres:postgres` 已沉淀到 credentials，但 5432 surface 仍为 verified，待进一步利用
+   - 仍未成功 exploited: vsftpd 2.3.4、distccd、UnrealIRCd、Samba、Tomcat、VNC/SSH/Telnet、Web 应用面
+   - 当前覆盖率: 严格按 exploited surface 约 2/20≈10%；含 credential_valid 约 3/20≈15%。R21 证明 P20 能沉淀凭据，但整体覆盖率仍远未达标
+
 ### 4.2 仍存在的问题
 
-1. **hydra 爆破超时**: telnet/SSH/VNC 爆破字典大，hydra 经常跑 10+ 分钟不结束
-2. **Web 应用完全未覆盖**: Mutillidae/DVWA/TWiki/phpMyAdmin 0% 覆盖
-3. **凭据采集仍不足**: P11 注入指令但 LLM 不一定执行，P13 的 MySQL/PostgreSQL 自动采集可改进
-4. **LLM 循环空转**: 经常在 LLM 思考阶段卡住，浪费轮次
-5. **报告教学化改造**: 当前报告偏命令日志风格，需要调整为叙事风格
+1. **漏洞利用覆盖率仍低**: R21 严格 exploited 仅 2/20 左右，vsftpd/distccd/UnrealIRCd/Samba/Tomcat/VNC/SSH/Telnet/Web 应用面仍未稳定利用
+2. **Direct exploit 仍需加固**: vsftpd direct Python/base64 仍失败；bindshell 输出和交互归属仍需更稳的 Python socket 会话封装
+3. **MSF fallback 重复消耗轮次**: direct/多次 MSF no-session 后仍继续重复 vsftpd/distccd/UnrealIRCd，需要按 failure_reason 进入 exhausted/换策略
+4. **done gate 仍过宽**: R21 仍在多个 high/critical surface 未 exploited 时 phase=done，需要 mandatory queue 强制未闭环不结束
+5. **Web 应用完全未覆盖**: Mutillidae/DVWA/TWiki/phpMyAdmin 0% 覆盖，报告教学化也仍待改造
 
 ### 4.3 不做事项（明确划清）
 

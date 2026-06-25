@@ -2,43 +2,28 @@
 
 来源: Rapid7 官方 Exploitability Guide + 实际 SDIT Agent 渗透测试 (5轮)
 
-## 一、已成功利用 (8/20)
+## 一、当前最新实测成功/有效验证 (R21, 2026-06-25)
 
-| # | 漏洞 | 端口 | CVE/类型 | 状态 | 轮次 |
-|---|------|------|----------|------|------|
-| 1 | bindshell ingreslock | 1524 | 后门 | ✅ root shell | R1 |
-| 2 | rlogin/rsh .rhosts++ | 512-514 | 配置错误 | ✅ root | R1 |
-| 3 | NFS / 全盘导出 | 2049 | 配置错误 | ✅ root | R1 |
-| 4 | MySQL root 空密码 | 3306 | 弱口令 | ✅ 验证通过 | R5/P13 |
-| 5 | PostgreSQL postgres 空密码 | 5432 | 弱口令 | ✅ 验证通过 | R5/P13 |
-| 6 | Samba 匿名访问+用户枚举 | 139/445 | 配置错误 | ✅ | R2 |
-| 7 | Java RMI 反序列化 | 1099 | CVE-2011-3556 | ✅ | R3 |
-| 8 | Tomcat tomcat:tomcat | 8180 | 弱口令 | ✅ | R2 |
-| 9 | SMTP VRFY 用户枚举 | 25 | 信息泄露 | ✅ | R1 |
+| # | 攻击面 | 端口 | 类型 | 最新状态 | 证据 / 说明 |
+|---|--------|------|------|----------|-------------|
+| 1 | bindshell / root shell | 1524 | 后门 / 直接 root shell | ✅ exploited | `root@metasploitable:/#`，attack_surface `192.168.136.137|1524` 为 exploited |
+| 2 | MySQL root 空密码/弱凭据 | 3306 | 弱口令 | ✅ exploited | `user() version()` 返回 `root@192.168.136.137 / 5.0.51a`，attack_surface `192.168.136.137|3306` 为 exploited |
+| 3 | PostgreSQL postgres 凭据 | 5432 | 弱口令 | ✅ credential_valid | credentials 中已有 `postgres` 和 `postgres/postgres`，能返回 PostgreSQL 8.3.1 版本；surface 仍为 verified，待进一步做 DB RCE/文件读取 |
 
-## 二、P13 自动尝试但失败的漏洞 (5个)
+**严格按 exploited surface 计：2 个（1524、3306）。**
+**把 credential_valid 也算有效验证：3 个。**
 
-P13 钩子尝试自动执行 msfconsole 利用，但因 **缺少 LHOST 参数** 失败：
+## 二、已识别但未真正利用成功的高价值攻击面
 
-| # | 漏洞 | 端口 | 失败原因 | 修复状态 |
-|---|------|------|----------|----------|
-| 1 | vsftpd 2.3.4 后门 | 21 | Msf::OptionValidateError: LHOST | ✅ 已加动态 LHOST |
-| 2 | distccd RCE | 3632 | PAYLOAD 格式错误 + 缺 LHOST | ✅ 已修复 |
-| 3 | UnrealIRCd 后门 | 6667 | Msf::OptionValidateError: LHOST | ✅ 已加动态 LHOST |
-| 4 | UnrealIRCd 后门 | 6697 | Msf::OptionValidateError: LHOST | ✅ 已加动态 LHOST |
-| 5 | ProFTPD mod_copy | 2121 | 未触发（无对应 vulnerability 记录） | 待验证 |
-
-## 三、未利用的漏洞 (7个)
-
-| # | 漏洞 | 端口 | 类型 | 原因 |
-|---|------|------|------|------|
-| 1 | Samba usermap_script RCE | 139 | CVE-2007-2447 | MSF 尝试未获 session |
-| 2 | Samba symlink traversal | 139/445 | 配置错误 | 未尝试 auxiliary |
-| 3 | VNC 密码破解 | 5900 | 弱口令(password) | hydra 字典太大超时 |
-| 4 | SSH 暴力破解 | 22 | 弱口令 | hydra 字典太大超时 |
-| 5 | Telnet 弱口令 | 23 | msfadmin:msfadmin | hydra 字典太大超时 |
-| 6 | PHP-CGI 参数注入 | 80 | CVE-2012-1823 | 未测试 |
-| 7 | Web 应用漏洞 | 80 | Mutillidae/DVWA/TWiki | 未做 Web 应用渗透 |
+| 漏洞 / 攻击面 | 端口 | 当前状态 | 主要问题 |
+|---|---:|---|---|
+| vsftpd 2.3.4 后门 | 21 | verified / 未拿 shell | direct Python/base64 仍报错；MSF 多次 no session；6200 状态需要独立验证 |
+| distccd RCE | 3632 | verified / no session | MSF reverse payload 不兼容，`/dev/tcp` 不可用；需要 direct/protocol 级验证 |
+| UnrealIRCd 后门 | 6667/6697 | verified / no session | MSF 多次 no session；需要非 MSF 直接协议触发或更换 payload 策略 |
+| Samba usermap_script | 139/445 | verified / no session | MSF 尝试未获 session，需 direct smb/rpc 验证或 Samba 专用策略 |
+| Tomcat Manager | 8180 | verified / 401 | 已确认需认证，默认凭据未稳定验证 |
+| VNC/SSH/Telnet 弱口令 | 5900/22/23 | 未成功 | Hydra 预算治理已做，但还未形成有效凭据验证闭环 |
+| Web 应用漏洞 | 80 | 未覆盖 | Mutillidae/DVWA/TWiki/phpMyAdmin 等 Web 面仍未系统枚举利用 |
 
 ## 四、P10-P13 新功能
 
@@ -51,14 +36,11 @@ P13 钩子尝试自动执行 msfconsole 利用，但因 **缺少 LHOST 参数** 
 
 ## 五、覆盖率
 
-- 服务端口覆盖: 9/14 可利用端口 (64%)
-- CVE 漏洞覆盖: 1/5 已知CVE (20%) — Java RMI 已验证，其余因 LHOST 失败
-- 弱口令覆盖: 2/9 弱口令 (22%) — MySQL/PostgreSQL 已验证
-- Web 应用覆盖: 0/6 应用 (0%)
-- 后门覆盖: 1/3 后门 (33%) — 仅 1524 bindshell
-- 配置错误覆盖: 3/4 配置错误 (75%)
-
-**总体漏洞覆盖率: 约 40%** (8/20 可利用向量，P13 修复后预期可提升至 70%)
+- R21 最新实测：31 findings, 7 vulnerabilities, 6 sessions, 2 credentials
+- 严格 exploited surface: 2 个（1524 bindshell, 3306 MySQL）
+- credential_valid: 1 个（5432 PostgreSQL）
+- 若按 Rapid7/MSF2 约 20 个可利用向量估算：严格成功约 10%，含凭据验证约 15%
+- 当前主要瓶颈：vsftpd/distccd/UnrealIRCd/Samba/Tomcat/VNC/SSH/Telnet/Web 应用仍未稳定 exploited
 
 ## 六、代码改进总结
 
