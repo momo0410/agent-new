@@ -241,6 +241,7 @@ frontmatter 字段: name, description, domain, subdomain, tags, cve, severity, v
    - P14 msfconsole 命令重写修复：自动移除中间 `run; exit` / `exploit; exit`，统一在 LPORT/payload 注入后追加 `exit -y`，避免追加参数落在 exit 后导致 Metasploit 长时间挂起
    - P15 msfconsole stall guard：将 msfconsole 通用超时从 900s 改为 `SDIT_MSF_STALL_TIMEOUT`（默认 90s），防止 reverse/session 模块在无会话时卡住整轮
    - P15 在线情报优先级提升：service_intel token 配额 500→1200，并提前到候选任务之前注入；上下文明确要求模型优先参考 CVE/MSF/default creds/recommended 命令
+   - P16 进程组强杀：Executor 在 POSIX 下用 `setsid` 启动子进程，超时时 kill 整个 process group，避免 shell 被杀但 msfconsole/ruby 子进程残留
 
 4. ✅ R10 首轮验证发现并修复 P14 问题
    - 流程: Windows 通过 GitHub 同步到 Kali (`git pull --ff-only origin master`)，Kali 本地运行 `SDIT_SSH_HOST=local python3 -u batch_pentest.py --targets MSF2=192.168.136.137 --max-rounds 25`
@@ -253,6 +254,12 @@ frontmatter 字段: name, description, domain, subdomain, tags, cve, severity, v
    - 处理: 立即停止 R11，保留日志作为问题证据；不继续等待 900s 默认超时
    - 修复: 将 msfconsole 执行超时改为可配置 `SDIT_MSF_STALL_TIMEOUT`，默认 90s；同时提高在线情报在 LLM 上下文中的优先级和可见性
    - 验证: `python -m pytest -q tests/test_p9_auto_intel_and_completion.py tests/test_p6_1_brute_dict.py tests/test_p6_exploit_retry.py tests/test_pentest_executor_fallback.py` 64 passed
+
+6. ✅ R12 监控发现并修复 P16 问题
+   - 发现: R12 中 msfconsole 已按 90s 超时，但只杀了 shell wrapper，ruby/msfconsole 子进程变成 PPID=1 继续残留
+   - 处理: 停止 R12 并手动清理残留 msfconsole/ruby 进程
+   - 修复: `_run_process()` 在 POSIX 使用 `preexec_fn=os.setsid` 开新进程组，超时通过 `os.killpg(..., SIGKILL)` 强杀整组；Windows 保持 `proc.kill()` 路径
+   - 验证: 同 P15 回归集合 64 passed
 
 ### 4.2 仍存在的问题
 
