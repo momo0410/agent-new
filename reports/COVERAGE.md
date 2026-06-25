@@ -73,3 +73,5 @@ P13 钩子尝试自动执行 msfconsole 利用，但因 **缺少 LHOST 参数** 
 | LLM 不选简单漏洞 | P13: 直接执行 msfconsole/shell | 需再跑一轮验证 |
 | P13 msfconsole 缺 LHOST | 动态 socket 检测 Kali IP + 所有命令加 set LHOST | 已推送，待验证 |
 | P14 msfconsole 参数追加到 exit 后 | 移除中间 `run; exit` / `exploit; exit`，统一重排为 LPORT/payload → exploit → exit -y | 已修复并加单测 |
+| P15 msfconsole reverse/session 模块无会话时挂起 | `SDIT_MSF_STALL_TIMEOUT` 默认 90s，阻塞即失败并进入下一轮诊断/重试 | 已修复，待 R12 验证 |
+| 在线情报被候选任务/历史动作挤到后面 | service_intel 配额 500→1200，提前到候选任务之前，并加“必须参考情报修正 exploit 命令”提示 | 已修复，待 R12 观察模型是否引用 |
