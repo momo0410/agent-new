@@ -221,13 +221,14 @@ frontmatter 字段: name, description, domain, subdomain, tags, cve, severity, v
    - R1: 30 findings, 8 vulns, 1 session (root via 1524 bindshell)
    - R2: 30 findings, 8 vulns, 7 sessions, 1 credential (Samba 139 exploited)
    - R3: 30 findings, 7 vulns, 12 sessions, Java RMI 1099 exploited
-   - R4-R5: P13 直接利用钩子自动执行 vsftpd/distccd/UnrealIRCd/MySQL/PostgreSQL
-   - **总体覆盖率: 14/20 漏洞 (70%)**
+   - R4-R5: P13 直接利用钩子尝试自动执行 vsftpd/distccd/UnrealIRCd/MySQL/PostgreSQL
+   - **实际覆盖率: 8/20 漏洞 (40%)** — P13 因缺 LHOST 参数导致 msfconsole 执行失败
+   - **P13 修复后预期: 14/20 漏洞 (70%)** — LHOST 动态检测已推送，待下一轮验证
 
 2. ✅ P10-P13 新功能开发
    - P10: exploit 失败自动联网检索替代方案
    - P11: shell 会话自动凭据采集
-   - P12: 未利用高价值漏洞自动注入利用指令
+   - P12: 未利用高价值漏洞自动注入利用指令（每3轮重新注入）
    - P13: 简单已知漏洞直接执行利用（绕过 LLM 选择偏差）
 
 3. ✅ 核心 bug 修复
@@ -236,6 +237,7 @@ frontmatter 字段: name, description, domain, subdomain, tags, cve, severity, v
    - LLM 输出占位符过滤（"工具名""参数"等）
    - searchsploit 候选从 6 降到 2
    - hydra 自动追加 `-I` 跳过恢复文件等待
+   - P13 msfconsole 命令动态获取 LHOST（socket 检测 Kali IP）
 
 ### 4.2 仍存在的问题
 
