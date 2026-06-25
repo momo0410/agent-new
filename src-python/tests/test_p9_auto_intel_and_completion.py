@@ -171,3 +171,41 @@ def test_planner_templates_do_not_suggest_rockyou_and_vsftpd_sets_interact_paylo
     vsftpd = next(t for t in SERVICE_EXPLOIT_TEMPLATES if "vsftpd" in str(t.get("purpose", "")).lower())
     assert "set PAYLOAD cmd/unix/interact" in vsftpd["args"]
     assert "exploit -j" not in vsftpd["args"]
+
+
+def test_init_shell_wrapped_scanner_rewrites_to_nmap(tmp_path):
+    from app.services.pentest_agent.agent import _apply_phase_task_defaults
+    state = State(str(tmp_path / "state.json"))
+    state.add_target("192.168.136.137")
+    state.set_phase("init")
+    tasks = [{
+        "tool": "shell",
+        "args": "masscan -p1-65535 192.168.136.137 --rate 1000 -oG masscan_results.gnmap",
+        "surface": "all",
+        "purpose": "fast scan",
+        "ports": [1, 65535],
+    }]
+
+    out = _apply_phase_task_defaults(tasks, state)
+
+    assert out[0]["tool"] == "nmap"
+    assert "-p-" in out[0]["args"]
+    assert "--version-light" in out[0]["args"]
+    assert "masscan" not in out[0]["args"].lower()
+
+
+def test_auto_intel_skips_generic_service_names(tmp_path):
+    state = State(str(tmp_path / "state.json"))
+    state.add_target("192.168.136.137")
+    fake = FakeOnlineSearch()
+    result = {"parsed": [
+        {"ip": "192.168.136.137", "port": 21, "service": "ftp"},
+        {"ip": "192.168.136.137", "port": 22, "service": "ssh"},
+        {"ip": "192.168.136.137", "port": 80, "service": "http"},
+        {"ip": "192.168.136.137", "port": 21, "service": "ftp         vsftpd 2.3.4"},
+    ]}
+
+    _auto_inject_service_intel(state, {"tool": "nmap"}, result, fake)
+
+    assert fake.search_calls == ["vsftpd 2.3.4"]
+    assert len(state.data["service_intel"]) == 1
