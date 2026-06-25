@@ -78,3 +78,4 @@ P13 钩子尝试自动执行 msfconsole 利用，但因 **缺少 LHOST 参数** 
 | msfconsole 超时只杀 shell wrapper | POSIX 使用 setsid + killpg 强杀整组，避免 ruby/msfconsole 孤儿进程残留 | 已修复，待 R13 验证 |
 | LLM 给的 msfconsole args 缺 LHOST | executor._rewrite_msfconsole_args 自动按环境/路由探测补 set LHOST | 已修复，待 R14 验证 |
 | LLM 在 init 用 shell 包装 masscan 导致无结构化 findings | init 阶段自动将 shell+scanner 改写为 nmap 工具调用，保留 parser 能力 | 已修复，待 R16 验证 |
+| Direct exploit 有输出但没有写入 credential/exploited 状态 | 新增 success_judge，并接入 P13 direct-first；PostgreSQL version 写 credential，root shell 写 host_compromise | 已修复，待 R20 验证 |
