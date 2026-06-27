@@ -299,12 +299,23 @@ class SkillGenerator:
                 for a in exploit_actions
             )
 
-            # 找成功的命令
-            successful_commands = [
-                {"tool": a.get("tool", ""), "args": a.get("args", ""), "result": (a.get("result", "") or "")[:200]}
-                for a in related_actions
-                if a.get("tool") not in {"_doctor", "_llm_wait", "_token_usage", "_done", "_skip", "_llm_error"}
-            ]
+            # 找成功的命令（含实际输出，用于 skill Workflow 章节）
+            successful_commands = []
+            for a in related_actions:
+                if a.get("tool") in {"_doctor", "_llm_wait", "_token_usage", "_done", "_skip", "_llm_error"}:
+                    continue
+                # 优先取 result，其次 result_summary，最后 full_stdout
+                result_text = (
+                    str(a.get("result", "") or "")
+                    or str(a.get("result_summary", "") or "")
+                    or str(a.get("full_stdout", "") or "")
+                )[:300]
+                successful_commands.append({
+                    "tool": a.get("tool", ""),
+                    "args": a.get("args", ""),
+                    "result": result_text,
+                    "status": a.get("status", ""),
+                })
 
             # 找此 service 相关的失败命令（→ Failure Modes 的素材）
             related_failures = [
@@ -926,16 +937,20 @@ class SkillGenerator:
         lines.append("")
         if exploit_success and cmds:
             lines.append(f"### Step 2: 利用（本次渗透实际执行的命令）")
-            for i, c in enumerate(cmds[:6], 1):
-                args_s = str(c.get("args", "") or "")[:200]
+            lines.append("")
+            for i, c in enumerate(cmds[:8], 1):
+                args_s = str(c.get("args", "") or "")[:300]
                 tool = c.get("tool", "?")
+                lines.append(f"**[{i}] {tool}**")
                 lines.append("```bash")
-                lines.append(f"# [{i}] tool={tool}")
-                lines.append(f"{tool} {args_s}".strip())
+                lines.append(args_s)
                 lines.append("```")
-                result = str(c.get("result", "") or "")[:160]
+                result = str(c.get("result", "") or "")[:300]
                 if result:
-                    lines.append(f"  ↳ 结果: `{result}`")
+                    lines.append(f"输出:")
+                    lines.append(f"```")
+                    lines.append(result)
+                    lines.append(f"```")
                 lines.append("")
         else:
             lines.append("### Step 2: 推荐尝试")
