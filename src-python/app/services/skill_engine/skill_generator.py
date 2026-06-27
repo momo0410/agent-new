@@ -134,26 +134,35 @@ class SkillGenerator:
         self.llm_client = llm_client
         self.online_search_results = online_search_results or []
         self._existing_skill_names: set[str] = set()
+        self._existing_builtin_skill_names: set[str] = set()
         self._load_existing_skill_names()
 
     def _load_existing_skill_names(self):
-        """扫描已有 skill 文件名，避免重复生成"""
+        """扫描已有 skill 文件名，区分预置 skill 和 learned skill"""
         for root, dirs, files in os.walk(self.skills_root):
             for f in files:
                 if f.endswith(".md"):
                     name = f.replace(".md", "").replace("SKILL", "").strip("-_").lower()
                     if name:
                         self._existing_skill_names.add(name)
+                        # builtin 和 imported 目录中的 skill 是预置的，不允许覆盖
+                        rel = os.path.relpath(root, self.skills_root)
+                        if rel.startswith("builtin") or rel.startswith("imported"):
+                            self._existing_builtin_skill_names.add(name)
 
     def _has_existing_skill(self, skill_name: str, path: dict) -> bool:
-        """检查是否已有同名或功能相同的预置 skill"""
-        # 精确名字匹配
-        if skill_name in self._existing_skill_names:
-            return True
-        # 检查 service tag 是否有对应的 exploit skill
+        """检查是否已有同名或功能相同的预置 skill。
+
+        只跳过 builtin/ 和 imported/ 中的预置 skill。
+        learned/draft/ 中的旧 skill 不阻止重新生成（允许覆盖升级）。
+        """
         tag = path.get("tag", "")
+        # 只检查 builtin 和 imported 目录（预置 skill 不覆盖）
+        for check_name in [skill_name]:
+            if check_name in self._existing_builtin_skill_names:
+                return True
         if tag:
-            for existing in self._existing_skill_names:
+            for existing in self._existing_builtin_skill_names:
                 if f"exploit-{tag}" in existing or f"{tag}-backdoor" in existing:
                     return True
         return False
