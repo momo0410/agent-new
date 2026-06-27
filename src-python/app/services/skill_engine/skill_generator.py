@@ -1135,3 +1135,91 @@ class SkillGenerator:
         lines.append("")
 
         return "\n".join(lines)
+
+
+def generate_skill_from_intel(
+    service_key: str,
+    intel: dict,
+    skills_root: str,
+    llm_client: Any = None,
+) -> Optional[str]:
+    """[P40] 从联网检索情报动态生成 v2.0 skill。"""
+    if not llm_client:
+        return None
+
+    safe_name = service_key.replace(" ", "-").replace("/", "-")
+    skill_name = _sanitize_name(f"intel-{safe_name}")
+    learned_dir = os.path.join(skills_root, "learned", "draft")
+    existing_path = os.path.join(learned_dir, f"{skill_name}.md")
+    if os.path.exists(existing_path):
+        return None
+
+    for subdir in ("builtin", "exploit-skills"):
+        check_dir = os.path.join(skills_root, subdir)
+        if os.path.isdir(check_dir):
+            for root, dirs, files in os.walk(check_dir):
+                for fname in files:
+                    if fname.endswith(".md") and service_key.split()[0].lower() in fname.lower():
+                        return None
+
+    cves = intel.get("cves", [])
+    msf = intel.get("msf_modules", [])
+    creds = intel.get("default_creds", {})
+    guide = intel.get("exploit_guide", "")
+    port = intel.get("port", "")
+
+    cve_list = [c.get("cve_id", "") or c.get("id", "") for c in cves[:5] if isinstance(c, dict)]
+    msf_list = [m.get("module_name", "") for m in msf[:3] if isinstance(m, dict)]
+    cred_list = []
+    if isinstance(creds, dict):
+        for c in creds.get("credentials", [])[:3]:
+            cred_list.append(f"{c.get('username', '?')}:{c.get('password', '?')}")
+
+    facts = (
+        f"Service: {service_key}\nPort: {port}\n"
+        f"CVEs: {', '.join(cve_list) or 'none'}\n"
+        f"MSF modules: {', '.join(msf_list) or 'none'}\n"
+        f"Default creds: {', '.join(cred_list) or 'none'}\n"
+        f"Exploit guide: {guide[:500] or 'none'}"
+    )
+
+    messages = [
+        {"role": "system", "content": (
+            "You are a senior pentest skill document author. Given service intel, "
+            "generate v2.0 SKILL.md with: YAML frontmatter, ## Principle, "
+            "## Detection Fingerprint, ## Workflow, ## Failure Modes, ## Generalization. "
+            "Output raw Markdown only."
+        )},
+        {"role": "user", "content": f"Generate skill:\n\n{facts}"},
+    ]
+
+    try:
+        import re as _re
+        response = llm_client.chat(messages)
+        if not response or not isinstance(response, str):
+            return None
+        cleaned = response.strip()
+        if cleaned.startswith("```"):
+            cleaned = _re.sub(r"^```[a-zA-Z]*\n", "", cleaned)
+            cleaned = _re.sub(r"\n```\s*$", "", cleaned)
+        if not cleaned.startswith("---"):
+            cleaned = (f"---\nname: {skill_name}\ndescription: {service_key} auto\n"
+                       f"domain: penetration-testing\nsubdomain: exploitation\nversion: '2.0'\n---\n\n" + cleaned)
+
+        from .quality_gate import SkillQualityGate
+        gate = SkillQualityGate(skills_root)
+        os.makedirs(learned_dir, exist_ok=True)
+        temp_path = os.path.join(learned_dir, f"{skill_name}.md")
+        with open(temp_path, "w", encoding="utf-8") as f:
+            f.write(cleaned)
+        result = gate.check(temp_path)
+        if result.accepted:
+            _LOGGER.info("SkillFromIntel: %s", skill_name)
+            return temp_path
+        else:
+            os.remove(temp_path)
+            _LOGGER.debug("SkillFromIntel rejected %s: %s", skill_name, result.rejected_reasons)
+            return None
+    except Exception as exc:
+        _LOGGER.debug("SkillFromIntel failed: %s", exc)
+        return None
