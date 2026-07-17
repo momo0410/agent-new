@@ -76,6 +76,17 @@ def test_executor_enforces_scope_before_tool_dispatch(tmp_path):
     assert any(event.event_type == "policy.denied" for event in state.event_store.read())
 
 
+def test_nmap_parser_recognizes_http_when_service_probe_reports_unknown():
+    raw = (
+        "3000/tcp open  ppp?\n"
+        "SF-Port3000-TCP:V=7.98%r(GetRequest,HTTP/1.1\\x20200\\x20OK"
+        "\\r\\nContent-Type:\\x20text/html)\n"
+        "Nmap done: 1 IP address (1 host up) scanned"
+    )
+    parsed = Executor().parse_port_services(raw)
+    assert parsed == [{"port": 3000, "state": "open", "service": "http (HTTP response detected)"}]
+
+
 def test_event_store_is_hash_chained_and_detects_tampering(tmp_path):
     store = EventStore(tmp_path / "events.jsonl")
     store.append("task-1", "task.created", {"target": "TARGET"})
