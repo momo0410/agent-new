@@ -19,11 +19,15 @@ SkillGenerator — 从渗透测试结果中自动生成可复用的 SKILL.md 技
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 import textwrap
 from datetime import datetime
 from typing import Any, Optional
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 # 已知服务 → 标准化 service tag
