@@ -16,9 +16,33 @@ const API_BASE_URL = (() => {
 
 class PythonApi {
   private baseUrl: string;
+  private localSessionToken: string | null = null;
+  private localSessionExpiresAt = 0;
 
   constructor(baseUrl: string = API_BASE_URL) {
     this.baseUrl = baseUrl;
+  }
+
+  /** Obtain the process-bound desktop session token without persisting it. */
+  async getLocalSessionToken(): Promise<string> {
+    if (this.localSessionToken && Date.now() < this.localSessionExpiresAt - 30_000) {
+      return this.localSessionToken;
+    }
+    const response = await fetch(`${this.baseUrl}/runtime/session`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+      mode: 'cors',
+      credentials: 'same-origin',
+    });
+    if (!response.ok) throw new Error(`无法建立本地会话 (${response.status})`);
+    const payload = await response.json() as { token: string; expires_at: string };
+    this.localSessionToken = payload.token;
+    this.localSessionExpiresAt = Date.parse(payload.expires_at);
+    return payload.token;
+  }
+
+  getLocalSessionTokenValue(): string | null {
+    return this.localSessionToken;
   }
 
   private async request<T = any>(
@@ -27,6 +51,7 @@ class PythonApi {
     body?: any,
     params?: Record<string, any>
   ): Promise<T> {
+    await this.getLocalSessionToken();
     let url = `${this.baseUrl}${path}`;
     
     // 添加查询参数
@@ -47,6 +72,7 @@ class PythonApi {
       method,
       headers: {
         'Content-Type': 'application/json',
+        ...(this.localSessionToken ? { 'X-SDIT-Session': this.localSessionToken } : {}),
       },
       mode: 'cors',
       credentials: 'same-origin',
@@ -284,6 +310,7 @@ class PythonApi {
   }
 
   async sftpUploadDirect(file: File, remotePath: string, uploadId: string) {
+    await this.getLocalSessionToken();
     const formData = new FormData();
     formData.append('file', file);
     formData.append('remote_path', remotePath);
@@ -293,6 +320,7 @@ class PythonApi {
     const url = `${this.baseUrl}/sftp/upload-direct`;
     const response = await fetch(url, {
       method: 'POST',
+      headers: this.localSessionToken ? { 'X-SDIT-Session': this.localSessionToken } : undefined,
       body: formData,
       // 不设置 Content-Type，让浏览器自动设置 multipart boundary
     });

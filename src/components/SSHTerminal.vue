@@ -372,6 +372,7 @@ import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
 import { Terminal } from 'xterm'
 import { FitAddon } from 'xterm-addon-fit'
 import { invoke } from '../shims/@tauri-apps/api/core'
+import pythonApi from '../config/python-api.config'
 import { commandHintsManager, type CommandHint } from '../modules/ssh/commandHints'
 import { streamAIProxyMessages, type AIProviderConfig } from '../modules/utils/aiProxy'
 import { aiService } from '../modules/ai/aiService'
@@ -488,7 +489,9 @@ const generateId = (): string => {
 }
 
 const getTerminalWsUrl = (terminalId: string): string => {
-  return `${TERMINAL_WS_BASE}/ws/terminal/${encodeURIComponent(terminalId)}`
+  const token = pythonApi.getLocalSessionTokenValue()
+  const query = token ? `?token=${encodeURIComponent(token)}` : ''
+  return `${TERMINAL_WS_BASE}/ws/terminal/${encodeURIComponent(terminalId)}${query}`
 }
 
 const isTerminalSocketOpen = (terminalInstance: TerminalInstance): boolean => {

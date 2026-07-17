@@ -1,10 +1,12 @@
 import asyncio
 import json
+import os
 from contextlib import asynccontextmanager
 import asyncssh
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from app.core.local_auth import LocalSessionAuth
 from app.routers.api import router, init_state, get_ssh_manager
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -24,6 +26,8 @@ app = FastAPI(
     version="0.55.0",
     lifespan=lifespan,
 )
+local_auth = LocalSessionAuth()
+app.state.local_auth = local_auth
 @app.exception_handler(ConnectionError)
 async def handle_connection_error(_, exc: ConnectionError):
     detail = str(exc).strip() or "没有活动的 SSH 连接"
@@ -34,14 +38,51 @@ async def handle_asyncssh_error(_, exc: asyncssh.Error):
     return JSONResponse(status_code=400, content={"detail": detail})
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=sorted(local_auth.allowed_origins),
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "X-SDIT-Session"],
 )
 app.include_router(router)
+
+
+@app.middleware("http")
+async def local_agent_session_guard(request: Request, call_next):
+    """Protect task control and report data while leaving the legacy desktop API compatible."""
+    protected_prefixes = (
+        "/api/v1/agent/pentest",
+        "/api/v1/agent/state",
+        "/api/v1/agent/report",
+        "/api/v1/agent/history",
+    )
+    if request.url.path.startswith(protected_prefixes) and os.getenv("SDIT_REQUIRE_LOCAL_AUTH", "1") != "0":
+        origin = request.headers.get("origin")
+        token = request.headers.get("x-sdit-session")
+        if not local_auth.origin_allowed(origin) or not local_auth.is_valid(token):
+            return JSONResponse(status_code=401, content={"detail": "local session token required"})
+    return await call_next(request)
+
+
+@app.get("/api/v1/runtime/session")
+async def runtime_session(request: Request):
+    """Bootstrap endpoint for the desktop bridge; token is kept in frontend memory only."""
+    origin = request.headers.get("origin")
+    if not local_auth.origin_allowed(origin):
+        return JSONResponse(status_code=403, content={"detail": "origin is not allowed"})
+    return {"token": local_auth.token, "expires_at": local_auth.expires_at.isoformat()}
+
+
+def _websocket_authorized(websocket: WebSocket) -> bool:
+    origin = websocket.headers.get("origin")
+    token = websocket.headers.get("x-sdit-session") or websocket.query_params.get("token")
+    return local_auth.origin_allowed(origin) and local_auth.is_valid(token)
+
+
 @app.websocket("/ws/terminal/{terminal_id}")
 async def websocket_terminal(websocket: WebSocket, terminal_id: str):
+    if os.getenv("SDIT_REQUIRE_LOCAL_AUTH", "1") != "0" and not _websocket_authorized(websocket):
+        await websocket.close(code=1008, reason="local session token required")
+        return
     await websocket.accept()
     try:
         ssh_manager = get_ssh_manager()
@@ -186,6 +227,9 @@ async def websocket_terminal(websocket: WebSocket, terminal_id: str):
             await ssh_manager.close_terminal_session(terminal_id)
 @app.websocket("/ws/events")
 async def websocket_events(websocket: WebSocket):
+    if os.getenv("SDIT_REQUIRE_LOCAL_AUTH", "1") != "0" and not _websocket_authorized(websocket):
+        await websocket.close(code=1008, reason="local session token required")
+        return
     await websocket.accept()
     print("WebSocket 事件通道连接")
     try:

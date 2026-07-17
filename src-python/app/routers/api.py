@@ -6,6 +6,8 @@ import time
 import asyncio
 import logging
 logger = logging.getLogger(__name__)
+import ipaddress
+from datetime import datetime, timedelta, timezone
 from typing import Any, Awaitable, Callable, Dict, List, Optional, TypeVar, Literal
 from urllib.parse import urlparse
 import asyncssh
@@ -1511,8 +1513,10 @@ async def get_log_file_info(log_path: str):
 from app.services.pentest_agent.state import State
 from app.services.pentest_agent.executor import Executor
 from app.services.pentest_agent.llm_client import LLMClient, set_llm_client
-from datetime import datetime
 from uuid import uuid4
+from app.core.contracts import ActionLevel, PortRange, ScopeContract
+from app.core.done_gate import DoneGate
+from app.core.scope_policy import ScopePolicy
 
 _pentest_tasks: dict[str, dict] = {}
 """所有渗透任务 {task_id: {target, state_file, start_time, task_obj, status}}"""
@@ -1522,6 +1526,7 @@ _SRC_PYTHON_DIR = os.path.dirname(
 )
 _PROJECT_ROOT_DIR = os.path.dirname(_SRC_PYTHON_DIR)
 _PENTEST_STATE_DIR = os.path.join(_PROJECT_ROOT_DIR, "data", "pentest")
+_pentest_scope_policy = ScopePolicy()
 
 def _state_file(task_id: str) -> str:
     return os.path.join(_PENTEST_STATE_DIR, f"pentest_state_{task_id}.json")
@@ -1622,6 +1627,8 @@ class PentestStartRequest(BaseModel):
     llm_timeout_seconds: int = Field(120, ge=10, le=600, description="LLM 单次请求超时时间")
     llm_max_retries: int = Field(1, ge=0, le=10, description="LLM 请求最大重试次数")
     llm_retry_backoff_seconds: float = Field(1.2, ge=0.1, le=30.0, description="LLM 重试退避秒数")
+    allowed_ports: list[int] = Field(default_factory=list, description="授权测试端口；为空时使用显式 1-65535 范围")
+    authorization_basis: str = Field("local authorized lab", min_length=1, max_length=240, description="授权依据摘要")
 
 
 class PentestTokenUsageRequest(BaseModel):
@@ -1633,10 +1640,71 @@ class PentestTokenUsageRequest(BaseModel):
     model: str = Field("", description="模型名")
     provider: str = Field("", description="提供商")
 
+
+def _build_pentest_scope(req: PentestStartRequest) -> ScopeContract:
+    target = req.target.strip()
+    allowed_targets: list[str] = []
+    allowed_cidrs: list[str] = []
+    allowed_domains: list[str] = []
+    if "/" in target:
+        try:
+            ipaddress.ip_network(target, strict=False)
+            allowed_cidrs.append(target)
+        except ValueError:
+            allowed_domains.append(target)
+    else:
+        try:
+            ipaddress.ip_address(target)
+            allowed_targets.append(target)
+        except ValueError:
+            allowed_domains.append(target)
+    ports = sorted(set(req.allowed_ports))
+    port_ranges = [PortRange(start=1, end=65535)] if not ports else []
+    return ScopeContract(
+        owner="local-user",
+        allowed_targets=allowed_targets or ([target] if not allowed_cidrs and not allowed_domains else [target]),
+        allowed_cidrs=allowed_cidrs,
+        allowed_domains=allowed_domains,
+        allowed_ports=ports,
+        allowed_port_ranges=port_ranges,
+        allowed_actions={
+            ActionLevel.OBSERVE,
+            ActionLevel.PROBE,
+            ActionLevel.CREDENTIAL_TEST,
+            ActionLevel.EXPLOIT,
+            ActionLevel.SESSION_VERIFY,
+            ActionLevel.POST_VERIFY,
+        },
+        forbidden_actions={ActionLevel.PROHIBITED},
+        expires_at=datetime.now(timezone.utc) + timedelta(seconds=max(60, req.llm_timeout_seconds * req.max_rounds)),
+        max_concurrency=1 if req.execution_mode == "serial" else 3,
+        max_duration_seconds=max(60, req.llm_timeout_seconds * req.max_rounds),
+        purpose=req.authorization_basis,
+    )
+
 @router.post("/agent/pentest/start")
 async def pentest_start(req: PentestStartRequest):
     task_id = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid4().hex[:8]}"
     state_path = _state_file(task_id)
+    scope_contract = _build_pentest_scope(req)
+    scope_token = _pentest_scope_policy.issue_token(scope_contract)
+
+    initial_state = State(state_path)
+    initial_state.data["scope_contract"] = scope_contract.model_dump(mode="json")
+    initial_state.data["scope_token_id"] = scope_token.split(".", 1)[0][:32]
+    initial_state.event_store.append(
+        initial_state.event_task_id,
+        "scope.created",
+        {
+            "scope_id": scope_contract.scope_id,
+            "targets": scope_contract.allowed_targets or scope_contract.allowed_cidrs or scope_contract.allowed_domains,
+            "port_count": len(scope_contract.allowed_ports) or 65535,
+            "policy_version": scope_contract.policy_version,
+        },
+        actor="task-api",
+    )
+    initial_state.data["event_count"] = initial_state.event_store.verify()["event_count"]
+    initial_state.save()
 
     client = LLMClient(
         api_key=req.api_key,
@@ -1657,6 +1725,8 @@ async def pentest_start(req: PentestStartRequest):
         "start_time": str(datetime.now()),
         "status": "running",
         "task_obj": None,
+        "scope_contract": scope_contract.model_dump(mode="json"),
+        "scope_token": scope_token,
     }
 
     loop = asyncio.new_event_loop()
@@ -1681,6 +1751,10 @@ async def pentest_start(req: PentestStartRequest):
                         parallel_execution=(req.execution_mode == "parallel"),
                         skill_query=req.skill_query or None,
                         skill_limit=req.skill_limit,
+                        scope_contract=scope_contract,
+                        scope_token=scope_token,
+                        scope_policy=_pentest_scope_policy,
+                        task_id=task_id,
                     )
                 finally:
                     loop.close()
@@ -1694,7 +1768,14 @@ async def pentest_start(req: PentestStartRequest):
 
     task = asyncio.create_task(_run_agent())
     _pentest_tasks[task_id]["task_obj"] = task
-    return {"success": True, "message": "渗透任务已启动", "target": req.target, "task_id": task_id}
+    return {
+        "success": True,
+        "message": "渗透任务已启动",
+        "target": req.target,
+        "task_id": task_id,
+        "scope_id": scope_contract.scope_id,
+        "scope_expires_at": scope_contract.expires_at.isoformat(),
+    }
 
 
 @router.get("/agent/pentest/doctor")
@@ -1715,6 +1796,10 @@ async def pentest_status(task_id: str):
     for a in actions[-10:]:
         slim = {k: v for k, v in a.items() if k != "full_stdout"}
         slim_actions.append(slim)
+    gate = DoneGate().evaluate(
+        [item for item in state.data.get("attack_surfaces", []) if isinstance(item, dict)],
+        report_complete=state.data.get("phase") in {"reflection", "done"},
+    )
     return {
         "running": is_running,
         "phase": state.data["phase"],
@@ -1727,6 +1812,9 @@ async def pentest_status(task_id: str):
         "token_usage": state.data.get("token_usage", {}),
         "task_id": task_id,
         "error": tinfo.get("error"),
+        "event_count": int(state.data.get("event_count", 0) or 0),
+        "scope_id": (state.data.get("scope_contract") or {}).get("scope_id", ""),
+        "done_gate": gate.as_dict(),
     }
 
 @router.get("/agent/pentest/logs")

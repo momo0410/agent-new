@@ -18,9 +18,9 @@ from typing import Any, Optional
 
 
 def stable_cache_key(*parts: str) -> str:
-    """根据多个字符串片段生成稳定的缓存键（sha1 前 16 位）。"""
+    """根据多个字符串片段生成稳定的非安全用途缓存键。"""
     raw = "|".join(str(p) for p in parts if p is not None)
-    return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:16]
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
 
 
 class OnlineSearchCache:
