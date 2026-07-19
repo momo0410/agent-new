@@ -1,0 +1,16 @@
+.git
+.github
+.pytest_cache
+.venv
+node_modules
+coverage
+dist
+reports
+src-python/.coverage
+src-python/.pytest_cache
+src-python/.venv
+src-python/coverage.xml
+src-python/public-benchmark-report.json
+**/__pycache__
+**/*.pyc
+*.docx

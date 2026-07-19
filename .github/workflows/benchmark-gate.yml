@@ -1,16 +1,17 @@
 name: Benchmark Regression Gate
+
 on:
   push:
-    branches: [main]
+    branches: [master, main, "release/**"]
   pull_request:
-    branches: [main]
+    branches: [master, main]
   schedule:
-    - cron: '0 2 * * 1'  # 每周一凌晨2点运行
+    - cron: "0 2 * * 1"
+  workflow_dispatch:
 
 jobs:
   benchmark-regression:
     runs-on: ubuntu-22.04
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -19,42 +20,25 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: "pip"
-          cache-dependency-path: src-python/requirements.txt
+          cache: pip
+          cache-dependency-path: |
+            src-python/requirements.lock
+            src-python/requirements-dev.lock
 
       - name: Install dependencies
         working-directory: src-python
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest pytest-asyncio pytest-cov pytest-benchmark
+          pip install --require-hashes -r requirements-dev.lock
 
-      - name: Run benchmark suite if present
+      - name: Require and run benchmark suite
         working-directory: src-python
         run: |
           mapfile -t benchmark_files < <(find tests -type f \( -name '*benchmark*.py' -o -path '*/benchmarks/*.py' \) | sort)
-
           if [ "${#benchmark_files[@]}" -eq 0 ]; then
-            python - <<'PY'
-import json
-from pathlib import Path
-
-payload = {
-    'benchmarks': [],
-    'metadata': {
-        'skipped': True,
-        'reason': 'No benchmark tests defined in src-python/tests',
-    },
-}
-Path('benchmark-results.json').write_text(
-    json.dumps(payload, ensure_ascii=False, indent=2),
-    encoding='utf-8',
-)
-print('No benchmark tests found; wrote skip artifact.')
-PY
-            exit 0
+            echo "ERROR: benchmark suite is required"
+            exit 1
           fi
-
           printf 'Benchmark files:\n%s\n' "${benchmark_files[@]}"
           pytest "${benchmark_files[@]}" -v \
             --benchmark-only \
@@ -62,53 +46,54 @@ PY
             --benchmark-save-data \
             --benchmark-json=benchmark-results.json
 
+      - name: Run correctness and safety benchmark gate
+        working-directory: src-python
+        run: pytest tests/test_final_control_plane.py::test_benchmark_gate_rejects_empty_and_accepts_measured_results -v
+
+      - name: Run public benchmark matrix three times
+        working-directory: src-python
+        env:
+          SDIT_BENCHMARK_REPETITIONS: "3"
+          SDIT_PUBLIC_BENCHMARK_REPORT: public-benchmark-report.json
+        run: python scripts/run_public_benchmark.py
+
       - name: Validate benchmark results
         working-directory: src-python
         run: |
           python - <<'PY'
-import json
-from pathlib import Path
-import sys
+          import json
+          import sys
+          from pathlib import Path
 
-path = Path('benchmark-results.json')
-if not path.exists():
-    print('ERROR: benchmark-results.json not found')
-    sys.exit(1)
-
-with path.open('r', encoding='utf-8') as f:
-    results = json.load(f)
-
-metadata = results.get('metadata', {})
-benches = results.get('benchmarks', [])
-if metadata.get('skipped'):
-    print(f"Benchmark suite skipped: {metadata.get('reason', 'no reason provided')}")
-    sys.exit(0)
-
-if not benches:
-    print('Benchmark suite completed without benchmark samples')
-    sys.exit(0)
-
-print('Benchmark results generated successfully')
-print(f'Total benchmarks: {len(benches)}')
-
-for bench in benches:
-    name = bench.get('name', 'unknown')
-    mean_ms = float(bench.get('stats', {}).get('mean', 0.0)) * 1000.0
-    std_ms = float(bench.get('stats', {}).get('stddev', 0.0)) * 1000.0
-    print(f'  {name}: mean={mean_ms:.2f}ms, std={std_ms:.2f}ms')
-PY
+          path = Path("benchmark-results.json")
+          if not path.exists():
+              print("ERROR: benchmark-results.json not found")
+              sys.exit(1)
+          results = json.loads(path.read_text(encoding="utf-8"))
+          metadata = results.get("metadata", {})
+          benches = results.get("benchmarks", [])
+          if metadata.get("skipped") or not benches:
+              print("ERROR: benchmark suite is missing, skipped, or empty")
+              sys.exit(1)
+          print(f"Benchmark results generated successfully: {len(benches)} sample(s)")
+          for bench in benches:
+              stats = bench.get("stats", {})
+              print(f"{bench.get('name', 'unknown')}: mean={float(stats.get('mean', 0.0)) * 1000:.2f}ms")
+          PY
 
       - name: Upload benchmark results
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
-          path: src-python/benchmark-results.json
+          path: |
+            src-python/benchmark-results.json
+            src-python/public-benchmark-report.json
+          if-no-files-found: error
           retention-days: 30
 
   benchmark-threshold-check:
     runs-on: ubuntu-22.04
     needs: benchmark-regression
-
     steps:
       - name: Download benchmark results
         uses: actions/download-artifact@v4
@@ -118,92 +103,141 @@ PY
       - name: Check performance thresholds
         run: |
           python - <<'PY'
-import json
-from pathlib import Path
-import sys
+          import json
+          import sys
+          from pathlib import Path
 
-THRESHOLDS = {
-    'test_orchestrator_basic': 5000,  # ms
-    'test_planner_rule_based': 1000,
-    'test_executor_sequential': 3000,
-}
+          thresholds = {"test_benchmark_scope_authorization": 5.0}
+          path = Path("benchmark-results.json")
+          if not path.exists():
+              print("ERROR: benchmark-results.json not found")
+              sys.exit(1)
+          results = json.loads(path.read_text(encoding="utf-8"))
+          benches = results.get("benchmarks", [])
+          failures = []
+          matched = set()
+          for bench in benches:
+              name = str(bench.get("name", ""))
+              mean_ms = float(bench.get("stats", {}).get("mean", 0.0)) * 1000.0
+              for pattern, threshold in thresholds.items():
+                  if pattern in name:
+                      matched.add(pattern)
+                      if mean_ms > threshold:
+                          failures.append(f"{name}: {mean_ms:.2f}ms > {threshold:.2f}ms")
+          failures.extend(f"missing required benchmark: {name}" for name in sorted(set(thresholds) - matched))
+          if failures:
+              print("Performance regression detected:")
+              print("\n".join(f"- {item}" for item in failures))
+              sys.exit(1)
+          print("All benchmarks within thresholds")
+          PY
 
-path = Path('benchmark-results.json')
-if not path.exists():
-    print('ERROR: benchmark-results.json not found')
-    sys.exit(1)
+  hidden-benchmark-gate:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-with path.open('r', encoding='utf-8') as f:
-    results = json.load(f)
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            src-python/requirements.lock
+            src-python/requirements-dev.lock
 
-metadata = results.get('metadata', {})
-benches = results.get('benchmarks', [])
-if metadata.get('skipped'):
-    print(f"Skipping threshold check: {metadata.get('reason', 'no reason provided')}")
-    sys.exit(0)
+      - name: Install evaluation worker dependencies
+        working-directory: src-python
+        run: |
+          python -m pip install --upgrade pip
+          pip install --require-hashes -r requirements.lock
 
-if not benches:
-    print('No benchmark samples available; threshold check skipped')
-    sys.exit(0)
+      - name: Require protected benchmark inputs
+        env:
+          SDIT_HIDDEN_BENCHMARK_B64: ${{ secrets.SDIT_HIDDEN_BENCHMARK_B64 }}
+          SDIT_HIDDEN_BENCHMARK_SIGNATURE: ${{ secrets.SDIT_HIDDEN_BENCHMARK_SIGNATURE }}
+          SDIT_HIDDEN_BENCHMARK_KEY: ${{ secrets.SDIT_HIDDEN_BENCHMARK_KEY }}
+          SDIT_BENCHMARK_CASE_RUNNER: ${{ vars.SDIT_BENCHMARK_CASE_RUNNER }}
+        run: |
+          test -n "$SDIT_HIDDEN_BENCHMARK_B64" || { echo "ERROR: protected benchmark payload is required"; exit 1; }
+          test -n "$SDIT_HIDDEN_BENCHMARK_SIGNATURE" || { echo "ERROR: protected benchmark signature is required"; exit 1; }
+          test -n "$SDIT_HIDDEN_BENCHMARK_KEY" || { echo "ERROR: protected benchmark verification key is required"; exit 1; }
+          test -n "$SDIT_BENCHMARK_CASE_RUNNER" || { echo "ERROR: protected case runner command is required"; exit 1; }
 
-failed = []
-for bench in benches:
-    name = bench.get('name', '')
-    mean_ms = float(bench.get('stats', {}).get('mean', 0.0)) * 1000.0
+      - name: Run isolated hidden benchmark three times
+        working-directory: src-python
+        env:
+          SDIT_HIDDEN_BENCHMARK_B64: ${{ secrets.SDIT_HIDDEN_BENCHMARK_B64 }}
+          SDIT_HIDDEN_BENCHMARK_SIGNATURE: ${{ secrets.SDIT_HIDDEN_BENCHMARK_SIGNATURE }}
+          SDIT_HIDDEN_BENCHMARK_KEY: ${{ secrets.SDIT_HIDDEN_BENCHMARK_KEY }}
+          SDIT_BENCHMARK_CASE_RUNNER: ${{ vars.SDIT_BENCHMARK_CASE_RUNNER }}
+          SDIT_BENCHMARK_REPETITIONS: "3"
+          SDIT_HIDDEN_BENCHMARK_REPORT: hidden-benchmark-report.json
+        run: python scripts/run_hidden_benchmark.py
 
-    for pattern, threshold in THRESHOLDS.items():
-        if pattern in name and mean_ms > threshold:
-            failed.append(f'{name}: {mean_ms:.1f}ms > {threshold}ms')
-
-if failed:
-    print('Performance regression detected:')
-    for item in failed:
-        print(f'  - {item}')
-    sys.exit(1)
-
-print('All benchmarks within thresholds')
-sys.exit(0)
-PY
+      - name: Upload redacted hidden benchmark report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hidden-benchmark-report
+          path: src-python/hidden-benchmark-report.json
+          if-no-files-found: error
+          retention-days: 30
 
   benchmark-report:
     runs-on: ubuntu-22.04
-    needs: [benchmark-regression, benchmark-threshold-check]
+    needs: [benchmark-regression, benchmark-threshold-check, hidden-benchmark-gate]
     if: always()
-
     steps:
       - name: Download benchmark results
+        if: needs.benchmark-regression.result == 'success'
         uses: actions/download-artifact@v4
         with:
           name: benchmark-results
 
+      - name: Download hidden benchmark report
+        if: needs.hidden-benchmark-gate.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          name: hidden-benchmark-report
+          path: hidden
+
       - name: Generate benchmark summary
         run: |
-          echo "## Benchmark Summary" >> $GITHUB_STEP_SUMMARY
-          echo "Run completed at: $(date -u)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          if [ -f "benchmark-results.json" ]; then
+          echo "## Benchmark Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "Run completed at: $(date -u)" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f benchmark-results.json ]; then
             python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
-import json
+          import json
+          from pathlib import Path
 
-with open('benchmark-results.json', 'r', encoding='utf-8') as f:
-    results = json.load(f)
-
-metadata = results.get('metadata', {})
-benches = results.get('benchmarks', [])
-if metadata.get('skipped'):
-    print(f"Benchmark suite skipped: {metadata.get('reason', 'no reason provided')}")
-elif not benches:
-    print('No benchmark samples available')
-else:
-    print('| Benchmark | Mean (ms) | Stddev (ms) |')
-    print('|-----------|-----------|-------------|')
-    for bench in benches:
-        name = bench.get('name', 'unknown')
-        mean = float(bench.get('stats', {}).get('mean', 0.0)) * 1000.0
-        std = float(bench.get('stats', {}).get('stddev', 0.0)) * 1000.0
-        print(f'| {name} | {mean:.2f} | {std:.2f} |')
-PY
+          results = json.loads(Path("benchmark-results.json").read_text(encoding="utf-8"))
+          print("| Benchmark | Mean (ms) | Stddev (ms) |")
+          print("|---|---:|---:|")
+          for bench in results.get("benchmarks", []):
+              stats = bench.get("stats", {})
+              print(f"| {bench.get('name', 'unknown')} | {float(stats.get('mean', 0.0)) * 1000:.2f} | {float(stats.get('stddev', 0.0)) * 1000:.2f} |")
+          PY
           else
-            echo "No benchmark results available" >> $GITHUB_STEP_SUMMARY
+            echo "Visible benchmark result: ${{ needs.benchmark-regression.result }}" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -f hidden/hidden-benchmark-report.json ]; then
+            python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("hidden/hidden-benchmark-report.json").read_text(encoding="utf-8"))
+          metrics = report.get("metrics", {})
+          print("\n### Hidden benchmark")
+          print(f"Manifest: {report.get('manifest_version', 'unknown')}")
+          print(f"Repetitions: {report.get('repetitions', 0)}")
+          print("| Metric | Value |")
+          print("|---|---:|")
+          for name in ("VATR", "VPR", "verified_recall", "false_positive_rate", "flaky_case_rate", "p50_duration_seconds", "p95_duration_seconds", "total_cost", "security_events"):
+              print(f"| {name} | {float(metrics.get(name, 0.0)):.4f} |")
+          PY
+          else
+            echo "Hidden benchmark job result: ${{ needs.hidden-benchmark-gate.result }}" >> "$GITHUB_STEP_SUMMARY"
           fi

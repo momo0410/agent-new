@@ -33,7 +33,7 @@ def _extract_failure_signals(state) -> list[dict]:
             "failure_reason": "auth-failed",
             "occurrences": 5,
             "evidence_samples": ["<excerpt>", ...],
-            "target_fingerprint": "192.168.1.10:21/ftp",
+            "target_fingerprint": "TARGET:PORT/service",
         }, ...
     ]
 

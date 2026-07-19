@@ -280,7 +280,7 @@ export class SettingsManager extends EventEmitter<AppSettings> {
    */
   private saveToLocalStorage(): void {
     try {
-      localStorage.setItem('LERT-settings', JSON.stringify(this.settings));
+      localStorage.setItem('LERT-settings', JSON.stringify(this.settingsForPersistence()));
     } catch (error) {
       console.error('保存设置到本地存储失败:', error);
     }
@@ -339,7 +339,7 @@ export class SettingsManager extends EventEmitter<AppSettings> {
   private async saveToBackend(): Promise<void> {
     try {
       const { invoke } = await import('../../shims/@tauri-apps/api/core');
-      const settingsJson = JSON.stringify(this.settings, null, 2);
+      const settingsJson = JSON.stringify(this.settingsForPersistence(), null, 2);
       await invoke('write_settings_file', { content: settingsJson });
       console.log('✅ 设置保存到settings.json成功');
     } catch (error) {
@@ -389,7 +389,17 @@ export class SettingsManager extends EventEmitter<AppSettings> {
    * 导出设置
    */
   exportSettings(): string {
-    return JSON.stringify(this.settings, null, 2);
+    return JSON.stringify(this.settingsForPersistence(), null, 2);
+  }
+
+  /** Keep model credentials in the runtime secret layer, never in settings snapshots. */
+  private settingsForPersistence(): AppSettings {
+    const snapshot = JSON.parse(JSON.stringify(this.settings)) as AppSettings;
+    for (const provider of Object.values(snapshot.ai?.providers || {})) {
+      if (provider && typeof provider === 'object') provider.apiKey = '';
+    }
+    if (snapshot.ai?.primary_model) snapshot.ai.primary_model.api_key = undefined;
+    return snapshot;
   }
 
   /**

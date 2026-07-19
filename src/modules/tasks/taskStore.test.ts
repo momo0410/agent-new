@@ -29,4 +29,23 @@ describe('TaskStore', () => {
     expect(store.apply(denied).reason).toBe('duplicate event')
     expect(store.snapshot.tasks['task-1'].warnings).toContain('outside scope')
   })
+
+  it('folds mission lifecycle transitions into the task snapshot', () => {
+    const store = new TaskStore()
+    expect(store.apply(event(1, 'mission.paused', { reason: 'operator pause' })).applied).toBe(true)
+    expect(store.snapshot.tasks['task-1'].status).toBe('paused')
+    expect(store.apply(event(2, 'mission.cancelling', { reason: 'operator stop' })).applied).toBe(true)
+    expect(store.snapshot.tasks['task-1'].status).toBe('cancelling')
+    expect(store.apply(event(3, 'mission.cancelled', { reason: 'operator stop' })).applied).toBe(true)
+    expect(store.snapshot.tasks['task-1'].status).toBe('cancelled')
+    expect(store.snapshot.tasks['task-1'].missionControl?.cancel_requested).toBe(true)
+  })
+
+  it('folds autonomy transitions with an audit trail', () => {
+    const store = new TaskStore()
+    expect(store.apply(event(1, 'autonomy.changed', { previous: 'supervised', current: 'advisory' })).applied).toBe(true)
+    const task = store.snapshot.tasks['task-1']
+    expect(task.autonomyMode).toBe('advisory')
+    expect(task.autonomyHistory?.[0].previous).toBe('supervised')
+  })
 })

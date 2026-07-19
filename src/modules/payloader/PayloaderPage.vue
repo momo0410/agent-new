@@ -112,6 +112,14 @@
         </button>
         <button
           v-if="state.viewMode === 'list'"
+          class="payloader-btn payloader-btn--tool"
+          @click="showTaskWorkspace = true"
+          title="任务创建、事件图谱与运行控制"
+        >
+          任务工作台
+        </button>
+        <button
+          v-if="state.viewMode === 'list'"
           :class="['payloader-btn', 'payloader-btn--pentest', { 'is-running': agentRunning }]"
           @click="handlePentestEntry"
           :title="agentRunning ? `${activeRunningCount} 个任务运行中` : '渗透测试'"
@@ -169,6 +177,18 @@
     </PayloaderToolbar>
 
     <PayloaderContent>
+      <div v-if="showTaskWorkspace" class="payloader-modal-overlay" @click.self="showTaskWorkspace = false">
+        <div class="payloader-modal payloader-modal--result">
+          <div class="payloader-modal-header">
+            <h3>自主安全任务工作台</h3>
+            <button class="payloader-modal-close" title="关闭" @click="showTaskWorkspace = false">&times;</button>
+          </div>
+          <div class="payloader-modal-body payloader-modal-body--scroll">
+            <TaskWorkspace @started="handleWorkspaceTaskStarted" />
+          </div>
+        </div>
+      </div>
+
       <!-- Agent 启动确认弹窗 -->
       <div v-if="showPentestModal" class="payloader-modal-overlay" @click.self="closePentestModal">
         <div class="payloader-modal">
@@ -711,8 +731,8 @@
                       <span class="payloader-log-time">{{ formatActionTime(round.time) }}</span>
                     </div>
                     <div class="payloader-log-think">
-                      <div class="payloader-log-think-label">🤖 AI 决策</div>
-                      <pre class="payloader-log-think-content">{{ formatActionPayload(round.llm_decision, '[暂无决策记录]') }}</pre>
+                      <div class="payloader-log-think-label">🤖 选择原因</div>
+                      <pre class="payloader-log-think-content">{{ formatActionPayload(round.choice_reason, '[暂无选择原因]') }}</pre>
                     </div>
                     <div class="payloader-log-entry">
                       <div class="payloader-log-meta">
@@ -1168,6 +1188,7 @@
 import PayloaderContent from './components/PayloaderContent.vue';
 import EncodingTools from './components/EncodingTools.vue';
 import PentestReportDashboard from './components/PentestReportDashboard.vue';
+import TaskWorkspace from '../tasks/TaskWorkspace.vue';
 import {
   resolveReportView,
   type PentestReportView,
@@ -1193,6 +1214,11 @@ const {
 const showViewDropdown = ref(false);
 const showCategoryDropdown = ref(false);
 const activeSection = ref<'execution' | 'chain' | 'analysis' | 'tutorial'>('execution');
+const showTaskWorkspace = ref(false);
+
+function handleWorkspaceTaskStarted(taskId: string): void {
+  (window as any).showNotification?.(`任务 ${taskId} 已进入事件工作台`, 'success');
+}
 
 const views = [
   { id: 'web', label: 'Web 渗透' },
@@ -1412,20 +1438,15 @@ function setPentestExecutionMode(mode: PentestExecutionMode) {
 }
 
 function getAIConfig() {
-  try {
-    const raw = localStorage.getItem('LERT-ai-config');
-    if (!raw) return null;
-    const cfg = JSON.parse(raw);
-    return {
-      apiKey: cfg.apiKey || '',
-      model: cfg.model || 'gpt-4o-mini',
-      baseUrl: cfg.baseUrl || 'https://api.openai.com/v1',
-      provider: cfg.provider || 'openai',
-      temperature: cfg.temperature ?? 0.3,
-    };
-  } catch {
-    return null;
-  }
+  const cfg = aiService.getConfig();
+  if (!cfg) return null;
+  return {
+    apiKey: cfg.apiKey || '',
+    model: cfg.model || 'gpt-4o-mini',
+    baseUrl: cfg.baseUrl || 'https://api.openai.com/v1',
+    provider: cfg.provider || 'openai',
+    temperature: cfg.temperature ?? 0.3,
+  };
 }
 
 function openPentestModal() {
@@ -1776,7 +1797,7 @@ const compactRoundItems = computed<PentestLogRound[]>(() => {
         key,
         round,
         time: action.time,
-        llm_decision: action.llm_decision,
+        choice_reason: action.choice_reason,
         actions: [],
         summary: '',
         statusSummary: '',
@@ -1791,8 +1812,8 @@ const compactRoundItems = computed<PentestLogRound[]>(() => {
     if (!group.time && action.time) {
       group.time = action.time;
     }
-    if (!group.llm_decision && action.llm_decision) {
-      group.llm_decision = action.llm_decision;
+    if (!group.choice_reason && action.choice_reason) {
+      group.choice_reason = action.choice_reason;
     }
     group.actions.push(action);
   });
@@ -2483,7 +2504,7 @@ function buildUserFacingPentestReport(params: {
   );
   const decisionItems = Array.from(new Set(
     logs
-      .map((log) => summarizeReportValue(log.llm_decision, '', 220))
+      .map((log) => summarizeReportValue(log.choice_reason, '', 220))
       .filter(Boolean)
   )).slice(0, 4);
   const target = params.target || normalizedPentestTarget.value || '未知目标';
@@ -2558,10 +2579,10 @@ function buildUserFacingPentestReport(params: {
       reportLiHtml(formatReportInline('对失败或未完成的探测步骤安排补测，避免因环境因素导致风险遗漏。')),
       reportLiHtml(formatReportInline('保留本次执行日志、关键截图和原始输出，作为后续整改闭环与审计留痕依据。')),
     ]),
-    reportH2('AI 决策摘要'),
+    reportH2('自动选择原因'),
     decisionItems.length > 0
       ? reportOlText(decisionItems)
-      : reportOlText(['暂无 AI 决策记录']),
+      : reportOlText(['暂无自动选择原因']),
     reportH2('说明'),
     reportUl([
       reportLiHtml(formatReportInline('页面展示的是面向阅读的渗透测试报告，详细参数、原始输出和完整过程请查看右上角“日志”。')),
@@ -2683,10 +2704,10 @@ async function buildInterruptedPentestSummary(taskId: string, target: string = '
     `   输出: ${summarizeActionPayload(log.full_stdout || log.result || log.error, '暂无输出', 180)}`,
   ].join('\n')).join('\n\n');
 
-  const llmDecisions = Array.from(
+  const choiceReasons = Array.from(
     new Set(
       normalizedLogs
-        .map((log) => summarizeActionPayload(log.llm_decision, '', 260))
+        .map((log) => summarizeActionPayload(log.choice_reason, '', 260))
         .filter((item) => item && item !== '...')
     )
   ).slice(-3).join('\n\n');
@@ -2706,8 +2727,8 @@ async function buildInterruptedPentestSummary(taskId: string, target: string = '
 发现资产: ${findingsCount}
 发现漏洞: ${vulnCount}
 
-AI 决策摘要:
-${llmDecisions || '暂无 AI 决策记录'}
+自动选择原因:
+${choiceReasons || '暂无自动选择原因'}
 
 最近执行日志:
 ${recentLogs || '暂无执行日志'}
@@ -2832,12 +2853,13 @@ async function startHostAgent() {
 
   try {
     const pythonApi = (await import('../../config/python-api.config')).default;
+    const modelSecret = await pythonApi.pentestStoreModelSecret(aiConfig.apiKey, aiConfig.provider);
     const startRes = await pythonApi.pentestStart({
       target: normalizedTarget,
       max_rounds: 30,
       dry_run: false,
       execution_mode: pentestExecutionMode.value,
-      api_key: aiConfig.apiKey,
+      api_key: modelSecret.secret_ref,
       model: aiConfig.model,
       base_url: aiConfig.baseUrl,
       provider: aiConfig.provider,
@@ -2987,7 +3009,8 @@ type PentestLogEntry = {
   time: string;
   result: string;
   full_stdout: string;
-  llm_decision: string;
+  output_preview?: string;
+  choice_reason: string;
   returncode: number | null;
   error: string;
   status?: string;
@@ -3008,7 +3031,7 @@ type PentestLogRound = {
   key: string;
   round: number | null;
   time: string;
-  llm_decision: string;
+  choice_reason: string;
   actions: PentestLogEntry[];
   summary: string;
   statusSummary: string;
@@ -3143,9 +3166,10 @@ function normalizeLogEntry(log: Record<string, unknown>) {
     tool: String(log.tool || 'unknown'),
     args: String(log.args || ''),
     time: String(log.time || ''),
-    result: stripAnsiEscapeCodes(String(log.result || '')),
-    full_stdout: stripAnsiEscapeCodes(String(log.full_stdout || '')),
-    llm_decision: stripAnsiEscapeCodes(String(log.llm_decision || '')),
+    result: stripAnsiEscapeCodes(String(log.result || log.output_preview || '')),
+    full_stdout: stripAnsiEscapeCodes(String(log.full_stdout || log.output_preview || '')),
+    output_preview: stripAnsiEscapeCodes(String(log.output_preview || '')),
+    choice_reason: stripAnsiEscapeCodes(String(log.choice_reason || '')),
     returncode: typeof log.returncode === 'number' ? log.returncode : null,
     error: stripAnsiEscapeCodes(String(log.error || '')),
     status: typeof log.status === 'string' ? log.status : 'completed',
@@ -3173,9 +3197,7 @@ const logRounds = computed<PentestLogRound[]>(() => {
   const groupIndex = new Map<string, number>();
 
   logData.value.forEach((log, index) => {
-    const streamingDecision = log.tool === '_llm_wait'
-      ? formatActionPayload(log.result || log.full_stdout, log.llm_decision)
-      : log.llm_decision;
+    const streamingDecision = log.choice_reason;
     const round = typeof log.round === 'number' ? log.round : null;
     const key = round !== null ? `round-${round}` : `single-${log.id || index}`;
     let group = groupIndex.has(key) ? groups[groupIndex.get(key)!] : undefined;
@@ -3185,7 +3207,7 @@ const logRounds = computed<PentestLogRound[]>(() => {
         key,
         round,
         time: log.time,
-        llm_decision: streamingDecision,
+        choice_reason: streamingDecision,
         actions: [],
         summary: '',
         statusSummary: '',
@@ -3199,8 +3221,8 @@ const logRounds = computed<PentestLogRound[]>(() => {
       groups.push(group);
     }
 
-    if (!group.llm_decision && streamingDecision) {
-      group.llm_decision = streamingDecision;
+    if (!group.choice_reason && streamingDecision) {
+      group.choice_reason = streamingDecision;
     }
     if (!group.time && log.time) {
       group.time = log.time;

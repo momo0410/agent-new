@@ -1,71 +1,98 @@
 name: Release
+
 on:
   push:
-    tags:
-      - 'v*'
+    tags: ['v*']
   workflow_dispatch:
 
-jobs:
-  release:
-    permissions:
-      contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [macos-latest, ubuntu-22.04, windows-latest]
+permissions:
+  contents: write
 
-    runs-on: ${{ matrix.platform }}
+jobs:
+  verify-and-package:
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies (Ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04'
-        # Tauri v2 Linux 依赖
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
-
-      - name: Rust setup
-        uses: dtolnay/rust-toolchain@stable
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            src-python/requirements.lock
+            src-python/requirements-dev.lock
 
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: './src-tauri -> target'
-
-      - name: Sync node version and setup cache
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
-          cache: 'npm'
+          cache: npm
 
-      - name: Install frontend dependencies
-        run: npm install
+      - name: Install and verify frontend
+        run: |
+          npm ci
+          npm run typecheck
+          npm run test
+          npm run build
 
-      - name: Build the app (macOS/Linux)
-        if: matrix.platform != 'windows-latest'
-        uses: tauri-apps/tauri-action@v0
+      - name: Install and verify backend
+        working-directory: src-python
+        run: |
+          python -m pip install --upgrade pip
+          pip install --require-hashes -r requirements-dev.lock
+          ruff check app/core app/services/pentest_agent/tool_registry.py app/services/skill_engine/lifecycle_manager.py
+          mypy app/core --ignore-missing-imports --no-error-summary
+          pytest tests -q --tb=short --cov=app --cov-fail-under=35
+          python scripts/verify_supply_chain.py --root ..
+          python scripts/generate_sbom.py --root .. --output ../release-sdit.cdx.json
+
+      - name: Create release bundle
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tagName: ${{ github.ref_name }}
-          releaseName: 'LovelyERes v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: true
-          prerelease: false
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          rm -rf release dist-release
+          mkdir -p release/sdit
+          cp -a dist release/sdit/frontend
+          cp -a src-python release/sdit/backend
+          cp -a skills release/sdit/skills
+          cp -a knowledge_base release/sdit/knowledge_base
+          cp package.json package-lock.json README.md LICENSE release/sdit/ 2>/dev/null || true
+          cp src-python/requirements.lock src-python/requirements-dev.lock docker/toolchain.lock.json release/sdit/ 2>/dev/null || true
+          cp release-sdit.cdx.json release/sdit/SBOM.cdx.json
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path('release/sdit')
+          files = []
+          for path in sorted(root.rglob('*')):
+              if path.is_file():
+                  files.append({
+                      'path': str(path.relative_to(root)).replace('\\', '/'),
+                      'sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
+                      'bytes': path.stat().st_size,
+                  })
+          manifest = {
+              'product': 'SDIT',
+              'tag': os.environ.get('RELEASE_TAG', ''),
+              'commit': os.environ.get('RELEASE_SHA', ''),
+              'files': files,
+          }
+          (root / 'RELEASE_MANIFEST.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
+          PY
+          tar -C release -czf "SDIT-${RELEASE_TAG:-snapshot}.tar.gz" sdit
+          sha256sum "SDIT-${RELEASE_TAG:-snapshot}.tar.gz" > "SDIT-${RELEASE_TAG:-snapshot}.sha256"
 
-      - name: Build Windows
-        if: matrix.platform == 'windows-latest'
-        run: npm run tauri build -- --no-bundle
-
-      - name: Upload Windows EXE
-        if: matrix.platform == 'windows-latest'
+      - name: Publish GitHub release assets
         uses: softprops/action-gh-release@v2
         with:
-          files: src-tauri/target/release/lovelyres.exe
-          name: LovelyERes ${{ github.ref_name }}
-          body: 'See the assets to download this version and install.'
+          tag_name: ${{ github.ref_name }}
+          name: SDIT ${{ github.ref_name }}
+          generate_release_notes: true
           draft: true
+          files: |
+            SDIT-${{ github.ref_name }}.tar.gz
+            SDIT-${{ github.ref_name }}.sha256

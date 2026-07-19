@@ -29,7 +29,7 @@ def build_teaching_report(data: dict[str, Any]) -> dict[str, Any]:
             "step": index,
             "time": item.get("time", ""),
             "tool": item.get("tool", ""),
-            "purpose": item.get("purpose", "") or item.get("llm_decision", ""),
+            "purpose": item.get("purpose", "") or item.get("choice_reason", ""),
             "result": item.get("result", ""),
             "status": item.get("status", ""),
             "evidence_ref": item.get("evidence_id", item.get("id", "")),
@@ -69,4 +69,3 @@ def build_teaching_report(data: dict[str, Any]) -> dict[str, Any]:
             ),
         },
     }
-

@@ -14,6 +14,39 @@ export interface AIServiceConfig extends AIProviderConfig {
 }
 
 const STORAGE_KEY = 'LERT-ai-config'
+const LEGACY_SECRET_STORAGE_KEYS = [STORAGE_KEY, 'LERT-ai-config-v2', 'LERT-settings']
+
+function isSensitiveStorageField(key: string): boolean {
+  const normalized = key.replace(/[^a-z0-9]/gi, '').toLowerCase()
+  return [
+    'apikey', 'password', 'secret', 'token', 'accesstoken', 'refreshtoken',
+    'privatekey', 'credential', 'credentials',
+  ].includes(normalized)
+}
+
+function scrubSecretsForPersistence(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(scrubSecretsForPersistence)
+  if (!value || typeof value !== 'object') return value
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>).map(([key, item]) => [
+      key,
+      isSensitiveStorageField(key) ? '' : scrubSecretsForPersistence(item),
+    ]),
+  )
+}
+
+function purgeLegacyBrowserSecrets(): void {
+  try {
+    for (const key of LEGACY_SECRET_STORAGE_KEYS) {
+      const raw = localStorage.getItem(key)
+      if (!raw) continue
+      const parsed = JSON.parse(raw) as unknown
+      localStorage.setItem(key, JSON.stringify(scrubSecretsForPersistence(parsed)))
+    }
+  } catch {
+    // Runtime configuration remains in memory if browser storage is restricted.
+  }
+}
 
 const DEFAULT_PROVIDER_CONFIGS: Record<string, Omit<AIServiceConfig, 'provider'>> = {
   openai: {
@@ -143,11 +176,13 @@ function readConfigFromCommandCenter(): AIServiceConfig | null {
 }
 
 function readStoredConfig(): AIServiceConfig | null {
-  return (
+  const config = (
     normalizeConfig(readJsonFromLocalStorage(STORAGE_KEY))
     || readConfigFromLegacySettings()
     || readConfigFromCommandCenter()
   )
+  purgeLegacyBrowserSecrets()
+  return config
 }
 
 function ensureConfig(config: AIServiceConfig | null): AIServiceConfig {
@@ -213,7 +248,7 @@ export class AIService {
     }
 
     this.config = normalized
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(scrubSecretsForPersistence(normalized)))
   }
 
   clearConfig(): void {

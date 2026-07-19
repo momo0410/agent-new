@@ -1,9 +1,9 @@
 name: CI
 on:
   push:
-    branches: [main]
+    branches: [master, main, "release/**"]
   pull_request:
-    branches: [main]
+    branches: [master, main]
 
 jobs:
   python-tests:
@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - name: Checkout repository
@@ -22,26 +22,25 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
-          cache-dependency-path: src-python/requirements.txt
+          cache-dependency-path: |
+            src-python/requirements.lock
+            src-python/requirements-dev.lock
 
       - name: Install dependencies
         working-directory: src-python
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest pytest-asyncio pytest-cov
+          pip install --require-hashes -r requirements-dev.lock
 
       - name: Lint with ruff
         working-directory: src-python
         run: |
-          pip install ruff
-          ruff check app/ --output-format=github || true
+          ruff check app/core app/services/pentest_agent/tool_registry.py app/services/skill_engine/lifecycle_manager.py --output-format=github
 
       - name: Type check with mypy
         working-directory: src-python
         run: |
-          pip install mypy
-          mypy app/ --ignore-missing-imports --no-error-summary || true
+          mypy app/core --ignore-missing-imports --no-error-summary
 
       - name: Run backend tests
         working-directory: src-python
@@ -49,7 +48,12 @@ jobs:
           pytest tests -v --tb=short \
             --cov=app \
             --cov-report=xml:coverage.xml \
-            --cov-report=term-missing
+            --cov-report=term-missing \
+            --cov-fail-under=35
+
+      - name: Verify supply-chain metadata
+        working-directory: src-python
+        run: python scripts/verify_supply_chain.py --root ..
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
@@ -80,6 +84,9 @@ jobs:
       - name: Run frontend tests
         run: npx vitest run --coverage
 
+      - name: Build frontend
+        run: npm run build
+
   security-scan:
     runs-on: ubuntu-22.04
 
@@ -95,12 +102,11 @@ jobs:
       - name: Run Bandit security scan
         working-directory: src-python
         run: |
-          pip install bandit
-          bandit -r app/ -f json -o bandit-report.json || true
-          bandit -r app/ -f txt || true
+          python -m pip install --require-hashes -r requirements-dev.lock
+          bandit -r app/ -lll -f json -o bandit-report.json
 
       - name: Run npm audit
-        run: npm audit --audit-level=high || true
+        run: npm audit --audit-level=high
 
       - name: Upload security report
         uses: actions/upload-artifact@v4
@@ -108,4 +114,16 @@ jobs:
           name: security-reports
           path: |
             src-python/bandit-report.json
+          retention-days: 30
+
+      - name: Generate CycloneDX SBOM
+        working-directory: src-python
+        run: python scripts/generate_sbom.py --root .. --output ../sdit.cdx.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdit-sbom
+          path: sdit.cdx.json
+          if-no-files-found: error
           retention-days: 30

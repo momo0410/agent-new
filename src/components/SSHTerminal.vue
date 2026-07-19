@@ -488,12 +488,6 @@ const generateId = (): string => {
   return Date.now().toString(36) + Math.random().toString(36).substring(2)
 }
 
-const getTerminalWsUrl = (terminalId: string): string => {
-  const token = pythonApi.getLocalSessionTokenValue()
-  const query = token ? `?token=${encodeURIComponent(token)}` : ''
-  return `${TERMINAL_WS_BASE}/ws/terminal/${encodeURIComponent(terminalId)}${query}`
-}
-
 const isTerminalSocketOpen = (terminalInstance: TerminalInstance): boolean => {
   return terminalInstance.terminalSocket?.readyState === WebSocket.OPEN
 }
@@ -1263,10 +1257,17 @@ const connectToSSH = async (terminalInstance: TerminalInstance) => {
 }
 
 // 开始接收输出：仅使用 WebSocket 实时双向传输
-const startReceivingOutput = (terminalInstance: TerminalInstance) => {
+const startReceivingOutput = async (terminalInstance: TerminalInstance) => {
   stopReceivingOutput(terminalInstance)
 
-  const socket = new WebSocket(getTerminalWsUrl(terminalInstance.id)) as WebSocket & {
+  let ticket = ''
+  try {
+    ticket = await pythonApi.getWebSocketTicket()
+  } catch (error) {
+    terminalInstance.terminal.writeln('\x1b[31mWebSocket 会话票据获取失败: ' + error + '\x1b[0m')
+    return
+  }
+  const socket = new WebSocket(TERMINAL_WS_BASE + '/ws/terminal/' + encodeURIComponent(terminalInstance.id) + '?ticket=' + encodeURIComponent(ticket)) as WebSocket & {
     __expectedClose?: boolean
   }
   socket.binaryType = 'arraybuffer'
@@ -3309,3 +3310,5 @@ onUnmounted(() => {
   background: rgba(255, 255, 255, 0.3);
 }
 </style>
+
+

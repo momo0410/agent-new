@@ -1,11 +1,13 @@
 from __future__ import annotations
 import json
+import hashlib
 import os
 import tempfile
 import time
 import asyncio
 import logging
 logger = logging.getLogger(__name__)
+import re
 import ipaddress
 from datetime import datetime, timedelta, timezone
 from typing import Any, Awaitable, Callable, Dict, List, Optional, TypeVar, Literal
@@ -32,6 +34,7 @@ from app.services.settings import (
 from app.services.theme_manager import get_theme_settings
 from app.services.device_info import get_device_uuid
 from app.services.window_manager import WindowManager
+from app.core.secret_store import SecretRef, SecretStore
 from app.utils.crypto import get_rsa_public_key
 from app.utils.system_fonts import get_system_fonts
 router = APIRouter(prefix="/api/v1", tags=["sdit"])
@@ -57,6 +60,8 @@ _window_manager: Optional[WindowManager] = None
 _app_settings: Optional[AppSettings] = None
 """应用设置单例（主题、语言、快捷键等），启动时从本地配置文件加载。"""
 _sftp_upload_progress: Dict[str, Dict[str, Any]] = {}
+_ssh_secret_store = SecretStore(service="sdit-ssh-runtime", persistent=False)
+_model_secret_store = SecretStore(service="sdit-model-api-key", persistent=True)
 """SFTP 上传进度缓存，按 upload_id 记录当前阶段与字节进度。"""
 
 
@@ -99,6 +104,29 @@ def get_connection_manager() -> SSHConnectionManager:
     if _ssh_connection_manager is None:
         raise HTTPException(status_code=500, detail="SSH连接管理器未初始化")
     return _ssh_connection_manager
+
+
+def _resolve_secret_ref(value: Optional[str]) -> Optional[str]:
+    """Resolve an opaque runtime reference without returning its value to clients."""
+    if value is None or not str(value).strip():
+        return value
+    candidate = str(value).strip()
+    if not candidate.startswith("secret_"):
+        return candidate
+    resolved = _ssh_secret_store.resolve(candidate)
+    if resolved is None:
+        raise HTTPException(status_code=400, detail="secret reference expired")
+    return resolved
+
+
+def _resolve_model_api_key(value: str) -> str:
+    candidate = str(value or "").strip()
+    if not candidate.startswith("secret_"):
+        return candidate
+    resolved = _model_secret_store.resolve(candidate)
+    if resolved is None:
+        raise HTTPException(status_code=400, detail="model secret reference expired")
+    return resolved
 class ConnectDirectRequest(BaseModel):
     host: str
     """目标服务器 IP 或域名"""
@@ -106,8 +134,9 @@ class ConnectDirectRequest(BaseModel):
     """SSH 端口，默认 22"""
     username: str
     """登录用户名"""
-    password: str
-    """登录密码（明文传输，建议前端使用加密密码端点）"""
+    password: Optional[str] = None
+    secret_ref: Optional[str] = None
+    """短时运行时凭据引用；优先于 password。"""
 class ConnectWithAuthRequest(BaseModel):
     host: str
     """目标服务器 IP 或域名"""
@@ -118,7 +147,8 @@ class ConnectWithAuthRequest(BaseModel):
     auth_type: str = "password"
     """认证类型：password / key / certificate"""
     password: Optional[str] = None
-    """密码（auth_type=password 时必需）"""
+    secret_ref: Optional[str] = None
+    """短时运行时凭据引用；优先于 password。"""
     key_path: Optional[str] = None
     """私钥文件路径（auth_type=key 时必需）"""
     key_passphrase: Optional[str] = None
@@ -718,16 +748,31 @@ async def encrypt_password(req: EncryptPasswordRequest):
 @router.post("/ssh/decrypt-password")
 async def decrypt_password(req: DecryptPasswordRequest):
     manager = get_connection_manager()
-    return {"decrypted": manager.decrypt_password(req.encrypted_password)}
+    try:
+        secret = manager.decrypt_password(req.encrypted_password)
+        ref: SecretRef = _ssh_secret_store.put(
+            secret,
+            kind="ssh-password",
+            ttl_seconds=300,
+        )
+        return {
+            "secret_ref": ref.ref,
+            "kind": ref.kind,
+            "fingerprint": ref.fingerprint,
+            "expires_at": ref.expires_at,
+        }
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail="encrypted credential could not be opened") from exc
 @router.post("/ssh/connect")
 async def ssh_connect_with_auth(req: ConnectWithAuthRequest):
     ssh = get_ssh_manager()
     try:
+        password = _resolve_secret_ref(req.secret_ref or req.password)
         result = await ssh.connect(
             host=req.host,
             port=req.port,
             username=req.username,
-            password=req.password,
+            password=password,
             private_key=req.key_path,
             key_passphrase=req.key_passphrase,
         )
@@ -738,11 +783,12 @@ async def ssh_connect_with_auth(req: ConnectWithAuthRequest):
 async def ssh_test_connection(req: ConnectWithAuthRequest):
     ssh = get_ssh_manager()
     try:
+        password = _resolve_secret_ref(req.secret_ref or req.password)
         await ssh.connect(
             host=req.host,
             port=req.port,
             username=req.username,
-            password=req.password,
+            password=password,
             private_key=req.key_path,
             key_passphrase=req.key_passphrase,
         )
@@ -768,7 +814,7 @@ async def ssh_connect_direct(req: ConnectDirectRequest):
             host=req.host,
             port=req.port,
             username=req.username,
-            password=req.password,
+            password=_resolve_secret_ref(req.secret_ref or req.password),
         )
         return {"success": True}
     except Exception as e:
@@ -1514,9 +1560,19 @@ from app.services.pentest_agent.state import State
 from app.services.pentest_agent.executor import Executor
 from app.services.pentest_agent.llm_client import LLMClient, set_llm_client
 from uuid import uuid4
-from app.core.contracts import ActionLevel, PortRange, ScopeContract
+from app.core.contracts import ActionLevel, AutonomyMode, PortRange, ScopeContract
 from app.core.done_gate import DoneGate
+from app.core.mission_control import MissionControl
+from app.core.planner_contracts import ActionLimitController, AutonomyController
 from app.core.scope_policy import ScopePolicy
+from app.core.asset_graph import AssetGraph
+from app.core.asset_normalizer import AssetInventoryImporter
+from app.core.policy_templates import CoursePolicyError, CoursePolicyRegistry, CoursePolicyTemplate
+from app.core.web_model import AuthSession, WebCrawlerPolicy, WebRuleEngine, WebSessionStore
+from app.core.web_runtime import BrowserAutomationPlugin, BrowserTrace, ScopedWebCrawler, WebFetch
+from app.core.report_export import ReportExporter, build_report_document
+from app.core.report_contract import ReportCompletenessValidator, ReportSnapshot
+from app.core.choice_reason import summarize_choice_reason
 
 _pentest_tasks: dict[str, dict] = {}
 """所有渗透任务 {task_id: {target, state_file, start_time, task_obj, status}}"""
@@ -1526,7 +1582,9 @@ _SRC_PYTHON_DIR = os.path.dirname(
 )
 _PROJECT_ROOT_DIR = os.path.dirname(_SRC_PYTHON_DIR)
 _PENTEST_STATE_DIR = os.path.join(_PROJECT_ROOT_DIR, "data", "pentest")
-_pentest_scope_policy = ScopePolicy()
+_course_policy_registry = CoursePolicyRegistry()
+_pentest_scope_policy = ScopePolicy(course_policies=_course_policy_registry)
+_web_sessions = WebSessionStore()
 
 def _state_file(task_id: str) -> str:
     return os.path.join(_PENTEST_STATE_DIR, f"pentest_state_{task_id}.json")
@@ -1574,10 +1632,47 @@ def _load_task_state(task_id: str) -> Optional[State]:
     state_path = _resolve_task_state_path(task_id)
     if not state_path or not os.path.exists(state_path):
         return None
-    return State(state_path)
+    return State(state_path, task_id=task_id)
+
+
+def _public_action_view(action: dict[str, Any]) -> dict[str, Any]:
+    """Expose observable action status while keeping internal model text private."""
+    public = {
+        key: value
+        for key, value in action.items()
+        if key not in {"full_stdout", "llm_decision"}
+    }
+    public["choice_reason"] = summarize_choice_reason(
+        action.get("choice_reason") or action.get("purpose", ""),
+        str(action.get("purpose", "")),
+    )
+    preview = str(action.get("result") or action.get("error") or "")
+    preview = re.sub(
+        r"(?i)(password|passwd|token|secret|api[_-]?key|authorization)(\s*[:=]\s*)[^\s,;]+",
+        r"\1\2[REDACTED]",
+        preview,
+    )
+    public["output_preview"] = preview[:2000]
+    return public
+
+
+def _build_report_check(state: State, task_id: str) -> tuple[dict[str, Any], Any]:
+    report_data = dict(state.data)
+    report_data["event_integrity"] = state.event_store.integrity_manifest()
+    document = build_report_document(report_data, task_id=task_id)
+    snapshot = ReportSnapshot.from_document(
+        document,
+        task_version=str(state.data.get("version", "state.v1")),
+    )
+    return document, ReportCompletenessValidator().validate(snapshot)
 
 def _infer_task_status(task_id: str, state: Optional[State], tinfo: Optional[dict]) -> str:
     if tinfo:
+        control = tinfo.get("control")
+        if isinstance(control, MissionControl):
+            control_status = control.status
+            if control_status in {"paused", "cancelling", "cancelled", "completed", "failed"}:
+                return control_status
         task = tinfo.get("task_obj")
         if tinfo.get("status") == "running" and task and not task.done():
             return "running"
@@ -1628,7 +1723,55 @@ class PentestStartRequest(BaseModel):
     llm_max_retries: int = Field(1, ge=0, le=10, description="LLM 请求最大重试次数")
     llm_retry_backoff_seconds: float = Field(1.2, ge=0.1, le=30.0, description="LLM 重试退避秒数")
     allowed_ports: list[int] = Field(default_factory=list, description="授权测试端口；为空时使用显式 1-65535 范围")
-    authorization_basis: str = Field("local authorized lab", min_length=1, max_length=240, description="授权依据摘要")
+    allowed_protocols: list[str] = Field(default_factory=lambda: ["tcp"], min_length=1, max_length=16)
+    max_duration_seconds: int | None = Field(None, ge=1, le=604800)
+    max_commands: int = Field(1000, ge=1, le=100000)
+    max_network_requests: int = Field(10000, ge=1, le=1000000)
+    max_requests_per_second: float = Field(10.0, gt=0, le=10000)
+    max_bruteforce_attempts: int = Field(100, ge=0, le=1000000)
+    max_storage_bytes: int = Field(268435456, ge=0, le=1099511627776)
+    max_concurrency: int | None = Field(None, ge=1, le=64)
+    data_handling: Literal["ephemeral", "task_retained", "organization_retained"] = "ephemeral"
+    policy_template_id: str = Field("", max_length=128)
+    policy_template_version: str = Field("", max_length=64)
+    authorization_basis: str = Field("local synthetic fixture", min_length=1, max_length=240, description="任务依据摘要")
+    autonomy_mode: Literal["advisory", "supervised", "unattended"] = Field(
+        "supervised", description="自治等级"
+    )
+
+
+class AutonomyModeRequest(BaseModel):
+    task_id: str = Field(..., min_length=1, max_length=128)
+    mode: Literal["advisory", "supervised", "unattended"]
+    actor: str = Field("operator", min_length=1, max_length=160)
+    reason: str = Field("operator requested autonomy change", min_length=1, max_length=500)
+
+
+class ActionLimitRequest(BaseModel):
+    task_id: str = Field(..., min_length=1, max_length=128)
+    level: Literal["observe", "probe", "credential_test", "exploit", "session_verify", "post_verify"]
+    actor: str = Field("operator", min_length=1, max_length=160)
+    reason: str = Field("operator changed live action limit", min_length=1, max_length=500)
+
+
+class KillSwitchRequest(BaseModel):
+    enabled: bool = True
+    actor: str = Field("operator", min_length=1, max_length=160)
+    reason: str = Field("global mission stop requested", min_length=1, max_length=500)
+
+
+class CoursePolicyPublishRequest(BaseModel):
+    template: dict[str, Any] = Field(..., description="课程策略模板 JSON")
+    actor: str = Field("course-admin", min_length=1, max_length=160)
+    actor_role: str = Field("course_admin", min_length=1, max_length=80)
+
+
+class CoursePolicyBindRequest(BaseModel):
+    template_id: str = Field(..., min_length=3, max_length=128)
+    version: str = Field(..., min_length=1, max_length=64)
+    values: dict[str, Any] = Field(default_factory=dict)
+    actor: str = Field("student", min_length=1, max_length=160)
+    actor_role: str = Field("student", min_length=1, max_length=80)
 
 
 class PentestTokenUsageRequest(BaseModel):
@@ -1639,6 +1782,132 @@ class PentestTokenUsageRequest(BaseModel):
     total_tokens: int = Field(0, ge=0, description="总 token")
     model: str = Field("", description="模型名")
     provider: str = Field("", description="提供商")
+
+
+class WebFixtureResponse(BaseModel):
+    status_code: int = Field(200, ge=100, le=599)
+    headers: dict[str, str] = Field(default_factory=dict)
+    body: str = ""
+    request_id: str = ""
+    facts: dict[str, Any] = Field(default_factory=dict)
+
+
+class WebCrawlRequest(BaseModel):
+    task_id: str = Field(..., min_length=1, max_length=128)
+    seeds: list[str] = Field(..., min_length=1, max_length=50)
+    role: str = Field("anonymous", min_length=1, max_length=80)
+    session_id: str = Field("", max_length=128)
+    max_depth: int = Field(2, ge=0, le=8)
+    max_content_bytes: int = Field(2_000_000, ge=1, le=20_000_000)
+    max_requests_per_second: float = Field(2.0, gt=0, le=100)
+    fixtures: dict[str, WebFixtureResponse] = Field(default_factory=dict)
+    transport: Literal["fixture", "http"] = "fixture"
+
+
+class BrowserTraceRequest(BaseModel):
+    task_id: str = Field(..., min_length=1, max_length=128)
+    browser_version: str = Field(..., min_length=1, max_length=128)
+    trace_id: str = Field("", max_length=128)
+    dom_snapshots: list[dict[str, str]] = Field(default_factory=list, max_length=200)
+    network: list[dict[str, Any]] = Field(default_factory=list, max_length=2000)
+    actions: list[dict[str, str]] = Field(default_factory=list, max_length=2000)
+    replay: bool = False
+    replay_browser_version: str = Field("", max_length=128)
+
+
+class ReportExportRequest(BaseModel):
+    task_id: str = Field(..., min_length=1, max_length=128)
+    formats: list[Literal["md", "html", "json", "pdf", "docx"]] = Field(
+        default_factory=lambda: ["md", "html", "json", "pdf", "docx"],
+        min_length=1,
+    )
+
+
+class AssetInventoryImportRequest(BaseModel):
+    task_id: str = Field(..., min_length=1, max_length=128)
+    inventory: Any
+    source: str = Field("inventory-api", min_length=1, max_length=160)
+    ttl_seconds: int | None = Field(86400, ge=1, le=315360000)
+
+
+class ModelSecretRequest(BaseModel):
+    api_key: str = Field(..., min_length=1, max_length=16384)
+    ttl_seconds: int = Field(300, ge=30, le=3600)
+    provider: str = Field("model", min_length=1, max_length=80)
+
+
+@router.post("/agent/policy/templates/publish")
+async def publish_course_policy(req: CoursePolicyPublishRequest):
+    """Publish an immutable administrator-owned course policy version."""
+    try:
+        template = CoursePolicyTemplate.model_validate(req.template)
+        published = _course_policy_registry.publish(
+            template,
+            actor=req.actor,
+            actor_role=req.actor_role,
+        )
+    except (CoursePolicyError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {
+        "success": True,
+        "template": published.model_dump(mode="json"),
+        "template_hash": published.canonical_hash(),
+    }
+
+
+@router.get("/agent/policy/templates/{template_id}/{version}")
+async def get_course_policy(template_id: str, version: str):
+    try:
+        template = _course_policy_registry.get(template_id, version)
+    except CoursePolicyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return {
+        "template": template.model_dump(mode="json"),
+        "template_hash": template.canonical_hash(),
+    }
+
+
+@router.post("/agent/policy/templates/bind")
+async def bind_course_policy(req: CoursePolicyBindRequest):
+    """Create a student scope by narrowing a published course ceiling."""
+    try:
+        scope = _course_policy_registry.bind(
+            req.template_id,
+            req.version,
+            req.values,
+            actor=req.actor,
+            actor_role=req.actor_role,
+        )
+        token = _pentest_scope_policy.issue_token(scope)
+    except (CoursePolicyError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {
+        "success": True,
+        "scope_contract": scope.model_dump(mode="json"),
+        "scope_token": token,
+        "template_hash": scope.policy_template_hash,
+    }
+
+
+@router.get("/agent/policy/templates/audit")
+async def course_policy_audit():
+    return {"events": _course_policy_registry.audit_events()}
+
+
+@router.post("/agent/model-secret")
+async def store_model_secret(req: ModelSecretRequest):
+    """Turn a transient model credential into an opaque runtime reference."""
+    ref = _model_secret_store.put(
+        req.api_key,
+        kind=f"{req.provider}-api-key",
+        ttl_seconds=req.ttl_seconds,
+    )
+    return {
+        "secret_ref": ref.ref,
+        "kind": ref.kind,
+        "fingerprint": ref.fingerprint,
+        "expires_at": ref.expires_at,
+    }
 
 
 def _build_pentest_scope(req: PentestStartRequest) -> ScopeContract:
@@ -1660,13 +1929,16 @@ def _build_pentest_scope(req: PentestStartRequest) -> ScopeContract:
             allowed_domains.append(target)
     ports = sorted(set(req.allowed_ports))
     port_ranges = [PortRange(start=1, end=65535)] if not ports else []
-    return ScopeContract(
+    duration_seconds = req.max_duration_seconds or max(60, req.llm_timeout_seconds * req.max_rounds)
+    concurrency = req.max_concurrency or (1 if req.execution_mode == "serial" else 3)
+    scope = ScopeContract(
         owner="local-user",
         allowed_targets=allowed_targets or ([target] if not allowed_cidrs and not allowed_domains else [target]),
         allowed_cidrs=allowed_cidrs,
         allowed_domains=allowed_domains,
         allowed_ports=ports,
         allowed_port_ranges=port_ranges,
+        allowed_protocols=req.allowed_protocols,
         allowed_actions={
             ActionLevel.OBSERVE,
             ActionLevel.PROBE,
@@ -1676,22 +1948,90 @@ def _build_pentest_scope(req: PentestStartRequest) -> ScopeContract:
             ActionLevel.POST_VERIFY,
         },
         forbidden_actions={ActionLevel.PROHIBITED},
-        expires_at=datetime.now(timezone.utc) + timedelta(seconds=max(60, req.llm_timeout_seconds * req.max_rounds)),
-        max_concurrency=1 if req.execution_mode == "serial" else 3,
-        max_duration_seconds=max(60, req.llm_timeout_seconds * req.max_rounds),
+        expires_at=datetime.now(timezone.utc) + timedelta(seconds=duration_seconds),
+        max_concurrency=concurrency,
+        max_duration_seconds=duration_seconds,
+        max_commands=req.max_commands,
+        max_network_requests=req.max_network_requests,
+        max_requests_per_second=req.max_requests_per_second,
+        max_bruteforce_attempts=req.max_bruteforce_attempts,
+        max_storage_bytes=req.max_storage_bytes,
+        data_handling=req.data_handling,
         purpose=req.authorization_basis,
+        autonomy_mode=AutonomyMode(req.autonomy_mode),
     )
+    if req.policy_template_id:
+        if not req.policy_template_version:
+            raise CoursePolicyError("course policy template version is required")
+        scope = _course_policy_registry.bind(
+            req.policy_template_id,
+            req.policy_template_version,
+            scope.model_dump(),
+            actor="local-user",
+            actor_role="student",
+        )
+    return scope
 
 @router.post("/agent/pentest/start")
 async def pentest_start(req: PentestStartRequest):
+    resolved_api_key = _resolve_model_api_key(req.api_key)
     task_id = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid4().hex[:8]}"
     state_path = _state_file(task_id)
-    scope_contract = _build_pentest_scope(req)
+    control = MissionControl(task_id)
+    try:
+        scope_contract = _build_pentest_scope(req)
+    except CoursePolicyError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     scope_token = _pentest_scope_policy.issue_token(scope_contract)
 
-    initial_state = State(state_path)
+    initial_state = State(state_path, task_id=task_id)
+    initial_state.data["task_id"] = task_id
+    initial_state.data["targets"] = [req.target.strip()]
     initial_state.data["scope_contract"] = scope_contract.model_dump(mode="json")
+    initial_state.data["autonomy_mode"] = scope_contract.autonomy_mode
+    initial_state.data["autonomy_history"] = []
+    initial_state.data["action_limit"] = "post_verify"
+    initial_state.data["action_limit_history"] = []
     initial_state.data["scope_token_id"] = scope_token.split(".", 1)[0][:32]
+    model_url = urlparse(req.base_url)
+    model_origin = (
+        f"{model_url.scheme}://{model_url.hostname}"
+        + (f":{model_url.port}" if model_url.port else "")
+        if model_url.scheme and model_url.hostname
+        else "local-runtime"
+    )
+    runtime_snapshot = initial_state.data.setdefault("runtime_snapshot", {})
+    runtime_snapshot["model"] = {
+        "provider": req.provider,
+        "model": req.model,
+        "base_url_origin": model_origin,
+        "temperature": req.temperature,
+        "max_tokens": req.llm_max_tokens,
+    }
+    initial_state.event_store.append(
+        initial_state.event_task_id,
+        "task.created",
+        {
+            "task_id": task_id,
+            "config": {
+                "target": req.target.strip(),
+                "targets": [req.target.strip()],
+                "scope_id": scope_contract.scope_id,
+                "mission_id": scope_contract.mission_id,
+                "autonomy_mode": scope_contract.autonomy_mode,
+                "max_rounds": req.max_rounds,
+                "dry_run": req.dry_run,
+                "execution_mode": req.execution_mode,
+                "versions": {
+                    "state": str(initial_state.data.get("version", "1.0")),
+                    "event": "event.v1",
+                    "policy": scope_contract.policy_version,
+                },
+            },
+        },
+        actor="task-api",
+        idempotency_key=f"task.create:{task_id}",
+    )
     initial_state.event_store.append(
         initial_state.event_task_id,
         "scope.created",
@@ -1702,12 +2042,18 @@ async def pentest_start(req: PentestStartRequest):
             "policy_version": scope_contract.policy_version,
         },
         actor="task-api",
+        idempotency_key=f"scope.create:{scope_contract.scope_id}",
     )
     initial_state.data["event_count"] = initial_state.event_store.verify()["event_count"]
+    initial_state.record_mission_control(
+        control.snapshot(),
+        previous_status=str(initial_state.data.get("mission_status", "")),
+        actor="task-api",
+    )
     initial_state.save()
 
     client = LLMClient(
-        api_key=req.api_key,
+        api_key=resolved_api_key,
         model=req.model,
         base_url=req.base_url,
         provider=req.provider,
@@ -1717,16 +2063,23 @@ async def pentest_start(req: PentestStartRequest):
         max_retries=req.llm_max_retries,
         retry_backoff=req.llm_retry_backoff_seconds,
     )
+    if str(req.api_key).startswith("secret_"):
+        _model_secret_store.delete(str(req.api_key))
     set_llm_client(client)
 
+    autonomy_controller = AutonomyController(scope_contract.autonomy_mode)
+    action_limit_controller = ActionLimitController("post_verify")
     _pentest_tasks[task_id] = {
         "target": req.target,
         "state_file": state_path,
         "start_time": str(datetime.now()),
         "status": "running",
         "task_obj": None,
+        "control": control,
         "scope_contract": scope_contract.model_dump(mode="json"),
         "scope_token": scope_token,
+        "autonomy": autonomy_controller,
+        "action_limit": action_limit_controller,
     }
 
     loop = asyncio.new_event_loop()
@@ -1755,15 +2108,32 @@ async def pentest_start(req: PentestStartRequest):
                         scope_token=scope_token,
                         scope_policy=_pentest_scope_policy,
                         task_id=task_id,
+                        mission_control=control,
+                        autonomy_controller=autonomy_controller,
+                        action_limit_controller=action_limit_controller,
                     )
                 finally:
                     loop.close()
 
             await asyncio.to_thread(_blocking)
-            _pentest_tasks[task_id]["status"] = "done"
+            if control.is_cancel_requested:
+                control.mark_cancelled(control.reason or "mission cancellation requested")
+                _pentest_tasks[task_id]["status"] = "cancelled"
+            else:
+                control.mark_completed("mission run completed")
+                _pentest_tasks[task_id]["status"] = "done"
+        except asyncio.CancelledError:
+            control.cancel("async task wrapper cancelled")
+            _pentest_tasks[task_id]["status"] = "cancelling"
+            raise
         except Exception as e:
             logger.error(f"Pentest task {task_id} failed: {str(e)}", exc_info=True)
-            _pentest_tasks[task_id]["status"] = "failed"
+            if control.is_cancel_requested:
+                control.mark_cancelled(str(e) or "mission cancellation requested")
+                _pentest_tasks[task_id]["status"] = "cancelled"
+            else:
+                control.mark_failed(str(e))
+                _pentest_tasks[task_id]["status"] = "failed"
             _pentest_tasks[task_id]["error"] = str(e)
 
     task = asyncio.create_task(_run_agent())
@@ -1790,18 +2160,64 @@ async def pentest_status(task_id: str):
         raise HTTPException(status_code=404, detail="任务不存在")
 
     state = State(tinfo["state_file"])
-    is_running = tinfo.get("status") == "running" and tinfo.get("task_obj") and not tinfo["task_obj"].done()
+    control = tinfo.get("control")
+    control_snapshot = control.snapshot() if isinstance(control, MissionControl) else dict(
+        state.data.get("mission_control") or {}
+    )
+    lifecycle_status = (
+        control_snapshot.get("status")
+        or tinfo.get("status")
+        or _infer_task_status(task_id, state, tinfo)
+    )
+    task_obj = tinfo.get("task_obj")
+    is_running = bool(
+        lifecycle_status in {"running", "paused", "cancelling"}
+        and task_obj
+        and not task_obj.done()
+    )
     actions = state.data["actions_taken"]
     slim_actions = []
     for a in actions[-10:]:
-        slim = {k: v for k, v in a.items() if k != "full_stdout"}
-        slim_actions.append(slim)
+        slim_actions.append(_public_action_view(a))
+    report_document, report_check = _build_report_check(state, task_id)
+    evidence_records = [
+        item for item in state.data.get("canonical_evidence", [])
+        if isinstance(item, dict)
+        and str(item.get("status", "")).strip().lower() not in DoneGate.TERMINAL
+    ]
+    target_records = [
+        item for item in state.data.get("targets", []) if isinstance(item, dict)
+    ]
+    budget_exhausted = bool(
+        state.data.get("budget_exhausted")
+        or state.data.get("resource_budget_exhausted")
+    )
     gate = DoneGate().evaluate(
         [item for item in state.data.get("attack_surfaces", []) if isinstance(item, dict)],
-        report_complete=state.data.get("phase") in {"reflection", "done"},
+        budget_exhausted=budget_exhausted,
+        report_complete=(
+            state.data.get("phase") in {"reflection", "done"}
+            and report_check.complete
+        ),
+        task_cancelled=lifecycle_status == "cancelled",
+        targets=target_records,
+        unresolved_evidence=evidence_records,
+        sessions=[item for item in state.data.get("sessions", []) if isinstance(item, dict)],
+        objective_required=bool(state.data.get("objective")),
+        objective_completed=bool(state.data.get("objective_completed")),
     )
+    try:
+        event_consistency = state.event_consistency()
+    except Exception as exc:
+        event_consistency = {
+            "schema_version": "state-consistency.v1",
+            "consistent": False,
+            "error": str(exc)[:500],
+        }
     return {
         "running": is_running,
+        "status": lifecycle_status,
+        "mission_control": control_snapshot,
         "phase": state.data["phase"],
         "targets": state.data["targets"],
         "findings_count": state.find_count,
@@ -1814,7 +2230,14 @@ async def pentest_status(task_id: str):
         "error": tinfo.get("error"),
         "event_count": int(state.data.get("event_count", 0) or 0),
         "scope_id": (state.data.get("scope_contract") or {}).get("scope_id", ""),
+        "autonomy_mode": state.data.get("autonomy_mode") or (state.data.get("scope_contract") or {}).get("autonomy_mode", "supervised"),
+        "autonomy_history": state.data.get("autonomy_history", [])[-20:],
+        "action_limit": state.data.get("action_limit", "post_verify"),
+        "action_limit_history": state.data.get("action_limit_history", [])[-20:],
         "done_gate": gate.as_dict(),
+        "report_completeness": report_check.as_dict(),
+        "report_integrity_hash": report_document.get("integrity_hash", ""),
+        "event_consistency": event_consistency,
     }
 
 @router.get("/agent/pentest/logs")
@@ -1825,7 +2248,7 @@ async def pentest_logs(task_id: str):
     return {
         "phase": state.data["phase"],
         "actions_count": len(state.data["actions_taken"]),
-        "actions": state.data["actions_taken"],
+        "actions": [_public_action_view(item) for item in state.data["actions_taken"]],
         "task_id": task_id,
     }
 
@@ -1834,12 +2257,192 @@ async def pentest_stop(task_id: str):
     tinfo = _pentest_tasks.get(task_id)
     if not tinfo:
         return {"success": False, "message": "任务不存在"}
+    control = tinfo.get("control")
+    if isinstance(control, MissionControl):
+        requested = control.cancel("user requested mission stop")
+        if requested:
+            tinfo["status"] = "cancelling"
+            return {
+                "success": True,
+                "message": "已发送终止信号",
+                "status": control.status,
+                "mission_control": control.snapshot(),
+            }
+        if control.status in {"cancelling", "cancelled"}:
+            return {"success": True, "message": "终止流程已在处理中", "status": control.status}
+        return {"success": False, "message": "没有运行中的任务", "status": control.status}
     task = tinfo.get("task_obj")
     if task and not task.done():
-        task.cancel()
-        tinfo["status"] = "stopped"
-        return {"success": True, "message": "已请求停止"}
+        tinfo["status"] = "cancelling"
+        return {"success": True, "message": "已发送终止信号", "status": "cancelling"}
     return {"success": False, "message": "没有运行中的任务"}
+
+
+@router.post("/agent/pentest/pause")
+async def pentest_pause(task_id: str):
+    tinfo = _pentest_tasks.get(task_id)
+    if not tinfo:
+        return {"success": False, "message": "任务不存在"}
+    control = tinfo.get("control")
+    if not isinstance(control, MissionControl):
+        return {"success": False, "message": "任务未接入生命周期控制"}
+    changed = control.pause("user requested mission pause")
+    if changed:
+        tinfo["status"] = "paused"
+    return {"success": changed, "status": control.status, "mission_control": control.snapshot()}
+
+
+@router.post("/agent/pentest/resume")
+async def pentest_resume(task_id: str):
+    tinfo = _pentest_tasks.get(task_id)
+    if not tinfo:
+        return {"success": False, "message": "任务不存在"}
+    control = tinfo.get("control")
+    if not isinstance(control, MissionControl):
+        return {"success": False, "message": "任务未接入生命周期控制"}
+    changed = control.resume("user requested mission resume")
+    if changed:
+        tinfo["status"] = "running"
+    return {"success": changed, "status": control.status, "mission_control": control.snapshot()}
+
+
+@router.get("/agent/pentest/kill-switch")
+async def pentest_kill_switch_status():
+    return {
+        "enabled": _pentest_scope_policy.emergency_stop_enabled(),
+        "active_tasks": sorted(
+            task_id
+            for task_id, info in _pentest_tasks.items()
+            if str(info.get("status", "")) in {"running", "paused", "cancelling"}
+        ),
+    }
+
+
+@router.post("/agent/pentest/kill-switch")
+async def pentest_set_kill_switch(req: KillSwitchRequest):
+    """Apply the global execution ceiling and propagate cancellation to live missions."""
+    _pentest_scope_policy.set_emergency_stop(req.enabled)
+    affected: list[str] = []
+    for task_id, info in list(_pentest_tasks.items()):
+        control = info.get("control")
+        if req.enabled and isinstance(control, MissionControl) and control.cancel(req.reason):
+            info["status"] = "cancelling"
+            affected.append(task_id)
+        state = _load_task_state(task_id)
+        if state is None:
+            continue
+        state.event_store.append(
+            state.event_task_id,
+            "system.kill_switch.changed",
+            {
+                "enabled": req.enabled,
+                "actor": req.actor,
+                "reason": req.reason,
+                "mission_status": control.status if isinstance(control, MissionControl) else info.get("status", ""),
+            },
+            actor=req.actor,
+            reason=req.reason,
+            idempotency_key=f"kill-switch:{req.enabled}:{req.reason}:{task_id}",
+        )
+        state.data["global_kill_switch"] = {
+            "enabled": req.enabled,
+            "actor": req.actor,
+            "reason": req.reason,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }
+        state.data["event_count"] = state.event_store.verify()["event_count"]
+        state.save()
+    return {
+        "success": True,
+        "enabled": req.enabled,
+        "affected_tasks": sorted(affected),
+        "reason": req.reason,
+    }
+
+
+@router.post("/agent/pentest/autonomy")
+async def pentest_set_autonomy(req: AutonomyModeRequest):
+    """Change a task's autonomy level and persist the transition as an event."""
+    tinfo = _pentest_tasks.get(req.task_id)
+    state = _load_task_state(req.task_id)
+    if not tinfo or not state:
+        raise HTTPException(status_code=404, detail="任务不存在")
+    controller = tinfo.get("autonomy")
+    if not isinstance(controller, AutonomyController):
+        controller = AutonomyController(state.data.get("autonomy_mode", "supervised"))
+        tinfo["autonomy"] = controller
+    try:
+        transition = controller.set_mode(req.mode, actor=req.actor, reason=req.reason)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail="自治等级无效") from exc
+    state.data["autonomy_mode"] = transition.current.value
+    history = state.data.setdefault("autonomy_history", [])
+    history.append({
+        "previous": transition.previous.value,
+        "current": transition.current.value,
+        "actor": transition.actor,
+        "reason": transition.reason,
+        "at": datetime.now(timezone.utc).isoformat(),
+    })
+    state.event_store.append(
+        state.event_task_id,
+        "autonomy.changed",
+        {"previous": transition.previous.value, "current": transition.current.value, "actor": transition.actor},
+        actor=transition.actor,
+        previous_state=transition.previous.value,
+        new_state=transition.current.value,
+        reason=transition.reason,
+        rule_version="autonomy.v1",
+        idempotency_key=f"autonomy:{req.task_id}:{len(history)}:{transition.current.value}",
+    )
+    state.data["event_count"] = state.event_store.verify()["event_count"]
+    state.save()
+    return {
+        "success": True,
+        "task_id": req.task_id,
+        "autonomy_mode": transition.current.value,
+        "transition": history[-1],
+    }
+
+
+@router.post("/agent/pentest/action-limit")
+async def pentest_set_action_limit(req: ActionLimitRequest):
+    """Lower or raise the live action ceiling with an auditable transition."""
+    tinfo = _pentest_tasks.get(req.task_id)
+    state = _load_task_state(req.task_id)
+    if not tinfo or not state:
+        raise HTTPException(status_code=404, detail="任务不存在")
+    controller = tinfo.get("action_limit")
+    if not isinstance(controller, ActionLimitController):
+        controller = ActionLimitController(state.data.get("action_limit", "post_verify"))
+        tinfo["action_limit"] = controller
+    try:
+        transition = controller.set_limit(req.level, actor=req.actor, reason=req.reason)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail="动作上限无效") from exc
+    state.data["action_limit"] = transition.current
+    history = state.data.setdefault("action_limit_history", [])
+    history.append({
+        "previous": transition.previous,
+        "current": transition.current,
+        "actor": transition.actor,
+        "reason": transition.reason,
+        "at": datetime.now(timezone.utc).isoformat(),
+    })
+    state.event_store.append(
+        state.event_task_id,
+        "action_limit.changed",
+        {"previous": transition.previous, "current": transition.current, "actor": transition.actor},
+        actor=transition.actor,
+        previous_state=transition.previous,
+        new_state=transition.current,
+        reason=transition.reason,
+        rule_version="action-limit.v1",
+        idempotency_key=f"action-limit:{req.task_id}:{len(history)}:{transition.current}",
+    )
+    state.data["event_count"] = state.event_store.verify()["event_count"]
+    state.save()
+    return {"success": True, "task_id": req.task_id, "action_limit": transition.current, "transition": history[-1]}
 
 @router.get("/agent/state")
 async def pentest_get_state(task_id: str):
@@ -1847,6 +2450,465 @@ async def pentest_get_state(task_id: str):
     if not state:
         raise HTTPException(status_code=404, detail="任务不存在")
     return state.data
+
+
+@router.get("/agent/events")
+async def pentest_get_events(task_id: str, after_sequence: int = 0, limit: int = 200):
+    """Return a verified, contiguous event slice for the typed task store."""
+    state = _load_task_state(task_id)
+    if not state:
+        raise HTTPException(status_code=404, detail="任务不存在")
+    if after_sequence < 0:
+        raise HTTPException(status_code=400, detail="after_sequence 无效")
+    limit = max(1, min(int(limit), 1000))
+    try:
+        all_events = state.event_store.stream(after_sequence=after_sequence, verify=True)
+        selected = all_events[:limit]
+        verification = state.event_store.verify()
+    except Exception as exc:
+        raise HTTPException(status_code=409, detail=f"事件链校验失败: {exc}") from exc
+    return {
+        "task_id": task_id,
+        "events": [event.model_dump(mode="json") for event in selected],
+        "after_sequence": after_sequence,
+        "next_sequence": selected[-1].sequence if selected else after_sequence,
+        "has_more": len(all_events) > len(selected),
+        "event_count": verification["event_count"],
+        "last_hash": verification["last_hash"],
+    }
+
+
+@router.get("/agent/read-model")
+async def pentest_get_read_model(task_id: str):
+    """Rebuild and return the typed task view from the immutable event chain."""
+    state = _load_task_state(task_id)
+    if not state:
+        raise HTTPException(status_code=404, detail="任务不存在")
+    try:
+        read_model = state.replay_read_model()
+        consistency = state.event_consistency()
+        manifest = state.event_store.integrity_manifest()
+    except Exception as exc:
+        raise HTTPException(status_code=409, detail=f"事件重放校验失败: {exc}") from exc
+    return {
+        "task_id": task_id,
+        "read_model": read_model,
+        "consistency": consistency,
+        "event_manifest": manifest,
+    }
+
+
+@router.get("/agent/metrics")
+async def pentest_get_metrics(task_id: str, group_by: str = ""):
+    state = _load_task_state(task_id)
+    if not state:
+        raise HTTPException(status_code=404, detail="任务不存在")
+    dimensions = [item.strip() for item in group_by.split(",") if item.strip()] or None
+    return {
+        "task_id": task_id,
+        "metrics": state.metrics_snapshot(group_by=dimensions),
+    }
+
+
+def _asset_node_is_in_scope(node: Any, scope: ScopeContract) -> bool:
+    """Classify imported inventory without expanding the immutable task scope."""
+    target = str(getattr(node, "target", "") or "").strip()
+    if not target:
+        return False
+    if str(getattr(node, "kind", "")).lower() == "cidr":
+        try:
+            candidate = ipaddress.ip_network(target, strict=False)
+        except ValueError:
+            return False
+        target_allowed = target.lower() in {
+            str(value).strip().lower() for value in scope.allowed_targets
+        }
+        cidr_allowed = False
+        for value in scope.allowed_cidrs:
+            try:
+                allowed = ipaddress.ip_network(value, strict=False)
+                if candidate.version == allowed.version and candidate.subnet_of(allowed):
+                    cidr_allowed = True
+                    break
+            except ValueError:
+                continue
+        if not (target_allowed or cidr_allowed):
+            return False
+    elif not ScopePolicy.target_in_scope(target, scope):
+        return False
+    return ScopePolicy.port_in_scope(getattr(node, "port", None), scope)
+
+
+@router.post("/agent/assets/import")
+async def agent_import_assets(req: AssetInventoryImportRequest):
+    """Merge heterogeneous inventory into the task graph with provenance and scope labels."""
+    state = _load_task_state(req.task_id)
+    if not state:
+        raise HTTPException(status_code=404, detail="任务不存在")
+    try:
+        existing = state.data.get("asset_graph")
+        graph = (
+            AssetGraph.model_validate(existing)
+            if isinstance(existing, dict) and existing
+            else AssetGraph.from_state(state.data)
+        )
+        result = AssetInventoryImporter(ttl_seconds=req.ttl_seconds).import_inventory(
+            req.inventory,
+            graph=graph,
+            source=req.source,
+        )
+    except (TypeError, ValueError, OSError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    scope: ScopeContract | None = None
+    scope_payload = state.data.get("scope_contract")
+    if isinstance(scope_payload, dict) and scope_payload:
+        try:
+            scope = ScopeContract.model_validate(scope_payload)
+        except ValueError:
+            scope = None
+
+    imported_ids = set(result.imported_nodes)
+    scope_counts = {"in_scope": 0, "out_of_scope": 0, "scope_unknown": 0}
+    for index, node in enumerate(result.graph.nodes):
+        if node.node_id not in imported_ids:
+            continue
+        if scope is None:
+            scope_status = "SCOPE_UNKNOWN"
+            scope_counts["scope_unknown"] += 1
+        elif _asset_node_is_in_scope(node, scope):
+            scope_status = "IN_SCOPE"
+            scope_counts["in_scope"] += 1
+        else:
+            scope_status = "OUT_OF_SCOPE"
+            scope_counts["out_of_scope"] += 1
+        attributes = dict(node.attributes)
+        attributes["scope_status"] = scope_status
+        result.graph.nodes[index] = node.model_copy(update={"attributes": attributes})
+
+    canonical_inventory = json.dumps(
+        req.inventory,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        default=str,
+    )
+    request_hash = hashlib.sha256(
+        f"{req.source}\n{req.ttl_seconds}\n{canonical_inventory}".encode("utf-8")
+    ).hexdigest()
+    import_id = f"asset_import_{request_hash[:24]}"
+    imported_at = datetime.now(timezone.utc).isoformat()
+    summary = result.as_dict()
+    summary["graph"] = result.graph.model_dump(mode="json")
+    import_record = {
+        "schema_version": "asset-import-record.v1",
+        "import_id": import_id,
+        "source": req.source,
+        "source_records": result.source_records,
+        "imported_node_count": len(result.imported_nodes),
+        "graph_node_count": len(result.graph.nodes),
+        "graph_edge_count": len(result.graph.edges),
+        "deduplicated_count": result.deduplicated_count,
+        "rejected_count": len(result.rejected),
+        "scope_counts": scope_counts,
+        "request_hash": request_hash,
+        "imported_at": imported_at,
+    }
+    imports = [
+        item
+        for item in state.data.setdefault("asset_imports", [])
+        if isinstance(item, dict) and str(item.get("import_id", "")) != import_id
+    ]
+    imports.append(import_record)
+    state.data["asset_imports"] = imports[-100:]
+    state.data["asset_graph"] = summary["graph"]
+
+    state.event_store.append(
+        state.event_task_id,
+        "asset.inventory.imported",
+        import_record,
+        actor="asset-importer",
+        idempotency_key=f"asset-import:{import_id}",
+    )
+    nodes_by_id = {node.node_id: node for node in result.graph.nodes}
+    for node_id in result.imported_nodes:
+        node = nodes_by_id.get(node_id)
+        if node is None:
+            continue
+        state.event_store.append(
+            state.event_task_id,
+            "asset.observed",
+            {
+                "asset_id": node.node_id,
+                "canonical_id": node.canonical_id,
+                "kind": node.kind,
+                "target": node.target,
+                "port": node.port,
+                "status": node.status,
+                "confidence": node.confidence,
+                "scope_status": node.attributes.get("scope_status", "SCOPE_UNKNOWN"),
+                "source_refs": node.source_refs,
+                "import_id": import_id,
+            },
+            actor="asset-importer",
+            idempotency_key=f"asset-import:{import_id}:{node.node_id}",
+        )
+    state.data["event_count"] = state.event_store.verify()["event_count"]
+    state.save()
+    return {
+        "task_id": req.task_id,
+        "import_id": import_id,
+        "scope_counts": scope_counts,
+        **summary,
+    }
+
+
+@router.post("/agent/web/crawl")
+async def agent_web_crawl(req: WebCrawlRequest):
+    """Run the scoped Web runtime against a fixture or explicitly selected HTTP transport."""
+    state = _load_task_state(req.task_id)
+    if not state:
+        raise HTTPException(status_code=404, detail="任务不存在")
+    try:
+        scope = ScopeContract.model_validate(state.data.get("scope_contract") or {})
+    except Exception as exc:
+        raise HTTPException(status_code=409, detail="任务缺少有效 Scope Contract") from exc
+
+    normalized_seeds: list[str] = []
+    origins: set[str] = set()
+    for seed in req.seeds:
+        parts = __import__("urllib.parse", fromlist=["urlsplit"]).urlsplit(str(seed).strip())
+        if parts.scheme.lower() not in {"http", "https"} or not parts.hostname:
+            raise HTTPException(status_code=400, detail="Web seed 必须是 HTTP 或 HTTPS URL")
+        host = parts.hostname
+        if not ScopePolicy.target_in_scope(host, scope):
+            raise HTTPException(status_code=403, detail=f"Web seed 超出任务范围: {host}")
+        port = parts.port or (443 if parts.scheme.lower() == "https" else 80)
+        if not ScopePolicy.port_in_scope(port, scope):
+            raise HTTPException(status_code=403, detail=f"Web seed 端口超出任务范围: {port}")
+        normalized = ScopedWebCrawler._normalize_url(str(seed))
+        normalized_seeds.append(normalized)
+        origins.add(f"{parts.scheme.lower()}://{parts.netloc.lower()}")
+
+    fixture_map = {ScopedWebCrawler._normalize_url(key): value for key, value in req.fixtures.items()}
+    session = _web_sessions.get(req.session_id) if req.session_id else None
+    if session is None:
+        session = AuthSession(req.session_id or f"web_{uuid4().hex}", req.role)
+        _web_sessions.put(session)
+
+    client: httpx.Client | None = None
+    if req.transport == "http":
+        client = httpx.Client(timeout=15.0, follow_redirects=False)
+
+    def fetch(url: str, method: str) -> WebFetch:
+        fixture = fixture_map.get(url)
+        if req.transport == "fixture":
+            if fixture is None:
+                return WebFetch(url, 599, body="fixture missing", request_id="fixture-missing")
+            return WebFetch(
+                url,
+                fixture.status_code,
+                headers=dict(fixture.headers),
+                body=fixture.body,
+                request_id=fixture.request_id or f"fixture:{url}",
+                facts=dict(fixture.facts),
+            )
+        assert client is not None
+        response = client.request(method, url, headers=session.request_headers())
+        return WebFetch(
+            url,
+            response.status_code,
+            headers=dict(response.headers),
+            body=response.text,
+            request_id=f"http:{response.headers.get('x-request-id', '')}",
+            facts={},
+        )
+
+    try:
+        crawler = ScopedWebCrawler(
+            WebCrawlerPolicy(
+                tuple(sorted(origins)),
+                max_depth=req.max_depth,
+                max_requests_per_second=req.max_requests_per_second,
+                max_content_bytes=req.max_content_bytes,
+            ),
+            fetch,
+            session_store=_web_sessions,
+        )
+        crawl = crawler.crawl(normalized_seeds, role=req.role, session=session)
+    finally:
+        if client is not None:
+            client.close()
+
+    from dataclasses import asdict
+
+    observation_payloads = [asdict(item) for item in crawl.observations]
+    rule_engine = WebRuleEngine()
+    web_finding_payloads: list[dict[str, Any]] = []
+    for item in crawl.observations:
+        facts = dict(item.facts or {})
+        facts["evidence_refs"] = [f"web:{item.endpoint_id}:{item.body_hash}"]
+        for finding in rule_engine.evaluate(facts):
+            finding_payload = asdict(finding)
+            finding_payload.update({
+                "finding_id": "webfinding_" + __import__("hashlib").sha256(
+                    f"{item.endpoint_id}:{finding.rule_id}:{item.body_hash}".encode("utf-8")
+                ).hexdigest()[:20],
+                "url": item.url,
+                "endpoint_id": item.endpoint_id,
+                "body_hash": item.body_hash,
+                "role": item.role,
+            })
+            web_finding_payloads.append(finding_payload)
+    def _web_json_default(value: Any) -> Any:
+        if hasattr(value, "__dataclass_fields__"):
+            return asdict(value)
+        if isinstance(value, set):
+            return sorted(value)
+        if isinstance(value, datetime):
+            return value.isoformat()
+        raise TypeError(f"unsupported Web payload type: {type(value).__name__}")
+
+    site_payloads = json.loads(json.dumps(crawl.sites, default=_web_json_default, ensure_ascii=False))
+    state.data.setdefault("web_observations", []).extend(observation_payloads)
+    state.data["web_observations"] = state.data["web_observations"][-5000:]
+    state.data["web_sites"] = site_payloads
+    state.data["web_blocked"] = list(crawl.blocked)[-2000:]
+    existing_web_findings = state.data.setdefault("web_findings", [])
+    by_id = {
+        str(item.get("finding_id")): item
+        for item in existing_web_findings
+        if isinstance(item, dict) and item.get("finding_id")
+    }
+    for item in web_finding_payloads:
+        by_id[str(item["finding_id"])] = item
+    state.data["web_findings"] = list(by_id.values())[-2000:]
+    state.data["web_sessions"] = _web_sessions.redacted()
+    # Rebuild the graph from the normalized read models so Web findings and
+    # classic service observations share one asset vocabulary.
+    graph = AssetGraph.from_state(state.data)
+    state.data["asset_graph"] = graph.model_dump(mode="json")
+    for node in graph.nodes:
+        state.event_store.append(
+            state.event_task_id,
+            "asset.observed",
+            {
+                "asset_id": node.node_id,
+                "kind": node.kind,
+                "label": node.label,
+                "status": node.status,
+                "confidence": node.confidence,
+            },
+            actor="asset-graph",
+            idempotency_key=f"asset:web:{node.node_id}:{node.status}",
+        )
+    for item in crawl.observations:
+        state.event_store.append(
+            state.event_task_id,
+            "web.observation",
+            {
+                "url": item.url,
+                "depth": item.depth,
+                "status_code": item.status_code,
+                "body_hash": item.body_hash,
+                "endpoint_id": item.endpoint_id,
+                "role": item.role,
+            },
+            actor="web-runtime",
+            idempotency_key=f"web:observation:{item.endpoint_id}:{item.body_hash}",
+        )
+    for item in crawl.blocked:
+        state.event_store.append(
+            state.event_task_id,
+            "web.blocked",
+            {"url": item.get("url", ""), "reason": item.get("reason", "")},
+            actor="web-runtime",
+            idempotency_key=f"web:blocked:{item.get('url', '')}:{item.get('reason', '')}",
+        )
+    for item in web_finding_payloads:
+        state.event_store.append(
+            state.event_task_id,
+            "web.finding",
+            {
+                "finding_id": item.get("finding_id", ""),
+                "rule_id": item.get("rule_id", ""),
+                "category": item.get("category", ""),
+                "status": item.get("status", ""),
+                "reason": item.get("reason", ""),
+                "url": item.get("url", ""),
+                "endpoint_id": item.get("endpoint_id", ""),
+                "evidence_refs": list(item.get("evidence_refs", [])),
+            },
+            actor="web-rule-engine",
+            evidence_refs=list(item.get("evidence_refs", [])),
+            idempotency_key=f"web:finding:{item.get('finding_id', '')}",
+        )
+    state.data["event_count"] = state.event_store.verify()["event_count"]
+    state.save()
+    return {
+        "task_id": req.task_id,
+        "session_id": session.session_id,
+        "observations": observation_payloads,
+        "sites": site_payloads,
+        "blocked": crawl.blocked,
+        "findings": web_finding_payloads,
+        "request_count": crawl.request_count,
+        "rate_delays": crawl.rate_delays,
+    }
+
+
+@router.post("/agent/web/browser/trace")
+async def agent_web_browser_trace(req: BrowserTraceRequest):
+    """Persist a redacted browser trace and optionally replay its actions."""
+    state = _load_task_state(req.task_id)
+    if not state:
+        raise HTTPException(status_code=404, detail="任务不存在")
+    trace = BrowserTrace(req.browser_version, trace_id=req.trace_id or f"trace_{uuid4().hex}")
+    plugin = BrowserAutomationPlugin(req.browser_version, trace=trace)
+    for item in req.dom_snapshots:
+        plugin.record_dom(str(item.get("url", "")), str(item.get("dom", "")))
+    for item in req.network:
+        plugin.record_network(
+            str(item.get("method", "GET")),
+            str(item.get("url", "")),
+            int(item.get("status_code", 0) or 0),
+            str(item.get("request", "")),
+            str(item.get("response", "")),
+        )
+    for item in req.actions:
+        plugin.record_action(
+            str(item.get("kind", "")),
+            str(item.get("target", "")),
+            str(item.get("value", "")),
+        )
+    replay_results: list[dict[str, Any]] = []
+    if req.replay:
+        try:
+            replay_results = plugin.replay(
+                lambda action: {"sequence": action.sequence, "kind": action.kind, "target": action.target},
+                browser_version=req.replay_browser_version or req.browser_version,
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+    trace_payload = trace.as_dict(include_dom=True)
+    state.data.setdefault("browser_traces", {})[trace.trace_id] = trace_payload
+    state.event_store.append(
+        state.event_task_id,
+        "web.browser_trace",
+        {
+            "trace_id": trace.trace_id,
+            "browser_version": trace.browser_version,
+            "dom_count": len(trace.dom_snapshots),
+            "network_count": len(trace.network),
+            "action_count": len(trace.actions),
+            "replayed": bool(req.replay),
+        },
+        actor="browser-plugin",
+        idempotency_key=f"web:browser:{trace.trace_id}:{len(trace.actions)}",
+    )
+    state.data["event_count"] = state.event_store.verify()["event_count"]
+    state.save()
+    return {"task_id": req.task_id, "trace": trace_payload, "replay": replay_results}
 
 @router.get("/agent/report")
 async def pentest_get_report(task_id: str):
@@ -1856,12 +2918,32 @@ async def pentest_get_report(task_id: str):
     report_path = state.generate_report()
     with open(report_path, "r", encoding="utf-8") as f:
         content = f.read()
+    report_document, report_check = _build_report_check(state, task_id)
     return {
         "report": content,
         "view": state.build_report_view_model(),
+        "document": report_document,
+        "completeness": report_check.as_dict(),
         "phase": state.data["phase"],
         "task_id": task_id,
         "token_usage": state.data.get("token_usage", {}),
+    }
+
+
+@router.post("/agent/report/export")
+async def pentest_export_report(req: ReportExportRequest):
+    state = _load_task_state(req.task_id)
+    if not state:
+        raise HTTPException(status_code=404, detail="任务不存在")
+    document, report_check = _build_report_check(state, req.task_id)
+    export_dir = os.path.join(os.path.dirname(state.path) or ".", "report_exports", req.task_id)
+    result = ReportExporter(document).export(export_dir, formats=tuple(req.formats))
+    return {
+        "task_id": req.task_id,
+        "formats": list(req.formats),
+        "integrity_hash": result["integrity_hash"],
+        "files": {fmt: os.path.basename(path) for fmt, path in result["paths"].items()},
+        "completeness": report_check.as_dict(),
     }
 
 

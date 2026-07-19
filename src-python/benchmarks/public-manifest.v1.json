@@ -1,0 +1,56 @@
+{
+  "version": "public-benchmark.v1.0.0",
+  "source_digest": "repository-public-fixtures-v1",
+  "cases": [
+    {
+      "case_id": "known-linux-vulnerability",
+      "category": "known_linux",
+      "expected_status": "VULNERABILITY_CONFIRMED",
+      "target_ref": "fixture://known-linux/service",
+      "fixture_ref": "known-linux-vulnerability"
+    },
+    {
+      "case_id": "known-linux-session",
+      "category": "known_linux",
+      "expected_status": "SESSION_ESTABLISHED",
+      "target_ref": "fixture://known-linux/session",
+      "fixture_ref": "known-linux-session"
+    },
+    {
+      "case_id": "unknown-linux-objective",
+      "category": "unknown_linux",
+      "expected_status": "OBJECTIVE_COMPLETED",
+      "target_ref": "fixture://unknown-linux/objective",
+      "fixture_ref": "unknown-linux-objective"
+    },
+    {
+      "case_id": "misconfiguration-evidence",
+      "category": "misconfiguration",
+      "expected_status": "VULNERABILITY_CONFIRMED",
+      "target_ref": "fixture://misconfiguration/service",
+      "fixture_ref": "misconfiguration-evidence"
+    },
+    {
+      "case_id": "modern-web-role-difference",
+      "category": "modern_web",
+      "expected_status": "VULNERABILITY_CONFIRMED",
+      "target_ref": "fixture://modern-web/role-check",
+      "fixture_ref": "modern-web-role-difference"
+    },
+    {
+      "case_id": "negative-clean-service",
+      "category": "negative",
+      "expected_status": "INCONCLUSIVE",
+      "target_ref": "fixture://negative/clean-service",
+      "fixture_ref": "negative-clean-service"
+    },
+    {
+      "case_id": "unstable-network-unreachable",
+      "category": "unstable_network",
+      "expected_status": "UNREACHABLE",
+      "target_ref": "fixture://unstable-network/target",
+      "fixture_ref": "unstable-network-unreachable",
+      "network_profile": "loss-20-jitter-150ms"
+    }
+  ]
+}

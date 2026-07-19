@@ -153,14 +153,14 @@ def test_llm_reflector_parses_json_response():
 
 
 def test_llm_reflector_handles_json_in_text_wrapping():
-    """LLM 经常用 ```json ... ``` 包裹响应"""
+    """LLM 经常用 ```json ... ``` 包裹响应；声明必须能对齐观测事实。"""
     ev = StructuredEvaluator().evaluate(_make_state())
     fake = """好的，我看完了，下面是分析：
     
 ```json
 {
     "root_cause_analysis": [],
-    "generalizable_patterns": [{"pattern":"P","applies_when":"W","skill_name_hint":"H"}],
+    "generalizable_patterns": [{"pattern":"ftp exploit","applies_when":"ftp service observed","skill_name_hint":"H"}],
     "recommendations_for_next_run": ["R"]
 }
 ```
@@ -179,6 +179,28 @@ def test_llm_reflector_keeps_raw_when_json_invalid():
     assert insights.raw_response.startswith("garbage")
     # 解析失败应当返回空列表而非崩溃
     assert insights.root_cause_analysis == []
+
+
+def test_llm_reflector_rejects_untraceable_claims_and_adds_grounding_refs():
+    ev = StructuredEvaluator().evaluate(_make_state())
+    fake_response = json.dumps({
+        "root_cause_analysis": [
+            {"failure": "ssh hydra auth-failed", "likely_cause": "dictionary miss", "evidence_line": "auth-failed"},
+            {"failure": "unobserved database", "likely_cause": "fiction", "evidence_line": "none"},
+        ],
+        "generalizable_patterns": [
+            {"pattern": "ftp exploit path", "applies_when": "ftp observed", "skill_name_hint": "ftp-path"},
+            {"pattern": "unobserved platform", "applies_when": "unknown", "skill_name_hint": "invented"},
+        ],
+        "recommendations_for_next_run": [],
+    })
+    insights = LLMReflector(llm_callable=lambda _s, _u: fake_response).reflect(ev)
+    assert insights is not None
+    assert len(insights.root_cause_analysis) == 1
+    assert insights.root_cause_analysis[0]["grounding_refs"]
+    assert len(insights.generalizable_patterns) == 1
+    assert insights.generalizable_patterns[0]["grounding_refs"]
+    assert len(insights.grounding_rejections) == 2
 
 
 def test_llm_reflector_handles_call_exception():

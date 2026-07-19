@@ -1,0 +1,31 @@
+{
+  "schema_version": "toolchain-lock.v1",
+  "image": {
+    "name": "sdit-agent-tools",
+    "dockerfile": "docker/agent-tools/Dockerfile",
+    "base": "python:3.13-slim",
+    "base_platform": "linux/amd64",
+    "base_digest": "sha256:afe189875f1d2f9b45e287834fb9f2c273a5d59d354ae4050ab9affbf0a6ba06",
+    "debian_snapshot": "20260718T000000Z"
+  },
+  "lockfiles": {
+    "python": "src-python/requirements.lock",
+    "python_sha256": "2087b48038ceb4895365492ef11a782255e95797ce6b7fd9b5d634e453b96bc9",
+    "npm": "package-lock.json",
+    "npm_sha256": "a126ca55ffa21f4040de7f869de9197015a7874bc98e9cbcebcdd4e177f4ce5d",
+    "python_dev": "src-python/requirements-dev.lock",
+    "python_dev_sha256": "9338d0e68c651724baf0c2e37ff8959179ce17525ac432657b002ece8eab15d0"
+  },
+  "runtime_tools": [
+    "ca-certificates",
+    "curl",
+    "dnsutils",
+    "iproute2",
+    "jq",
+    "netcat-openbsd",
+    "nmap",
+    "openssh-client",
+    "tini"
+  ],
+  "dockerfile_sha256": "1da119174b5421342343c925b09df03fb7d504291f008c8706fef3ab9ae565de"
+}

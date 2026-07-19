@@ -88,8 +88,10 @@ export class ApiService {
    */
   private loadTokensFromStorage(): void {
     try {
-      this.accessToken = localStorage.getItem('LERT-access-token');
-      this.refreshToken = localStorage.getItem('LERT-refresh-token');
+      this.accessToken = null;
+      this.refreshToken = null;
+      localStorage.removeItem('LERT-access-token');
+      localStorage.removeItem('LERT-refresh-token');
     } catch (error) {
       console.error('加载 Token 失败:', error);
     }
@@ -99,14 +101,8 @@ export class ApiService {
    * 保存 Token 到本地存储
    */
   private saveTokensToStorage(accessToken: string, refreshToken: string): void {
-    try {
-      this.accessToken = accessToken;
-      this.refreshToken = refreshToken;
-      localStorage.setItem('LERT-access-token', accessToken);
-      localStorage.setItem('LERT-refresh-token', refreshToken);
-    } catch (error) {
-      console.error('保存 Token 失败:', error);
-    }
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
   }
 
   /**
@@ -115,8 +111,12 @@ export class ApiService {
   private clearTokens(): void {
     this.accessToken = null;
     this.refreshToken = null;
-    localStorage.removeItem('LERT-access-token');
-    localStorage.removeItem('LERT-refresh-token');
+    try {
+      localStorage.removeItem('LERT-access-token');
+      localStorage.removeItem('LERT-refresh-token');
+    } catch {
+      // Tokens are already cleared from process memory.
+    }
   }
 
   /**

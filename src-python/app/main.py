@@ -2,6 +2,7 @@ import asyncio
 import json
 import os
 from contextlib import asynccontextmanager
+
 import asyncssh
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,6 +20,7 @@ async def lifespan(app: FastAPI):
             await ssh_manager.disconnect()
     except Exception:
         pass
+    local_auth.revoke()
     print("SDIT Python 后端已关闭")
 app = FastAPI(
     title="SDIT API",
@@ -49,14 +51,32 @@ app.include_router(router)
 @app.middleware("http")
 async def local_agent_session_guard(request: Request, call_next):
     """Protect task control and report data while leaving the legacy desktop API compatible."""
+    if not local_auth.host_allowed(request.headers.get("host")):
+        return JSONResponse(status_code=400, content={"detail": "invalid host"})
+    client_key = request.client.host if request.client else "local"
+    if not local_auth.rate_allowed(client_key):
+        return JSONResponse(status_code=429, content={"detail": "request rate exceeded"})
+    try:
+        content_length = int(request.headers.get("content-length", "0") or 0)
+    except ValueError:
+        return JSONResponse(status_code=400, content={"detail": "invalid content length"})
+    if content_length > local_auth.max_request_bytes:
+        return JSONResponse(status_code=413, content={"detail": "request body too large"})
+    origin = request.headers.get("origin")
+    if origin and not local_auth.origin_allowed(origin):
+        return JSONResponse(status_code=403, content={"detail": "origin is not allowed"})
     protected_prefixes = (
         "/api/v1/agent/pentest",
+        "/api/v1/agent/policy",
+        "/api/v1/agent/web",
+        "/api/v1/agent/metrics",
         "/api/v1/agent/state",
         "/api/v1/agent/report",
         "/api/v1/agent/history",
+        "/api/v1/agent/assets",
+        "/api/v1/agent/model-secret",
     )
     if request.url.path.startswith(protected_prefixes) and os.getenv("SDIT_REQUIRE_LOCAL_AUTH", "1") != "0":
-        origin = request.headers.get("origin")
         token = request.headers.get("x-sdit-session")
         if not local_auth.origin_allowed(origin) or not local_auth.is_valid(token):
             return JSONResponse(status_code=401, content={"detail": "local session token required"})
@@ -69,13 +89,29 @@ async def runtime_session(request: Request):
     origin = request.headers.get("origin")
     if not local_auth.origin_allowed(origin):
         return JSONResponse(status_code=403, content={"detail": "origin is not allowed"})
+    bootstrap = os.getenv("SDIT_BOOTSTRAP_SECRET", "").strip()
+    if bootstrap and not __import__("secrets").compare_digest(request.headers.get("x-sdit-bootstrap", ""), bootstrap):
+        return JSONResponse(status_code=401, content={"detail": "bootstrap credential required"})
     return {"token": local_auth.token, "expires_at": local_auth.expires_at.isoformat()}
+
+
+@app.post("/api/v1/runtime/ws-ticket")
+async def runtime_ws_ticket(request: Request):
+    origin = request.headers.get("origin")
+    token = request.headers.get("x-sdit-session")
+    if not local_auth.origin_allowed(origin) or not local_auth.is_valid(token):
+        return JSONResponse(status_code=401, content={"detail": "local session token required"})
+    ticket = local_auth.issue_ws_ticket(token)
+    return {"ticket": ticket, "expires_in": 30}
 
 
 def _websocket_authorized(websocket: WebSocket) -> bool:
     origin = websocket.headers.get("origin")
-    token = websocket.headers.get("x-sdit-session") or websocket.query_params.get("token")
-    return local_auth.origin_allowed(origin) and local_auth.is_valid(token)
+    header_token = websocket.headers.get("x-sdit-session")
+    ticket = websocket.query_params.get("ticket")
+    return local_auth.origin_allowed(origin) and (
+        local_auth.is_valid(header_token) or local_auth.consume_ws_ticket(ticket)
+    )
 
 
 @app.websocket("/ws/terminal/{terminal_id}")

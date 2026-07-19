@@ -7,6 +7,11 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "vue-tsc --noEmit",
+    "audit": "npm audit --audit-level=high",
+    "check": "npm run typecheck && npm run test:coverage && npm run build && npm run audit",
     "python-backend": "cd src-python && python run.py"
   },
   "dependencies": {

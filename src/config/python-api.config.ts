@@ -45,6 +45,23 @@ class PythonApi {
     return this.localSessionToken;
   }
 
+  /** Issue a single-use WebSocket ticket; the long-lived token remains in an HTTP header. */
+  async getWebSocketTicket(): Promise<string> {
+    await this.getLocalSessionToken();
+    const response = await fetch(this.baseUrl + '/runtime/ws-ticket', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        ...(this.localSessionToken ? { 'X-SDIT-Session': this.localSessionToken } : {}),
+      },
+      mode: 'cors',
+      credentials: 'same-origin',
+    });
+    if (!response.ok) throw new Error('WebSocket 会话票据获取失败 (' + response.status + ')');
+    const payload = await response.json() as { ticket: string };
+    return payload.ticket;
+  }
+
   private async request<T = any>(
     method: string,
     path: string,
@@ -209,26 +226,33 @@ class PythonApi {
   }
 
   async decryptPassword(encryptedPassword: string) {
-    const result = await this.request('POST', '/ssh/decrypt-password', { encrypted_password: encryptedPassword });
-    return result.decrypted;
+    const result = await this.request<{
+      secret_ref: string;
+      kind: string;
+      fingerprint: string;
+      expires_at?: number;
+    }>('POST', '/ssh/decrypt-password', { encrypted_password: encryptedPassword });
+    return result.secret_ref;
   }
 
   async sshConnectWithAuth(params: {
     host: string; port: number; username: string; authType: string;
     password?: string; keyPath?: string; keyPassphrase?: string; certificatePath?: string;
   }) {
+    const secretRef = params.password?.startsWith('secret_') ? params.password : undefined;
     return this.request('POST', '/ssh/connect', {
       host: params.host, port: params.port, username: params.username,
-      auth_type: params.authType, password: params.password,
+      auth_type: params.authType, password: secretRef ? undefined : params.password, secret_ref: secretRef,
       key_path: params.keyPath, key_passphrase: params.keyPassphrase,
       certificate_path: params.certificatePath,
     });
   }
 
   async sshTestConnection(params: any) {
+    const secretRef = params.password?.startsWith('secret_') ? params.password : undefined;
     const result = await this.request('POST', '/ssh/test-connection', {
       host: params.host, port: params.port, username: params.username,
-      auth_type: params.authType, password: params.password,
+      auth_type: params.authType, password: secretRef ? undefined : params.password, secret_ref: secretRef,
       key_path: params.keyPath, key_passphrase: params.keyPassphrase,
     });
     return result.success;
@@ -245,7 +269,10 @@ class PythonApi {
   // ==================== SSH/SFTP 直接命令 ====================
 
   async sshConnectDirect(host: string, port: number, username: string, password: string) {
-    return this.request('POST', '/ssh/connect-direct', { host, port, username, password });
+    const secretRef = password?.startsWith('secret_') ? password : undefined;
+    return this.request('POST', '/ssh/connect-direct', {
+      host, port, username, password: secretRef ? undefined : password, secret_ref: secretRef,
+    });
   }
 
   async sshDisconnectDirect() {
@@ -502,6 +529,20 @@ class PythonApi {
     base_url: string;
     provider: string;
     temperature?: number;
+    autonomy_mode?: 'advisory' | 'supervised' | 'unattended';
+    allowed_ports?: number[];
+    allowed_protocols?: string[];
+    authorization_basis?: string;
+    max_duration_seconds?: number;
+    max_commands?: number;
+    max_network_requests?: number;
+    max_requests_per_second?: number;
+    max_bruteforce_attempts?: number;
+    max_storage_bytes?: number;
+    max_concurrency?: number;
+    data_handling?: 'ephemeral' | 'task_retained' | 'organization_retained';
+    policy_template_id?: string;
+    policy_template_version?: string;
   }) {
     return this.request<{success: boolean; message: string; target: string; task_id: string}>('POST', '/agent/pentest/start', {
       target: params.target,
@@ -519,6 +560,33 @@ class PythonApi {
       base_url: params.base_url,
       provider: params.provider,
       temperature: params.temperature ?? 0.3,
+      autonomy_mode: params.autonomy_mode ?? 'supervised',
+      allowed_ports: params.allowed_ports ?? [],
+      allowed_protocols: params.allowed_protocols ?? ['tcp'],
+      authorization_basis: params.authorization_basis ?? 'local synthetic fixture',
+      max_duration_seconds: params.max_duration_seconds,
+      max_commands: params.max_commands ?? 1000,
+      max_network_requests: params.max_network_requests ?? 10000,
+      max_requests_per_second: params.max_requests_per_second ?? 10,
+      max_bruteforce_attempts: params.max_bruteforce_attempts ?? 100,
+      max_storage_bytes: params.max_storage_bytes ?? 268_435_456,
+      max_concurrency: params.max_concurrency,
+      data_handling: params.data_handling ?? 'ephemeral',
+      policy_template_id: params.policy_template_id ?? '',
+      policy_template_version: params.policy_template_version ?? '',
+    });
+  }
+
+  async pentestStoreModelSecret(apiKey: string, provider = 'model') {
+    return this.request<{
+      secret_ref: string;
+      kind: string;
+      fingerprint: string;
+      expires_at?: number;
+    }>('POST', '/agent/model-secret', {
+      api_key: apiKey,
+      provider,
+      ttl_seconds: 300,
     });
   }
 
@@ -542,6 +610,16 @@ class PythonApi {
   async pentestStatus(taskId: string) {
     return this.request<{
       running: boolean;
+      status: 'running' | 'paused' | 'cancelling' | 'cancelled' | 'completed' | 'failed' | 'done' | 'stopped';
+      mission_control?: {
+        mission_id?: string;
+        status?: string;
+        canonical_status?: string;
+        reason?: string;
+        cancel_requested?: boolean;
+        paused?: boolean;
+        updated_at?: string;
+      };
       phase: string;
       targets: string[];
       findings_count: number;
@@ -552,11 +630,94 @@ class PythonApi {
       token_usage?: Record<string, any>;
       task_id: string;
       error?: string;
+      autonomy_mode?: 'advisory' | 'supervised' | 'unattended';
+      autonomy_history?: Array<{previous: string; current: string; actor: string; reason: string; at: string}>;
+      action_limit?: 'observe' | 'probe' | 'credential_test' | 'exploit' | 'session_verify' | 'post_verify';
+      action_limit_history?: Array<{previous: string; current: string; actor: string; reason: string; at: string}>;
     }>('GET', '/agent/pentest/status', undefined, { task_id: taskId });
+  }
+
+  async pentestEvents(taskId: string, afterSequence = 0, limit = 200) {
+    return this.request<{
+      task_id: string;
+      events: Array<{
+        schema_version: string;
+        event_id: string;
+        task_id: string;
+        sequence: number;
+        timestamp: string;
+        event_type: string;
+        actor: string;
+        payload: Record<string, unknown>;
+        previous_hash?: string;
+        event_hash?: string;
+        reason?: string;
+        new_state?: string;
+        evidence_refs?: string[];
+      }>;
+      after_sequence: number;
+      next_sequence: number;
+      has_more: boolean;
+      event_count: number;
+      last_hash: string;
+    }>('GET', '/agent/events', undefined, {
+      task_id: taskId,
+      after_sequence: afterSequence,
+      limit,
+    });
   }
 
   async pentestStop(taskId: string) {
     return this.request('POST', '/agent/pentest/stop', undefined, { task_id: taskId });
+  }
+
+  async pentestSetKillSwitch(enabled: boolean, reason = 'operator global mission stop') {
+    return this.request<{success: boolean; enabled: boolean; affected_tasks: string[]; reason: string}>(
+      'POST', '/agent/pentest/kill-switch', { enabled, actor: 'operator', reason },
+    );
+  }
+
+  async pentestKillSwitchStatus() {
+    return this.request<{enabled: boolean; active_tasks: string[]}>('GET', '/agent/pentest/kill-switch');
+  }
+
+  async pentestPause(taskId: string) {
+    return this.request('POST', '/agent/pentest/pause', undefined, { task_id: taskId });
+  }
+
+  async pentestResume(taskId: string) {
+    return this.request('POST', '/agent/pentest/resume', undefined, { task_id: taskId });
+  }
+
+  async pentestSetAutonomy(
+    taskId: string,
+    mode: 'advisory' | 'supervised' | 'unattended',
+    reason = 'operator requested autonomy change',
+  ) {
+    return this.request<{
+      success: boolean;
+      task_id: string;
+      autonomy_mode: 'advisory' | 'supervised' | 'unattended';
+      transition: {previous: string; current: string; actor: string; reason: string; at: string};
+    }>('POST', '/agent/pentest/autonomy', {
+      task_id: taskId,
+      mode,
+      actor: 'operator',
+      reason,
+    });
+  }
+
+  async pentestSetActionLimit(
+    taskId: string,
+    level: 'observe' | 'probe' | 'credential_test' | 'exploit' | 'session_verify' | 'post_verify',
+    reason = 'operator changed live action limit',
+  ) {
+    return this.request<{success: boolean; task_id: string; action_limit: string; transition: Record<string, string>}>('POST', '/agent/pentest/action-limit', {
+      task_id: taskId,
+      level,
+      actor: 'operator',
+      reason,
+    });
   }
 
   async pentestGetState(taskId: string) {
@@ -565,6 +726,154 @@ class PythonApi {
 
   async pentestGetReport(taskId: string) {
     return this.request<{report: string; view?: Record<string, any>; phase: string; task_id: string; token_usage?: Record<string, any>}>('GET', '/agent/report', undefined, { task_id: taskId });
+  }
+
+  async pentestMetrics(taskId: string, groupBy: string[] = []) {
+    return this.request<{
+      task_id: string;
+      metrics: {
+        dimensions: string[];
+        groups: Record<string, Record<string, number>>;
+        generated_at: number;
+      };
+    }>('GET', '/agent/metrics', undefined, { task_id: taskId, group_by: groupBy.join(',') });
+  }
+
+  async pentestImportAssets(params: {
+    task_id: string;
+    inventory: unknown;
+    source?: string;
+    ttl_seconds?: number | null;
+  }) {
+    return this.request<{
+      task_id: string;
+      import_id: string;
+      schema_version: string;
+      source_records: number;
+      imported_nodes: string[];
+      imported_edges: number;
+      observation_ids: string[];
+      deduplicated_count: number;
+      rejected: Array<Record<string, unknown>>;
+      conflicts: Array<Record<string, unknown>>;
+      scope_counts: {in_scope: number; out_of_scope: number; scope_unknown: number};
+      graph: Record<string, unknown>;
+    }>('POST', '/agent/assets/import', {
+      task_id: params.task_id,
+      inventory: params.inventory,
+      source: params.source ?? 'inventory-ui',
+      ttl_seconds: params.ttl_seconds ?? 86400,
+    });
+  }
+
+  async pentestExportReport(
+    taskId: string,
+    formats: Array<'md' | 'html' | 'json' | 'pdf' | 'docx'> = ['md', 'html', 'json', 'pdf', 'docx'],
+  ) {
+    return this.request<{
+      task_id: string;
+      formats: string[];
+      integrity_hash: string;
+      files: Record<string, string>;
+    }>('POST', '/agent/report/export', { task_id: taskId, formats });
+  }
+
+  async pentestWebCrawl(params: {
+    task_id: string;
+    seeds: string[];
+    role?: string;
+    session_id?: string;
+    max_depth?: number;
+    max_content_bytes?: number;
+    max_requests_per_second?: number;
+    fixtures?: Record<string, {status_code?: number; headers?: Record<string, string>; body?: string; request_id?: string; facts?: Record<string, unknown>}>;
+    transport?: 'fixture' | 'http';
+  }) {
+    return this.request<{
+      task_id: string;
+      session_id: string;
+      observations: Array<Record<string, unknown>>;
+      sites: Record<string, unknown>;
+      blocked: Array<{url: string; reason: string}>;
+      request_count: number;
+      rate_delays: number;
+      findings: Array<Record<string, unknown>>;
+    }>('POST', '/agent/web/crawl', {
+      ...params,
+      role: params.role ?? 'anonymous',
+      max_depth: params.max_depth ?? 2,
+      max_content_bytes: params.max_content_bytes ?? 2_000_000,
+      max_requests_per_second: params.max_requests_per_second ?? 2,
+      fixtures: params.fixtures ?? {},
+      transport: params.transport ?? 'fixture',
+    });
+  }
+
+  async pentestWebBrowserTrace(params: {
+    task_id: string;
+    browser_version: string;
+    trace_id?: string;
+    dom_snapshots?: Array<{url?: string; dom?: string}>;
+    network?: Array<Record<string, unknown>>;
+    actions?: Array<{kind?: string; target?: string; value?: string}>;
+    replay?: boolean;
+    replay_browser_version?: string;
+  }) {
+    return this.request<{
+      task_id: string;
+      trace: Record<string, unknown>;
+      replay: Array<Record<string, unknown>>;
+    }>('POST', '/agent/web/browser/trace', {
+      ...params,
+      trace_id: params.trace_id ?? '',
+      dom_snapshots: params.dom_snapshots ?? [],
+      network: params.network ?? [],
+      actions: params.actions ?? [],
+      replay: params.replay ?? false,
+      replay_browser_version: params.replay_browser_version ?? '',
+    });
+  }
+
+  async pentestPolicyPublish(template: Record<string, unknown>, actor = 'course-admin', actorRole = 'course_admin') {
+    return this.request<{
+      success: boolean;
+      template: Record<string, unknown>;
+      template_hash: string;
+    }>('POST', '/agent/policy/templates/publish', {
+      template,
+      actor,
+      actor_role: actorRole,
+    });
+  }
+
+  async pentestPolicyGet(templateId: string, version: string) {
+    return this.request<{template: Record<string, unknown>; template_hash: string}>(
+      'GET', `/agent/policy/templates/${encodeURIComponent(templateId)}/${encodeURIComponent(version)}`,
+    );
+  }
+
+  async pentestPolicyBind(params: {
+    template_id: string;
+    version: string;
+    values?: Record<string, unknown>;
+    actor?: string;
+    actor_role?: string;
+  }) {
+    return this.request<{
+      success: boolean;
+      scope_contract: Record<string, unknown>;
+      scope_token: string;
+      template_hash: string;
+    }>('POST', '/agent/policy/templates/bind', {
+      ...params,
+      values: params.values ?? {},
+      actor: params.actor ?? 'student',
+      actor_role: params.actor_role ?? 'student',
+    });
+  }
+
+  async pentestPolicyAudit() {
+    return this.request<{events: Array<Record<string, unknown>>}>('GET', '/agent/policy/templates/audit');
   }
 
   async pentestRecordTokenUsage(params: {
@@ -602,8 +911,9 @@ class PythonApi {
         args: string;
         time: string;
         result: string;
-        full_stdout: string;
-        llm_decision: string;
+        full_stdout?: string;
+        output_preview?: string;
+        choice_reason: string;
         returncode: number | null;
         error: string;
         status?: string;
